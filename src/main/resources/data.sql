@@ -11,3 +11,13 @@ INSERT INTO flights(source, destination, departure_date_time, arrival_date_time)
 ('Seoul, South Korea', 'Dublin, Ireland', '2021-03-05 20:30', '2021-03-05 00:30'),
 ('Pyongyang, North Korea', 'Dublin, Ireland', '2021-03-05 20:30', '2021-03-05 00:30'),
 ('Tokyo, Japan', 'Dublin, Ireland', '2021-03-05 20:30', '2021-03-05 00:30');
+
+
+
+ALTER TABLE library.reservations MODIFY reservationID int NOT NULL AUTO_INCREMENT;
+
+INSERT INTO reservations(email, flight_reference) VALUES
+('slav@ucdconnect.ie', 3),
+('sean@ucdconnect.ie', 2),
+('vincent@ucdconnect.ie', 5),
+('ola@ucdconnect.ie', 1);
