@@ -47,7 +47,6 @@ public class FlightController {
         return updatedFlight;
     }
 
-
     //    Delete a flight record
     @DeleteMapping("/flights/{id}")
     public ResponseEntity<?> deleteFlight(@PathVariable(value = "id") Long flightID) throws FlightNotFoundException {
@@ -55,7 +54,6 @@ public class FlightController {
                 .orElseThrow(() -> new FlightNotFoundException(flightID));
 
         flightRepository.delete(flight);
-
 
         return ResponseEntity.ok().build();
     }
