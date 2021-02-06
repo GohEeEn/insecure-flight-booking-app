@@ -7,5 +7,6 @@ Engineering
 ### Authors (Team inSecurity)
 
 - [Ee En Goh](https://github.com/GohEeEn)
-- [Seán Conor McLoughlin]()
-- [Olanipekun Akintola]()
+- [Seán Conor McLoughlin](https://github.com/SeanConor)
+- [Olanipekun Akintola](https://github.com/olaakintola)
+- [Svetoslav Nizhnichenkov](https://github.com/nizhnichenkov)
