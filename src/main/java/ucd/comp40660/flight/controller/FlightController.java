@@ -1,6 +1,8 @@
 package ucd.comp40660.flight.controller;
 
 
+import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.RestController;
 import ucd.comp40660.flight.exception.FlightNotFoundException;
 import ucd.comp40660.flight.model.Flight;
@@ -12,11 +14,16 @@ import org.springframework.web.bind.annotation.*;
 import javax.validation.Valid;
 import java.util.List;
 
-@RestController
+@Controller
 public class FlightController {
 
     @Autowired
     FlightRepository flightRepository;
+
+    @GetMapping("/")
+    public String index(){
+        return "index.html";
+    }
 
     //    Get all flights
     @GetMapping("/flights")
