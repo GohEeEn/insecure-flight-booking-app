@@ -44,5 +44,5 @@ public class FlightSearch {
     public void setPassengers(String passengers) {
         this.passengers = passengers;
     }
-    
+
 }

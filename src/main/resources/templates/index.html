@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="utf-8">
+		<title>Home</title>
+		<meta name = "viewport" content="width = device-width, intial-scale = 1">
+		<link rel="stylesheet" type="text/css" href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css">
+
+		<style type="text/css">
+
+			.footer {
+				position: fixed;
+				left: 0;
+				bottom: 0;
+				width: 100%;
+				background-color: white;
+				color: black;
+				text-align: left;
+				padding-right: 1%;
+			}
+
+		</style>
+
+		<script src="https://code.jquery.com/jquery-3.5.0.js"></script>
+		<script src="javascript/script.js"></script>
+		<script src="script.js"></script>
+
+
+	</head>
+	<body>
+		<div class="container">
+		  <div class="row">
+		    <div class="col-8">
+		    	<h1>Secure Airways</h1>
+		    </div>
+		    <div class="col-2">	
+		    	<button type="button" class="btn btn-outline-secondary">Sign up</button>
+		    </div>
+		    <div class="col-2">	
+		    	<button type="button" class="btn btn-primary btn-lg">Log in</button>
+		    </div>
+		  </div>
+		</div>
+		<hr style="color: green; display: block;" >
+
+		<div class="container">
+			<div class="row">
+				<div class="col-8"><h3>Flights</h3>
+					<table>
+						<tr>
+<!-- 						We can use this space to display result???
+ -->						</tr>
+					</table>
+					<br>
+
+				</div>
+				<div class="col-4">
+					<h4>Choose Flights</h4>
+					<form action="/processFlightSearch" method="post" >
+						<div class="row">
+							<div class="col">
+								<div class="form-group">
+									<label for="formSelect1">From</label>
+									<select class="form-control" id="formSelect1" name="departure" required>
+										<option value="">Departure City</option>
+										<option value="Sofia, Bulgaria">Sofia, Bulgaria</option>
+										<option value="Dublin, Ireland">Dublin, Ireland</option>
+										<option value="Stockholm, Sweden">Stockholm, Sweden</option>
+										<option value="Oslo, Norway">Oslo, Norway</option>
+										<option value="Rio de Janeiro, Brazil">Rio de Janeiro, Brazil</option>
+										<option value="Manila, Philippines">Manila, Philippines</option>
+										<option value="Seoul, South Korea">Seoul, South Korea</option>
+										<option value="Tokyo, Japan">Tokyo, Japan</option>
+										<option value="Bucharest, Romania">Bucharest, Romania</option>
+										<option value="Pyongyang, North Korea">Pyongyang, North Korea</option>
+									</select>
+								</div>
+							</div>
+						</div>
+						<div class="row">
+							<div class="col">
+								<div class="form-group">
+									<label for="formSelect1">To</label>
+									<select class="form-control" id="formSelect1" name="destination" required>
+										<option value="">Destination City</option>
+										<option value="Sofia, Bulgaria">Sofia, Bulgaria</option>
+										<option value="Dublin, Ireland">Dublin, Ireland</option>
+										<option value="Stockholm, Sweden">Stockholm, Sweden</option>
+										<option value="Oslo, Norway">Oslo, Norway</option>
+										<option value="Rio de Janeiro, Brazil">Rio de Janeiro, Brazil</option>
+										<option value="Manila, Philippines">Manila, Philippines</option>
+										<option value="Seoul, South Korea">Seoul, South Korea</option>
+										<option value="Tokyo, Japan">Tokyo, Japan</option>
+										<option value="Bucharest, Romania">Bucharest, Romania</option>
+										<option value="Pyongyang, North Korea">Pyongyang, North Korea</option>
+									</select>
+								</div>
+							</div>
+						</div>
+					<div class="form-check form-check-inline">
+						<input class="form-check-input" type="radio" name="oneWayTrip" id="oneWayTripRadio1" value="true" required="required">
+						<label class="form-check-label" for="inlineRadio4">One Way</label>
+					</div>
+					<div class="form-check form-check-inline">
+						<input class="form-check-input" type="radio" name="oneWayTrip" id="oneWayTripRadio2" value="false" required="required">
+						<label class="form-check-label" for="inlineRadio5">Return Trip</label>
+					</div>
+					<br>
+					<br>
+						<div class="row">
+							<div class="col">
+							<label for="name">Passengers</label>
+							<input type="text" class="form-control" placeholder="Number of Travellers" name="passeners" required="required">
+							</div>
+						</div>
+					<br>
+					<div class="row">
+						<div class="col">
+							<div class="form-group">
+								<label for="outboundDate">Outbound Date:</label>
+								<br>
+								<input type="date" id="outboundDate" name="outboundDate" min="2020-11-28" max="2021-12-31">
+							</div>
+						</div>
+						<div class="col">
+							<div class="form-group">
+								<label for="returnDate">Return Date:</label>
+								<br>
+								<input type="date" id="returnDate" name="returnDate" min="2020-11-28" max="2021-12-31">
+							</div>
+						</div>
+					</div>
+					<br><br>
+					<button type="submit" class="btn btn-primary">Submit</button>
+					</form>
+				</div>
+			</div>
+		</div>
+		 <div class="footer">
+		 	<p>&copy; 2020 Email: <a href="mailto:olanipekun.akintola@ucdconnect.ie">olanipekun.akintola@ucdconnect.ie</a>.</p>
+ 		 </div>
+
+		<script type="text/javascript" src="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/js/bootstrap.min.js"></script>
+		<script type="text/javascript" src="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/js/bootstrap.bundle.min.js"></script>
+	</body>
+	</html>
