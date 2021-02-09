@@ -5,18 +5,12 @@ public class FlightSearch {
     String destination;
     String date;
     String passengers;
-    String outboundDate;
-    String returnDate;
-    boolean oneWayTrip;
 
-    public FlightSearch(String departure, String destination, String date, String passengers, String outboundDate, String returnDate, boolean oneWayTrip) {
+    public FlightSearch(String departure, String destination, String date, String passengers) {
         this.departure = departure;
         this.destination = destination;
         this.date = date;
         this.passengers = passengers;
-        this.outboundDate = outboundDate;
-        this.returnDate = returnDate;
-        this.oneWayTrip = oneWayTrip;
     }
 
     public String getDeparture() {
@@ -49,29 +43,5 @@ public class FlightSearch {
 
     public void setPassengers(String passengers) {
         this.passengers = passengers;
-    }
-
-    public String getOutboundDate() {
-        return outboundDate;
-    }
-
-    public void setOutboundDate(String outboundDate) {
-        this.outboundDate = outboundDate;
-    }
-
-    public String getReturnDate() {
-        return returnDate;
-    }
-
-    public void setReturnDate(String returnDate) {
-        this.returnDate = returnDate;
-    }
-
-    public boolean isOneWayTrip() {
-        return oneWayTrip;
-    }
-
-    public void setOneWayTrip(boolean oneWayTrip) {
-        this.oneWayTrip = oneWayTrip;
     }
 }
