@@ -2,14 +2,17 @@ package ucd.comp40660.flight.model;
 
 public class FlightSearch {
     String departure;
-    String destination;
-    String date;
+    String destinationInput;
+    String outboundDate;
     String passengers;
 
-    public FlightSearch(String departure, String destination, String date, String passengers) {
+    public FlightSearch() {
+    }
+
+    public FlightSearch(String departure, String destinationInput, String outboundDate, String passengers) {
         this.departure = departure;
-        this.destination = destination;
-        this.date = date;
+        this.destinationInput = destinationInput;
+        this.outboundDate = outboundDate;
         this.passengers = passengers;
     }
 
@@ -21,20 +24,20 @@ public class FlightSearch {
         this.departure = departure;
     }
 
-    public String getDestination() {
-        return destination;
+    public String getDestinationInput() {
+        return destinationInput;
     }
 
-    public void setDestination(String destination) {
-        this.destination = destination;
+    public void setDestinationInput(String destinationInput) {
+        this.destinationInput = destinationInput;
     }
 
-    public String getDate() {
-        return date;
+    public String getOutboundDate() {
+        return outboundDate;
     }
 
-    public void setDate(String date) {
-        this.date = date;
+    public void setOutboundDate(String outboundDate) {
+        this.outboundDate = outboundDate;
     }
 
     public String getPassengers() {
