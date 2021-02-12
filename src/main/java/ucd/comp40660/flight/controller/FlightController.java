@@ -85,8 +85,8 @@ public class FlightController {
     @GetMapping("/flightSearchResults")
     public String flightSearchResults(Model model){
         List<Flight> flightList = new ArrayList<>();
-//        flightList = flightCheck();
-        flightList = flightRepository.findAll();
+        flightList = flightCheck();
+//        flightList = flightRepository.findAll();
         model.addAttribute("displayedFlights", flightList);
         return "flightResults.html";
     }
@@ -100,9 +100,9 @@ public class FlightController {
         int i = 0;
         for( i = 0; i < availableFlights.size(); i++){
             String flightStringFormat = availableFlights.get(i).getDeparture_date_time().toString().substring(0,11).trim();
-            if( flightStringFormat.equals(flightSearch.getOutboundDate().toString() ) ){
-                if(availableFlights.get(i).getSource().toString().equals(flightSearch.getDeparture().toString() )
-                && availableFlights.get(i).getDestination().equals(flightSearch.getDestinationInput().toString()) ){
+            if( flightStringFormat.equals(flightSearch.getOutboundDate() ) ){
+                if(availableFlights.get(i).getSource().equals(flightSearch.getDeparture() )
+                && availableFlights.get(i).getDestination().equals(flightSearch.getDestinationInput()) ){
                     userFlightOptions.add(availableFlights.get(i) );
                 }
             }
