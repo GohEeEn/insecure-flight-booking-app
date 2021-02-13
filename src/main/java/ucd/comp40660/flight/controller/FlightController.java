@@ -18,6 +18,11 @@ public class FlightController {
     @Autowired
     FlightRepository flightRepository;
 
+    @GetMapping("/")
+    public String index(){
+        return "index.html";
+    }
+
     //    Get all flights
     @GetMapping("/flights")
     public List<Flight> getAllFlights() {

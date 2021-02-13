@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<body>
+    <form method="POST" action="/login">
+        <h1>Login</h1>
+        <div class="txt">
+            <input id="username" type="text" name="username"
+                   placeholder="Username" />
+            <label for="user" class="entypo-user"></label>
+        </div>
+
+        <div class="txt">
+            <input id="password" type="password" name="password"
+                   placeholder="Password" />
+            <label for="password" class="entypo-lock"></label>
+            <div class="container">
+              <span th:if="error != null">
+                  <div class="row">
+                      <p style="color:red;font-weight:bold;" th:text="${error}"></p>
+                  </div>
+            </div>
+
+            <div class="buttons">
+                <input type="submit" value="Login" />
+                <span>
+              <a href="/register" class="entypo-user-add register">Register</a>
+                </span>
+            </div>
+        </div>
+    </form>
+
+</body>
+</html>

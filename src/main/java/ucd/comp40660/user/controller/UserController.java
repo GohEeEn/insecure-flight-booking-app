@@ -2,6 +2,7 @@ package ucd.comp40660.user.controller;
 
 import ucd.comp40660.user.UserSession;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.stereotype.Controller;
 import ucd.comp40660.user.exception.UserNotFoundException;
 import ucd.comp40660.user.model.User;
 import ucd.comp40660.user.repository.UserRepository;
@@ -15,7 +16,9 @@ import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
 import java.util.List;
 
-@RestController
+
+
+@Controller
 public class UserController {
 
     @Autowired
@@ -26,21 +29,23 @@ public class UserController {
     UserRepository userRepository;
 
     //    Get all registrations
-    @GetMapping("/registrations")
-    public List<User> getAllRegistrations() {
+    @GetMapping("/users")
+    @ResponseBody
+    public List<User> getAllUsers() {
         return userRepository.findAll();
     }
 
     //    Get a single registration by id
 //    the id can be changed to any other attribute
-    @GetMapping("/registrations/{id}")
+    @GetMapping("/users/{id}")
+    @ResponseBody
     public User getRegistrationById(@PathVariable(value = "id") Long registrationId) throws UserNotFoundException {
         return userRepository.findById(registrationId)
                 .orElseThrow(() -> new UserNotFoundException(registrationId));
     }
 
     //    update registration details
-    @PutMapping("/registrations/{id}")
+    @PutMapping("/users/{id}")
     public User updateRegistration(@PathVariable(value = "id") Long registrationId, @Valid @RequestBody User userDetails) throws UserNotFoundException {
         User user = userRepository.findById(registrationId)
                 .orElseThrow(() -> new UserNotFoundException(registrationId));
@@ -61,7 +66,7 @@ public class UserController {
     }
 
     //    Delete a registration record
-    @DeleteMapping("/registrations/{id}")
+    @DeleteMapping("/users/{id}")
     public ResponseEntity<?> deleteRegistration(@PathVariable(value = "id") Long registrationID) throws UserNotFoundException {
         User user = userRepository.findById(registrationID)
                 .orElseThrow(() -> new UserNotFoundException(registrationID));
@@ -72,7 +77,7 @@ public class UserController {
     }
 
     @GetMapping("/register")
-    public String registerView(Model model, HttpServletResponse response) throws Exception{
+    public String register(Model model, HttpServletResponse response) throws Exception{
         if(userSession.isLoginFailed()){
             model.addAttribute("error", "Unable to create account, passwords do not match");
             userSession.setLoginFailed(false);
@@ -80,37 +85,39 @@ public class UserController {
         if (userSession.getUser() != null){
             response.sendRedirect("/logout");
         }
-        return "registerPage.html";
+        return "register.html";
     }
 
     @PostMapping("/register")
-    public User createUser(@Valid @RequestBody User user) {
-        return userRepository.save(user);
-    }
-//    public void createUser(String name, String surname, String username, Long phone, String address, String email, String credit_card_details,
-//                           String password, String passwordDuplicate  /*, HttpServletResponse response*/) throws Exception{
-//
-//        if(password.equals(passwordDuplicate)){
-//            User user = new User();
-//            user.setName(name);
-//            user.setSurname(surname);
-//            user.setUsername(username);
-//            user.setPhone(phone);
-//            user.setAddress(address);
-//            user.setEmail(email);
-//            user.setCredit_card_details(credit_card_details);
-//            user.setRole("member");
-//            user.setPassword(password);
-//            user.setReservation_history("");
-//            user.setUpcoming_reservations("");
-//            userRepository.save(user);
-//            userSession.setUser(user);
-//            response.sendRedirect("/");
-//        }
-//        else{
-//            userSession.setLoginFailed(true);
-//            response.sendRedirect("/register");
-//        }
+//    public User createUser(@Valid @RequestParam User user) {
+//        return userRepository.save(user);
 //    }
+    public void createUser(String name, String surname, String username, Long phone, String address, String email, String credit_card_details,
+                           String password, String passwordDuplicate  , HttpServletResponse response) throws Exception{
+
+        if(password.equals(passwordDuplicate)){
+            User user = new User();
+            user.setName(name);
+            user.setSurname(surname);
+            user.setUsername(username);
+            user.setPhone(phone);
+            user.setAddress(address);
+            user.setEmail(email);
+            user.setCredit_card_details(credit_card_details);
+            user.setRole("member");
+            user.setPassword(password);
+            user.setReservation_history("None");
+            user.setUpcoming_reservations("None");
+            userRepository.save(user);
+            userSession.setUser(user);
+            response.sendRedirect("/");
+        }
+        else{
+            userSession.setLoginFailed(true);
+            response.sendRedirect("/register");
+        }
+    }
+
+
 
 }

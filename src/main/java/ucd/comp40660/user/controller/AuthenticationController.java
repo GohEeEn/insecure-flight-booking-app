@@ -32,7 +32,7 @@ public class AuthenticationController{
             model.addAttribute("error", "Username and Password combination incorrect.");
             userSession.setLoginFailed(false);
         }
-        return "loginPage.html";
+        return "login.html";
     }
 
     @GetMapping("/logout")
@@ -43,15 +43,15 @@ public class AuthenticationController{
 
     @PostMapping("/login")
     public void doLogin(String username, String password, HttpServletResponse response) throws Exception{
-//        Optional<User> user = userRepository.findAllByUsernameAndPassword(username, password);
-//        if(user.isPresent()){
-//            userSession.setUser(user.get());
-//            response.sendRedirect("/");
-//        }
-//        else {
-//            userSession.setLoginFailed(true);
-//            response.sendRedirect("/login");
-//        }
+        Optional<User> user = userRepository.findAllByUsernameAndPassword(username, password);
+        if(user.isPresent()){
+            userSession.setUser(user.get());
+            response.sendRedirect("/");
+        }
+        else {
+            userSession.setLoginFailed(true);
+            response.sendRedirect("/login");
+        }
     }
 
 }
