@@ -4,12 +4,12 @@ public class FlightSearch {
     String departure;
     String destinationInput;
     String outboundDate;
-    String passengers;
+    int passengers;
 
     public FlightSearch() {
     }
 
-    public FlightSearch(String departure, String destinationInput, String outboundDate, String passengers) {
+    public FlightSearch(String departure, String destinationInput, String outboundDate, int passengers) {
         this.departure = departure;
         this.destinationInput = destinationInput;
         this.outboundDate = outboundDate;
@@ -40,11 +40,11 @@ public class FlightSearch {
         this.outboundDate = outboundDate;
     }
 
-    public String getPassengers() {
+    public int getPassengers() {
         return passengers;
     }
 
-    public void setPassengers(String passengers) {
+    public void setPassengers(int passengers) {
         this.passengers = passengers;
     }
 }

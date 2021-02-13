@@ -71,7 +71,7 @@ public class FlightController {
     }
 
     @PostMapping("/processFlightSearch")
-    public void processFlightSearch(String departure, String destinationInput, String passengers, String outboundDate, HttpServletResponse response) throws IOException {
+    public void processFlightSearch(String departure, String destinationInput, int passengers, String outboundDate, HttpServletResponse response) throws IOException {
 
         System.out.println(outboundDate);
         flightSearch.setDeparture(departure);
