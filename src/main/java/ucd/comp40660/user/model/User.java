@@ -64,7 +64,6 @@ public class User {
 //    }
 
     public User(String name, String surname, String username, String role, Long phone, String email, String address, String credit_card_details, String password, String reservation_history, String upcoming_reservations) {
-        this.registrationID = registrationID;
         this.name = name;
         this.surname = surname;
         this.username = username;
