@@ -23,7 +23,7 @@ INSERT INTO reservations(email, flight_reference) VALUES
 ('ola@ucdconnect.ie', 1);
 
 
-ALTER TABLE library.registrations MODIFY registrationID int NOT NULL AUTO_INCREMENT;
+ALTER TABLE library.users MODIFY registrationID int NOT NULL AUTO_INCREMENT;
 
 INSERT INTO users(name, surname, phone, email, address, credit_card_details, reservation_history, upcoming_reservations) VALUES
 ('slav', 'denisov', '0830881242', 'slav@ucdconnect.ie', '10 beach bay, smithfield', '8418 5823 1153 8818', '1,2', '7,12'),
