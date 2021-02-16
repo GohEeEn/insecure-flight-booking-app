@@ -92,7 +92,7 @@ public class UserController {
 //    public User createUser(@Valid @RequestParam User user) {
 //        return userRepository.save(user);
 //    }
-    public void createUser(String name, String surname, String username, Long phone, String address, String email, String credit_card_details,
+    public void createUser(String name, String surname, String username, String phone, String address, String email, String credit_card_details,
                            String password, String passwordDuplicate  , HttpServletResponse response) throws Exception{
 
         if(password.equals(passwordDuplicate)){

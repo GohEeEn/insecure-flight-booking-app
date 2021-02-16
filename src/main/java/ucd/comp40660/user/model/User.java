@@ -6,7 +6,7 @@ import javax.validation.constraints.*;
 import lombok.Data;
 
 @Entity
-@Table(name = "users")
+@Table(name = "users", uniqueConstraints={@UniqueConstraint(columnNames = {"username", "email", "phone"})})
 @Data
 public class User {
 
@@ -23,15 +23,18 @@ public class User {
     @NotBlank
     private String role;
 
+    @Column(unique=true)
     @NotBlank
     private String username;
 
     @NotBlank
     private String password;
 
+    @Column(unique=true)
     @NotNull
-    private Long phone;
+    private String phone;
 
+    @Column(unique=true)
     @NotBlank
     private String email;
 
@@ -63,7 +66,7 @@ public class User {
 //        this.upcoming_reservations = upcoming_reservations;
 //    }
 
-    public User(String name, String surname, String username, String role, Long phone, String email, String address, String credit_card_details, String password, String reservation_history, String upcoming_reservations) {
+    public User(String name, String surname, String username, String role, String phone, String email, String address, String credit_card_details, String password, String reservation_history, String upcoming_reservations) {
         this.name = name;
         this.surname = surname;
         this.username = username;
