@@ -14,6 +14,8 @@ import org.springframework.ui.Model;
 
 import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
+import java.io.IOException;
+import java.sql.SQLIntegrityConstraintViolationException;
 import java.util.List;
 
 
@@ -92,29 +94,40 @@ public class UserController {
 //    public User createUser(@Valid @RequestParam User user) {
 //        return userRepository.save(user);
 //    }
-    public void createUser(String name, String surname, String username, String phone, String address, String email, String credit_card_details,
-                           String password, String passwordDuplicate  , HttpServletResponse response) throws Exception{
+    public String createUser(String name, String surname, String username, String phone, String address, String email, String credit_card_details,
+                           String password, String passwordDuplicate, HttpServletResponse response, Model model) throws SQLIntegrityConstraintViolationException, IOException {
 
-        if(password.equals(passwordDuplicate)){
-            User user = new User();
-            user.setName(name);
-            user.setSurname(surname);
-            user.setUsername(username);
-            user.setPhone(phone);
-            user.setAddress(address);
-            user.setEmail(email);
-            user.setCredit_card_details(credit_card_details);
-            user.setRole("member");
-            user.setPassword(password);
-            user.setReservation_history("None");
-            user.setUpcoming_reservations("None");
-            userRepository.save(user);
-            userSession.setUser(user);
-            response.sendRedirect("/");
+        if(userRepository.existsByUsername(username)){
+            System.out.println("\n\nDUPLICATE USERNAME DETECTED\n\n");
+            model.addAttribute("error", "Username already exists.");
+//            response.sendRedirect("/register");
+            return "register.html";
         }
-        else{
-            userSession.setLoginFailed(true);
-            response.sendRedirect("/register");
+        else {
+            if (password.equals(passwordDuplicate)) {
+                User user = new User();
+                user.setName(name);
+                user.setSurname(surname);
+                user.setUsername(username);
+                user.setPhone(phone);
+                user.setAddress(address);
+                user.setEmail(email);
+                user.setCredit_card_details(credit_card_details);
+                user.setRole("member");
+                user.setPassword(password);
+                user.setReservation_history("None");
+                user.setUpcoming_reservations("None");
+                userRepository.save(user);
+                userSession.setUser(user);
+//                response.sendRedirect("/");
+                return "index.html";
+
+            } else {
+                userSession.setLoginFailed(true);
+//                response.sendRedirect("/register");
+                return "register.html";
+
+            }
         }
     }
 

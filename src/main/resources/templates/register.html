@@ -99,15 +99,14 @@
             <div class="buttons">
                 <input type="submit" value="Register" />
             </div>
-
-            <div class="container">
-            <span th:if="error != null">
-              <div class="row">
-                <p style="color:red;font-weight:bold;" th:text="${error}"></p>
-              </div>
-            </span>
-            </div>
-
         </form>
+        <div class="container">
+                <span th:if="error != null">
+                  <div class="row">
+                    <p style="color:red;font-weight:bold;" th:text="${error}"></p>
+                  </div>
+                </span>
+        </div>
+
     </body>
 </html>

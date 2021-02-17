@@ -39,6 +39,26 @@
 		    <div class="col-2" style="margin-top: 10px">	
 		    	<button type="button" class="btn btn-primary btn-lg">Log in</button>
 		    </div>
+			  <span th:if="${user != null}">
+				  <a class="btn btn-primary" href="/logout">Logout</a>
+				  <span>Logged in as </span>
+				  <span th:text="${user.getUserName()}"></span>
+			  </span>
+			  <ul>
+				  <li th:if="${user==null}" class="nav-item">
+					  <a class="nav-link js-scroll-trigger" href="/login">Login</a>
+				  </li>
+				  <li th:if="${user==null}" class="nav-item">
+					  <a class="nav-link js-scroll-trigger" href="/register">Register</a>
+				  </li>
+				  <li th:if="${user!=null} and ${user.getRole()=='member'}" class="nav-item">
+					  <a class="nav-link js-scroll-trigger" href="/flight_history">Flight History</a>
+				  </li>
+				  <li th:if="${user!=null} and ${user.getRole()=='member'}" class="nav-item">
+					  <a class="nav-link js-scroll-trigger" href="/upcoming_flights">Upcoming Flights</a>
+				  </li>
+			  </ul>
+
 		  </div>
 		</div>
 		<hr style="color: green; display: block;" >
