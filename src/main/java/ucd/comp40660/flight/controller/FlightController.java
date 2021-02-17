@@ -1,19 +1,26 @@
 package ucd.comp40660.flight.controller;
 
 
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
 import ucd.comp40660.flight.exception.FlightNotFoundException;
 import ucd.comp40660.flight.model.Flight;
+import ucd.comp40660.flight.model.FlightSearch;
 import ucd.comp40660.flight.repository.FlightRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
+import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
 
-@RestController
+@Controller
 public class FlightController {
+
+    private FlightSearch flightSearch = new FlightSearch();
 
     @Autowired
     FlightRepository flightRepository;
@@ -62,4 +69,48 @@ public class FlightController {
 
         return ResponseEntity.ok().build();
     }
+
+    @PostMapping("/processFlightSearch")
+    public void processFlightSearch(String departure, String destinationInput, int passengers, String outboundDate, HttpServletResponse response) throws IOException {
+
+        System.out.println(outboundDate);
+        flightSearch.setDeparture(departure);
+        flightSearch.setDestinationInput(destinationInput);
+        flightSearch.setPassengers(passengers);
+        flightSearch.setOutboundDate(outboundDate);
+
+        response.sendRedirect("/flightSearchResults");
+    }
+
+    @GetMapping("/flightSearchResults")
+    public String flightSearchResults(Model model){
+        List<Flight> flightList = new ArrayList<>();
+        flightList = flightCheck();
+//        flightList = flightRepository.findAll();
+        model.addAttribute("displayedFlights", flightList);
+        return "flightResults.html";
+    }
+
+    private List<Flight> flightCheck() {
+        List<Flight> availableFlights = new ArrayList<>();
+        List<Flight> userFlightOptions = new ArrayList<>();
+
+        availableFlights = flightRepository.findAll();
+
+        int i = 0;
+        for( i = 0; i < availableFlights.size(); i++){
+            String flightStringFormat = availableFlights.get(i).getDeparture_date_time().toString().substring(0,11).trim();
+            if( flightStringFormat.equals(flightSearch.getOutboundDate() ) ){
+                if(availableFlights.get(i).getSource().equals(flightSearch.getDeparture() )
+                && availableFlights.get(i).getDestination().equals(flightSearch.getDestinationInput()) ){
+                    userFlightOptions.add(availableFlights.get(i) );
+                }
+            }
+
+        }
+//        userFlightOptions.add(availableFlights.get(0));
+        return userFlightOptions;
+    }
+
+
 }
