@@ -103,6 +103,14 @@ public class UserController {
 //            response.sendRedirect("/register");
             return "register.html";
         }
+        else if(userRepository.existsByEmail(email)){
+            model.addAttribute("error", "E-mail address already in use.");
+            return "register.html";
+        }
+        else if(userRepository.existsByPhone(phone)){
+            model.addAttribute("error", "Phone number already in use.");
+            return "register.html";
+        }
         else {
             if (password.equals(passwordDuplicate)) {
                 User user = new User();

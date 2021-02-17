@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html>
+<html xmlns:th="http://www.thymeleaf.org">
 	<head>
 		<meta charset="utf-8">
 		<title>Home</title>
@@ -28,22 +28,32 @@
 
 	</head>
 	<body>
-		<div class="container">
+
+	<div class="container">
 		  <div class="row">
 		    <div class="col-8">
 		    	<h1>Secure Airways</h1>
 		    </div>
-		    <div class="col-2" style="margin-top: 15px">	
+			<div>
+<!--					<p>-->
+<!--					<p>-->
+<!--						<span th:text="'Today is: ' + ${#dates.format(#dates.createNow(), 'dd MMM yyyy HH:mm')}" th:remove="tag"></span>-->
+<!--					</p>-->
+<!--					</p>-->
+					<span th:if="${user != null}">
+						  <a class="btn btn-primary" href="/logout">Logout</a>
+						  <span>Logged in as </span>
+						  <span th:text="${user.getUserName()}"></span>
+					</span>
+			</div>
+			  <div class="col-2" style="margin-top: 15px">
 		    	<button type="button" class="btn btn-outline-secondary">Sign up</button>
 		    </div>
 		    <div class="col-2" style="margin-top: 10px">	
 		    	<button type="button" class="btn btn-primary btn-lg">Log in</button>
 		    </div>
-			  <span th:if="${user != null}">
-				  <a class="btn btn-primary" href="/logout">Logout</a>
-				  <span>Logged in as </span>
-				  <span th:text="${user.getUserName()}"></span>
-			  </span>
+		  </div>
+
 			  <ul>
 				  <li th:if="${user==null}" class="nav-item">
 					  <a class="nav-link js-scroll-trigger" href="/login">Login</a>

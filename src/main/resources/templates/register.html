@@ -31,6 +31,24 @@
                 <div class="col-8">
                     <h1>Secure Airways</h1>
                 </div>
+                </div>
+                <div>
+                    <ul>
+                        <li th:if="${user==null}" class="nav-item">
+                            <a class="nav-link js-scroll-trigger" href="/login">Login</a>
+                        </li>
+                        <li th:if="${user==null}" class="nav-item">
+                            <a class="nav-link js-scroll-trigger" href="/register">Register</a>
+                        </li>
+                        <li th:if="${user!=null} and ${user.getRole()=='member'}" class="nav-item">
+                            <a class="nav-link js-scroll-trigger" href="/flight_history">Flight History</a>
+                        </li>
+                        <li th:if="${user!=null} and ${user.getRole()=='member'}" class="nav-item">
+                            <a class="nav-link js-scroll-trigger" href="/upcoming_flights">Upcoming Flights</a>
+                        </li>
+                    </ul>
+
+                </div>
                 <div class="col-2" style="margin-top: 15px">
                     <button type="button" class="btn btn-outline-secondary">Sign up</button>
                 </div>
