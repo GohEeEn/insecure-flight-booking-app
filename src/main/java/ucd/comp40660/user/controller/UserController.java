@@ -1,5 +1,6 @@
 package ucd.comp40660.user.controller;
 
+import org.springframework.validation.annotation.Validated;
 import ucd.comp40660.user.UserSession;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.stereotype.Controller;
@@ -90,6 +91,20 @@ public class UserController {
         return "register.html";
     }
 
+    //TEST REGISTRATION
+    @GetMapping("/register2")
+    public String register2(Model model, HttpServletResponse response) throws Exception{
+        if(userSession.isLoginFailed()){
+            model.addAttribute("error", "Unable to create account, passwords do not match");
+            userSession.setLoginFailed(false);
+        }
+        if (userSession.getUser() != null){
+            response.sendRedirect("/logout");
+        }
+        return "register2.html";
+    }
+
+
     @PostMapping("/register")
 //    public User createUser(@Valid @RequestParam User user) {
 //        return userRepository.save(user);
@@ -138,6 +153,40 @@ public class UserController {
             }
         }
     }
+
+    @GetMapping("/userProfile")
+    public String userProfile(Model model) {
+        model.addAttribute("user", userSession.getUser());
+//        model.addAttribute("items", itemRepository.findAllByUser(userSession.getUser()));
+        return "profile.html";
+    }
+
+    @PostMapping("/editProfile")
+    public void editProfile(String newName, String newSurname, String newPhone, String newEmail, String newAddress, String newCreditCardDetails, String newUsername, String password, String passwordDuplicate, HttpServletResponse response)
+            throws Exception {
+
+        User user = userSession.getUser();
+
+
+        if (password.equals(passwordDuplicate)) {
+
+            user.setName(newName);
+            user.setSurname(newSurname);
+            user.setAddress(newAddress);
+            user.setEmail(newEmail);
+            user.setPhone(newPhone);
+            user.setCredit_card_details(newCreditCardDetails);
+            user.setUsername(newUsername);
+            user.setPassword(password);
+            userRepository.save(user);
+            response.sendRedirect("/");
+        } else {
+            userSession.setLoginFailed(true);
+            response.sendRedirect("/");
+        }
+    }
+
+
 
 
 

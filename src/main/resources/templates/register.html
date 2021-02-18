@@ -58,12 +58,14 @@
             </div>
         </div>
 
-        <form action="/register" method="POST">
+        <form action="/register" method="POST" th:object=${user}">
             <h2>Register An Account</h2>
             <div class="txt">
                 <input id="name" type="text" name="name"
                        placeholder="First Name" />
                 <label for="name" class="entypo-user"></label>
+                <span th:if="${#fields.hasErrors('name')}" th:errors="*{name}">First name error</span>
+
             </div>
 
             <div class="txt">
