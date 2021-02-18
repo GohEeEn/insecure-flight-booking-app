@@ -31,7 +31,7 @@ INSERT INTO users(name, surname, phone, email, address, credit_card_details, res
 ('vincent', 'goh', '0830881244', 'vincent@ucdconnect.ie', '69 miami bay area, awesomefield', '8418 5823 1153 8811', '17,18', '23,'),
 ('sean', 'mcloughlin', '0830881245', 'sean@ucdconnect.ie', '27 day dreams, bringfield', '8418 5823 1153 8812', '11,22', '');
 
-ALTER TABLE library.guest MODIFY guestId int NOT NULL AUTO_INCREMENT;
+ALTER TABLE library.guest MODIFY guestID int NOT NULL AUTO_INCREMENT;
 
 INSERT INTO guest(name, surname, phone, email, address, credit_card_details) VALUES
 ('joe', 'blogg', '0892209191', 'olamoiakin@gmail.com', '1 no mans land, mainfield', '1234 5678 1234 5678');

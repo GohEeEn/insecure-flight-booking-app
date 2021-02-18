@@ -12,7 +12,7 @@ public class Guest {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long guestId;
+    private Long guestID;
 
     @NotBlank
     private String name;

@@ -11,6 +11,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import ucd.comp40660.user.model.Guest;
+import ucd.comp40660.user.repository.GuestRepository;
 
 import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
@@ -26,6 +27,9 @@ public class FlightController {
 
     @Autowired
     FlightRepository flightRepository;
+
+    @Autowired
+    GuestRepository guestRepository;
 
     @GetMapping("/")
     public String index(){
@@ -116,6 +120,21 @@ public class FlightController {
         guest.setAddress(address);
 
         response.sendRedirect("/displayPaymentPage");
+    }
+
+    @GetMapping("/displayPaymentPage")
+    public String displayPaymentPage(){
+
+        return "displayPaymentPage.html";
+    }
+
+    @PostMapping("/processPayment")
+    public void processPayment(String credit_card_details, HttpServletResponse response) throws IOException {
+
+        guest.setCredit_card_details(credit_card_details);
+        guestRepository.save(guest);
+
+        response.sendRedirect("/displayReservationId");
     }
 
     private List<Flight> flightCheck() {
