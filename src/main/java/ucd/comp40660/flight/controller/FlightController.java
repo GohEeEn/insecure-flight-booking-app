@@ -104,6 +104,11 @@ public class FlightController {
         return "guestDetails.html";
     }
 
+    @PostMapping("/processGuestPersonalDetails")
+    public void processGuestPersonalDetails(String name, String surname, String email, String phoneNumber, String address ){
+
+    }
+
     private List<Flight> flightCheck() {
         List<Flight> availableFlights = new ArrayList<>();
         List<Flight> userFlightOptions = new ArrayList<>();
