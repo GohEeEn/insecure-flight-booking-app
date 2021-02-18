@@ -10,6 +10,7 @@ import ucd.comp40660.flight.repository.FlightRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import ucd.comp40660.user.model.Guest;
 
 import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
@@ -21,6 +22,7 @@ import java.util.List;
 public class FlightController {
 
     private FlightSearch flightSearch = new FlightSearch();
+    private Guest guest = new Guest();
 
     @Autowired
     FlightRepository flightRepository;
@@ -105,8 +107,15 @@ public class FlightController {
     }
 
     @PostMapping("/processGuestPersonalDetails")
-    public void processGuestPersonalDetails(String name, String surname, String email, String phoneNumber, String address ){
+    public void processGuestPersonalDetails(String name, String surname, String email, String phoneNumber, String address, HttpServletResponse response ) throws IOException {
 
+        guest.setName(name);
+        guest.setSurname(surname);
+        guest.setEmail(email);
+        guest.setPhone(phoneNumber);
+        guest.setAddress(address);
+
+        response.sendRedirect("/displayPaymentPage");
     }
 
     private List<Flight> flightCheck() {
