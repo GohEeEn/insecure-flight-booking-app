@@ -91,6 +91,19 @@ public class FlightController {
         return "flightResults.html";
     }
 
+    @PostMapping("/selectFlight")
+    public void selectFlight(String flightIndexSelected, HttpServletResponse response) throws IOException {
+        int flightIndex = Integer.parseInt(flightIndexSelected);
+
+        response.sendRedirect("/guestBooking");
+    }
+
+    @GetMapping("/guestBooking")
+    public String guestBooking(){
+
+        return "guestDetails.html";
+    }
+
     private List<Flight> flightCheck() {
         List<Flight> availableFlights = new ArrayList<>();
         List<Flight> userFlightOptions = new ArrayList<>();
