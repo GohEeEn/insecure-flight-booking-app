@@ -76,14 +76,15 @@ public class UserController {
     }
 
     //    Delete a registration record
-    @DeleteMapping("/users/{id}")
-    public ResponseEntity<?> deleteRegistration(@PathVariable(value = "id") Long registrationID) throws UserNotFoundException {
+    @GetMapping("/delete/{id}")
+    public String deleteRegistration(@PathVariable(value = "id") Long registrationID) throws UserNotFoundException {
         User user = userRepository.findById(registrationID)
                 .orElseThrow(() -> new UserNotFoundException(registrationID));
 
         userRepository.delete(user);
+        userSession.setUser(null);
 
-        return ResponseEntity.ok().build();
+        return "index.html";
     }
 
     @GetMapping("/register")
