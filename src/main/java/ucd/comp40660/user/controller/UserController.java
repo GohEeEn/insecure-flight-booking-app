@@ -153,9 +153,14 @@ public class UserController {
             }
         }
     }
+    @GetMapping("/viewProfile")
+    public String viewProfile(Model model) {
+        model.addAttribute("user", userSession.getUser());
+        return "viewProfile.html";
+    }
 
     @GetMapping("/editProfile")
-    public String userProfile(Model model) {
+    public String loadEditProfile(Model model) {
         model.addAttribute("user", userSession.getUser());
         return "editProfile.html";
     }
