@@ -45,10 +45,10 @@ public class User {
     @NotBlank(message = "Credit Card Details field must not be empty.")
     private String credit_card_details;
 
-    @NotBlank(message = "Reservation History improperly initialised.")
+//    @NotBlank(message = "Reservation History improperly initialised(blank).")
     private String reservation_history;
 
-    @NotBlank(message = "Upcoming Reservations improperly initialised.")
+//    @NotBlank(message = "Upcoming Reservations improperly initialised(blank).")
     private String upcoming_reservations;
 
 
