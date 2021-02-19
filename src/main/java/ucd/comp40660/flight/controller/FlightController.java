@@ -16,6 +16,7 @@ import ucd.comp40660.user.repository.GuestRepository;
 import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
 import java.io.IOException;
+import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -79,7 +80,7 @@ public class FlightController {
     @PostMapping("/processFlightSearch")
     public void processFlightSearch(String departure, String destinationInput, int passengers, String outboundDate, HttpServletResponse response) throws IOException {
 
-        System.out.println(outboundDate);
+//        System.out.println(outboundDate);
         flightSearch.setDeparture(departure);
         flightSearch.setDestinationInput(destinationInput);
         flightSearch.setPassengers(passengers);
@@ -99,12 +100,30 @@ public class FlightController {
 
     @PostMapping("/selectFlight")
     public void selectFlight(String flightIndexSelected, HttpServletResponse response) throws IOException {
-        int flightIndex = Integer.parseInt(flightIndexSelected);
-
-        response.sendRedirect("/guestBooking");
+        boolean isNumber = flightIndexSelected.chars().allMatch( Character::isDigit);
+        if(!isNumber){
+            PrintWriter out = response.getWriter();
+            out.println("<script>");
+            out.println("alert('" + "Select from displayed Index"+"');");
+            out.println("window.location.replace('" + "/flightSearchResults" + "');");
+            out.println("</script>");
+        }
+        else{
+            List<Flight> flightList = flightCheck();
+            int flightIndex = Integer.parseInt(flightIndexSelected);
+            if(flightIndex <= 0 || flightIndex > flightList.size() ){
+                PrintWriter out = response.getWriter();
+                out.println("<script>");
+                out.println("alert('" + "Select from displayed Index"+"');");
+                out.println("window.location.replace('" + "/flightSearchResults" + "');");
+                out.println("</script>");
+            }else{
+                response.sendRedirect("/displayBookingPage");
+            }
+        }
     }
 
-    @GetMapping("/guestBooking")
+    @GetMapping("/displayBookingPage")
     public String guestBooking(){
 
         return "guestDetails.html";
