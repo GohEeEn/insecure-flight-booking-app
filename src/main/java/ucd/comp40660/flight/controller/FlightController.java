@@ -17,18 +17,24 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
+import ucd.comp40660.user.UserSession;
+import ucd.comp40660.user.model.User;
+
+
 @Controller
 public class FlightController {
+
+
 
     private FlightSearch flightSearch = new FlightSearch();
 
     @Autowired
     FlightRepository flightRepository;
 
-    @GetMapping("/")
-    public String index(){
-        return "index.html";
-    }
+//    @GetMapping("/")
+//    public String index(){
+//        return "index.html";
+//    }
 
     //    Get all flights
     @GetMapping("/flights")

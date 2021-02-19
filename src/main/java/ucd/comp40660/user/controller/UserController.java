@@ -31,6 +31,13 @@ public class UserController {
     @Autowired
     UserRepository userRepository;
 
+
+    @GetMapping("/")
+    public String index(Model model){
+        model.addAttribute("user", userSession.getUser());
+        return "index.html";
+    }
+
     //    Get all registrations
     @GetMapping("/users")
     @ResponseBody
@@ -90,20 +97,6 @@ public class UserController {
         }
         return "register.html";
     }
-
-    //TEST REGISTRATION
-    @GetMapping("/register2")
-    public String register2(Model model, HttpServletResponse response) throws Exception{
-        if(userSession.isLoginFailed()){
-            model.addAttribute("error", "Unable to create account, passwords do not match");
-            userSession.setLoginFailed(false);
-        }
-        if (userSession.getUser() != null){
-            response.sendRedirect("/logout");
-        }
-        return "register2.html";
-    }
-
 
     @PostMapping("/register")
 //    public User createUser(@Valid @RequestParam User user) {
