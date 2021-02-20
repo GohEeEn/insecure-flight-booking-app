@@ -46,10 +46,10 @@ public class FlightController {
         return "index.html";
     }
 
-//    @PostMapping("/home")
-//    public void home(String homePage, HttpServletResponse response) throws IOException {
-//        response.sendRedirect("/");
-//    }
+    @PostMapping("/home")
+    public void home(String homeButton, HttpServletResponse response) throws IOException {
+        response.sendRedirect("/");
+    }
 
     //    Get all flights
     @GetMapping("/flights")
