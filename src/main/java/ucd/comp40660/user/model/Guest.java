@@ -3,16 +3,21 @@ package ucd.comp40660.user.model;
 import javax.persistence.*;
 import javax.validation.constraints.*;
 
+import jdk.dynalink.linker.LinkerServices;
 import lombok.Data;
+import ucd.comp40660.reservation.model.Reservation;
+
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity
-@Table(name = "guest", uniqueConstraints={@UniqueConstraint(columnNames = {"email", "phone"})})
+@Table(name = "guests", uniqueConstraints={@UniqueConstraint(columnNames = {"email", "phone"})})
 @Data
 public class Guest {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long guestID;
+    private Long id;
 
     @NotBlank
     private String name;
@@ -34,6 +39,10 @@ public class Guest {
     @NotBlank
     private String credit_card_details;
 
+    @Column
+    @OneToMany(mappedBy = "guest")
+    private List<Reservation> reservations = new ArrayList<>();
+
     public Guest() {
         super();
     }
@@ -41,13 +50,14 @@ public class Guest {
 //    public User(Long registrationID, String name, Long phone, String email, String address, String credit_card_details, String reservation_history, String upcoming_reservations) {
 //    }
 
-    public Guest(String name, String surname, String phone, String email, String address, String credit_card_details) {
+    public Guest(String name, String surname, String phone, String email, String address, String credit_card_details, List<Reservation> reservations) {
         this.name = name;
         this.surname = surname;
         this.phone = phone;
         this.email = email;
         this.address = address;
         this.credit_card_details = credit_card_details;
+        this.reservations = reservations;
     }
 }
 

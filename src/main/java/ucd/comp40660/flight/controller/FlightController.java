@@ -10,8 +10,11 @@ import ucd.comp40660.flight.repository.FlightRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import ucd.comp40660.reservation.model.Reservation;
+import ucd.comp40660.reservation.repository.ReservationRepository;
 import ucd.comp40660.user.model.Guest;
 import ucd.comp40660.user.repository.GuestRepository;
+
 
 import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
@@ -25,6 +28,10 @@ public class FlightController {
 
     private FlightSearch flightSearch = new FlightSearch();
     private Guest guest = new Guest();
+    private Reservation reservation = new Reservation();
+
+    @Autowired
+    ReservationRepository reservationRepository;
 
     @Autowired
     FlightRepository flightRepository;
@@ -32,10 +39,17 @@ public class FlightController {
     @Autowired
     GuestRepository guestRepository;
 
+    Long temporaryFlightReference;
+
     @GetMapping("/")
     public String index(){
         return "index.html";
     }
+
+//    @PostMapping("/home")
+//    public void home(String homePage, HttpServletResponse response) throws IOException {
+//        response.sendRedirect("/");
+//    }
 
     //    Get all flights
     @GetMapping("/flights")
@@ -118,6 +132,9 @@ public class FlightController {
                 out.println("window.location.replace('" + "/flightSearchResults" + "');");
                 out.println("</script>");
             }else{
+                List<Flight> allFlight = flightRepository.findAll();
+                Flight chosenFlight= allFlight.get(flightIndex);
+                temporaryFlightReference = chosenFlight.getFlightID();
                 response.sendRedirect("/displayBookingPage");
             }
         }
@@ -126,7 +143,7 @@ public class FlightController {
     @GetMapping("/displayBookingPage")
     public String guestBooking(){
 
-        return "guestDetails.html";
+        return "bookingDetails.html";
     }
 
     @PostMapping("/processGuestPersonalDetails")
@@ -151,9 +168,38 @@ public class FlightController {
     public void processPayment(String credit_card_details, HttpServletResponse response) throws IOException {
 
         guest.setCredit_card_details(credit_card_details);
+
+        reservation.setEmail(guest.getEmail());
+        reservation.setFlight_reference(temporaryFlightReference);
+        reservation.setGuest(guest);
+
+        guest.getReservations().add(reservation);
         guestRepository.save(guest);
 
+        reservationRepository.save(reservation);
+
         response.sendRedirect("/displayReservationId");
+    }
+
+    @GetMapping("/displayReservationId")
+    public String displayReservationId(Model model){
+        List<Reservation> guestReservationId = new ArrayList<>();
+        List<Guest> guestList = guestRepository.findAll();
+        List<Reservation> reservationList = reservationRepository.findAll();
+
+        for(Reservation reserved: reservationList){
+            List<Reservation> reservedLists = new ArrayList<>();
+            for(int i = 0; i < guestList.size(); i++){
+                reservedLists = guestList.get(i).getReservations();
+                for(Reservation reservedList: reservedLists){
+                    if(reservedList.getEmail().equals(reserved.getEmail()) && reservedList.getFlight_reference().equals(reserved.getFlight_reference())){
+                        guestReservationId.add(reserved);
+                    }
+                }
+            }
+        }
+        model.addAttribute("guestReservationIds", guestReservationId);
+        return "displayReservation.html";
     }
 
     private List<Flight> flightCheck() {
