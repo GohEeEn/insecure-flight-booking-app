@@ -47,24 +47,20 @@
 		    </div>
 		    <div class="col-2" style="margin-top: 10px">	
 		    	<button type="button" class="btn btn-primary btn-lg">Log in</button>
+
+		    				<form action="/home" class="form-inline" method="post">
+							  <button name="homeButton" type="submit" class="btn btn-primary mb-2" value="0">Return to Home Page</button>
+							</form>
 		    </div>
 		  </div>
 		</div>
 		<hr style="color: green; display: block;" >
 
-<!-- 		<div class="container" th:if="${#arrays.isEmpty(flightDetails)}">
-			<h2>No flights found to the destination city</h2>
-			<br>
-			<form action="/userFlightSelection" method="post" >
-				<button name="inputFlightIndex" type="submit" value="0">See Hotels</button>
-			</form>
-		</div> -->
 		<div class="container">
 			<div class="row">
 				<div class="col-12"><h5>Search Results</h5>
-					<h6>Select a Flight</h6>
-                    <form action="/selectFlight" method="post" >
-                        <div class="container">
+<!-- 					<h6>Select a Flight</h6>
+ -->                        <div class="container">
                             <table class="table">
                             	<thead>
   								<tr>
@@ -82,12 +78,11 @@
                         </div>
                         <br>
 						  <div class="form-group row">
-							<form action="/home" class="form-inline" method="post">
+<!-- 							<form action="/home" class="form-inline" method="post">
 							  <button name="homeButton" type="submit" class="btn btn-primary mb-2" value="0">Return to Home Page</button>
-							</form>
+							</form> -->
 						  </div>
 						<br>
-					</form>
 					<br>
 				</div>
 			</div>
