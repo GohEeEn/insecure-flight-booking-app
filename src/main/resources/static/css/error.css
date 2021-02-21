@@ -1,0 +1,35 @@
+@import url("https://fonts.googleapis.com/css?family=Share+Tech+Mono|Montserrat:700");
+
+* {
+    margin: 0;
+    padding: 0;
+    border: 0;
+    font-size: 100%;
+    font: inherit;
+    vertical-align: baseline;
+    box-sizing: border-box;
+    color: inherit;
+}
+
+h1 {
+    font-family: "Montserrat", monospace;
+    font-size: 20vw;
+}
+
+div#error-content {
+
+    margin: auto;
+    margin-top: 2vw;
+    height: 90%;
+}
+
+p {
+    font-family: "Share Tech Mono", monospace;
+    font-size: 1.5vw;
+    line-height: 1.2;
+}
+
+a {
+    margin-right: 2vw;
+    min-width: 2em;
+}
