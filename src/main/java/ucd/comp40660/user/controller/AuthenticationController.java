@@ -27,7 +27,6 @@ public class AuthenticationController{
 
     @GetMapping("/login")
     public String login(Model model){
-//        model.addAttribute("title", "Library Login");
         if(userSession.isLoginFailed()){
             model.addAttribute("error", "Username and Password combination incorrect.");
             userSession.setLoginFailed(false);
