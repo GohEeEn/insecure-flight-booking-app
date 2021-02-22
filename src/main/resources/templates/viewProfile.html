@@ -1,63 +1,72 @@
 <!DOCTYPE html>
-<html lang="en">
+
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+
 <head>
-    <meta charset="UTF-8">
-    <title>Title</title>
+    <title>View Profile</title>
+
+    <div th:replace="fragments/header :: header-data"></div>
 </head>
+
 <body>
-    <div class="row container-fluid">
-        <div class="col-1 align-self-center">
-            <label
-                    style="font-family:'Courier New', Courier, monospace;">First Name: </label>
-            <span  th:text="${user.getName()}"/>
-        </div>
-    </div>
 
-    <div class="row container-fluid">
-        <div class="col-1 align-self-center">
-            <label
-                    style="font-family:'Courier New', Courier, monospace;">Surname: </label>
-            <span  th:text="${user.getSurname()}"/>
-        </div>
-    </div>
+    <nav th:replace="fragments/header :: navigation-bar"></nav>
 
-    <div class="row container-fluid">
-        <div class="col-1 align-self-center">
-            <label
-                    style="font-family:'Courier New', Courier, monospace;">Username: </label>
-            <span  th:text="${user.getUsername()}"/>
+    <div class="container">
+        <div class="row container-fluid">
+            <div class="align-self-center">
+                <label
+                        style="font-family:'Courier New', Courier, monospace;">First Name: </label>
+                <span  th:text="${user.getName()}"></span>
+            </div>
         </div>
-    </div>
 
-    <div class="row container-fluid">
-        <div class="col-1 align-self-center">
-            <label
-                    style="font-family:'Courier New', Courier, monospace;">Address: </label>
-            <span  th:text="${user.getAddress()}"/>
+        <div class="row container-fluid">
+            <div class="align-self-center">
+                <label
+                        style="font-family:'Courier New', Courier, monospace;">Surname: </label>
+                <span  th:text="${user.getSurname()}"></span>
+            </div>
         </div>
-    </div>
 
-    <div class="row container-fluid">
-        <div class="col-1 align-self-center">
-            <label
-                    style="font-family:'Courier New', Courier, monospace;">E-mail: </label>
-            <span  th:text="${user.getEmail()}"/>
+        <div class="row container-fluid">
+            <div class="align-self-center">
+                <label
+                        style="font-family:'Courier New', Courier, monospace;">Username: </label>
+                <span  th:text="${user.getUsername()}"></span>
+            </div>
         </div>
-    </div>
 
-    <div class="row container-fluid">
-        <div class="col-1 align-self-center">
-            <label
-                    style="font-family:'Courier New', Courier, monospace;">Phone: </label>
-            <span  th:text="${user.getPhone()}"/>
+        <div class="row container-fluid">
+            <div class="align-self-center">
+                <label
+                        style="font-family:'Courier New', Courier, monospace;">Address: </label>
+                <span  th:text="${user.getAddress()}"></span>
+            </div>
         </div>
-    </div>
 
-    <div class="row container-fluid">
-        <div class="col-1 align-self-center">
-            <label
-                    style="font-family:'Courier New', Courier, monospace;">Credit Card Details: </label>
-            <span  th:text="${user.getCredit_card_details()}"/>
+        <div class="row container-fluid">
+            <div class="align-self-center">
+                <label
+                        style="font-family:'Courier New', Courier, monospace;">E-mail: </label>
+                <span  th:text="${user.getEmail()}"></span>
+            </div>
+        </div>
+
+        <div class="row container-fluid">
+            <div class="align-self-center">
+                <label
+                        style="font-family:'Courier New', Courier, monospace;">Phone: </label>
+                <span  th:text="${user.getPhone()}"></span>
+            </div>
+        </div>
+
+        <div class="row container-fluid">
+            <div class="align-self-center">
+                <label
+                        style="font-family:'Courier New', Courier, monospace;">Credit Card Details: </label>
+                <span  th:text="${user.getCredit_card_details()}"></span>
+            </div>
         </div>
     </div>
 
@@ -70,22 +79,15 @@
 <!--    </form>-->
     <a th:href="@{/delete/{id}(id = ${user.getRegistrationID()})}" class="btn btn-danger">Delete Profile</a>
 
+    <div th:replace="fragments/footer :: footer"></div>
 
-
-    <div>
-        <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js"
-                integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo"
-                crossorigin="anonymous"></script>
-        <script
-                src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js"
-                integrity="sha384-UO2eT0CpHqdSJQ6hJty5KVphtPhzWj9WO1clHTMGa3JDZwrnQq4sF86dIHNDz0W1"
-                crossorigin="anonymous"></script>
-        <script
-                src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"
-                integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM"
-                crossorigin="anonymous"></script>
-    </div>
-
+    <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js"
+            integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo"
+            crossorigin="anonymous"></script>
+    <script
+            src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js"
+            integrity="sha384-UO2eT0CpHqdSJQ6hJty5KVphtPhzWj9WO1clHTMGa3JDZwrnQq4sF86dIHNDz0W1"
+            crossorigin="anonymous"></script>
 </body>
 
 

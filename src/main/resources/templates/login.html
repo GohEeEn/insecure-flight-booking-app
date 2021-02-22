@@ -1,10 +1,15 @@
 <!DOCTYPE html>
-<html lang="en">
+
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
 <head>
-    <meta charset="UTF-8">
-    <title>Title</title>
+    <title>Login</title>
+
+    <div th:replace="fragments/header :: header-data"></div>
 </head>
 <body>
+
+<nav th:replace="fragments/header :: navigation-bar"></nav><div th:replace="fragments/footer :: footer"></div>
+
     <form method="POST" action="/login">
         <h1>Login</h1>
         <div class="txt">
@@ -33,6 +38,8 @@
             </div>
         </div>
     </form>
+
+    <div th:replace="fragments/footer :: footer"></div>
 
 </body>
 </html>

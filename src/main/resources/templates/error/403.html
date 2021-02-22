@@ -1,6 +1,6 @@
 <!DOCTYPE HTML>
 
-<html xmlns:th="http://www.thymeleaf.org">
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
 
     <head>
         <meta charset="utf-8">
@@ -9,8 +9,8 @@
         <meta name="description" content="">
         <meta name="viewport" content="width=device-width, initial-scale=1">
         
-        <div th:replace="fragments/header :: header-css"></div>
-        <link href="../../static/css/error.css" rel="stylesheet">
+        <div th:replace="fragments/header :: header-data"></div>
+        <link href="/css/error.css" rel="stylesheet">
     </head>
 
     <body>
@@ -20,13 +20,13 @@
             <h1>403</h1>
 
             <div class="container ">
-                <p><i>HTTP 403 Forbidden</i></p>
+                <p><em>HTTP 403 Forbidden</em></p>
                 <p>Access Denied</p>
                 <p>You Do Not Have The Permission To Access This Page</p>
 
                 <div class="mt-5">
                     <p>: Return to :</p>
-                    <a href="/home" class="btn btn-light">Home</a> 
+                    <a href="/" class="btn btn-light">Home</a> 
                     <a href="javascript:history.back()" class="btn btn-primary">Back</a> 
                 </div>
             </div>

@@ -9,8 +9,8 @@
         <meta name="description" content="">
         <meta name="viewport" content="width=device-width, initial-scale=1">
 
-        <div th:replace="fragments/header :: header-css"></div>
-        <link rel="stylesheet" href="../../static/css/error.css">
+        <div th:replace="fragments/header :: header-data"></div>
+        <link rel="stylesheet" href="/css/error.css">
     </head>
 
     <body>
@@ -20,13 +20,13 @@
             <h1>404</h1>
 
             <div class="container ">
-                <p><i>HTTP 404 Not Found</i></p>
+                <p><em>HTTP 404 Not Found</em></p>
                 <p>Page or Server Not Found</p>
                 <p>The Requested Webpage has been Removed or Doesn't Exist on Our Server</p>
 
                 <div class="mt-5">
                     <p>: Return to :</p>
-                    <a href="/home" class="btn btn-light">Home</a> 
+                    <a href="/" class="btn btn-light">Home</a> 
                     <a href="javascript:history.back()" class="btn btn-primary">Back</a> 
                 </div>
             </div>

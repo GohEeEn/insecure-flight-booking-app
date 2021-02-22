@@ -10,6 +10,11 @@ body, html{
     box-sizing: border-box;
 }
 
+.navbar {
+    padding-left: 2rem;
+    padding-right: 2rem;
+}
+
 h1#welcome-home {
     font-family: 'Roboto Mono', monospace;
     font-size: 5vw;
