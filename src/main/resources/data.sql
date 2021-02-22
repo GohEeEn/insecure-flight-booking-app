@@ -25,9 +25,9 @@ INSERT INTO reservations(email, flight_reference) VALUES
 
 ALTER TABLE library.users MODIFY registrationID int NOT NULL AUTO_INCREMENT;
 
-INSERT INTO users(name, surname, phone, email, address, credit_card_details, reservation_history, upcoming_reservations) VALUES
-('slav', 'denisov', '0830881242', 'slav@ucdconnect.ie', '10 beach bay, smithfield', '8418 5823 1153 8818', '1,2', '7,12'),
-('ola', 'akintola', '0830881243', 'ola@ucdconnect.ie', '13 gunners bay , automaticfield', '8418 5823 1153 8819', '3,4', '5,6'),
-('vincent', 'goh', '0830881244', 'vincent@ucdconnect.ie', '69 miami bay area, awesomefield', '8418 5823 1153 8811', '17,18', '23,'),
-('sean', 'mcloughlin', '0830881245', 'sean@ucdconnect.ie', '27 day dreams, bringfield', '8418 5823 1153 8812', '11,22', '');
+INSERT INTO users(name, surname, username, password, role, phone, email, address, credit_card_details, reservation_history, upcoming_reservations) VALUES
+('slav', 'denisov', 'Slav', 'Slav1234', 'member', '0830881242', 'slav@ucdconnect.ie', '10 beach bay, smithfield', '8418 5823 1153 8818', '1,2', '7,12'),
+('ola', 'akintola', 'Ola', 'Ola1234', 'member', '0830881243', 'ola@ucdconnect.ie', '13 gunners bay , automaticfield', '8418 5823 1153 8819', '3,4', '5,6'),
+('vincent', 'goh', 'Vincent', 'Vincent1234', 'member', '0830881244', 'vincent@ucdconnect.ie', '69 miami bay area, awesomefield', '8418 5823 1153 8811', '17,18', '23,'),
+('sean', 'mcloughlin', 'Sean', 'Sean1234', 'member', '0830881245', 'sean@ucdconnect.ie', '27 day dreams, bringfield', '8418 5823 1153 8812', '11,22', '');
 

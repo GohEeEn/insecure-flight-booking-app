@@ -31,6 +31,24 @@
                 <div class="col-8">
                     <h1>Secure Airways</h1>
                 </div>
+                </div>
+                <div>
+                    <ul>
+                        <li th:if="${user==null}" class="nav-item">
+                            <a class="nav-link js-scroll-trigger" href="/login">Login</a>
+                        </li>
+                        <li th:if="${user==null}" class="nav-item">
+                            <a class="nav-link js-scroll-trigger" href="/register">Register</a>
+                        </li>
+                        <li th:if="${user!=null} and ${user.getRole()=='member'}" class="nav-item">
+                            <a class="nav-link js-scroll-trigger" href="/flight_history">Flight History</a>
+                        </li>
+                        <li th:if="${user!=null} and ${user.getRole()=='member'}" class="nav-item">
+                            <a class="nav-link js-scroll-trigger" href="/upcoming_flights">Upcoming Flights</a>
+                        </li>
+                    </ul>
+
+                </div>
                 <div class="col-2" style="margin-top: 15px">
                     <button type="button" class="btn btn-outline-secondary">Sign up</button>
                 </div>
@@ -40,12 +58,14 @@
             </div>
         </div>
 
-        <form action="/register" method="POST">
+        <form action="/register" method="POST" th:object=${user}">
             <h2>Register An Account</h2>
             <div class="txt">
                 <input id="name" type="text" name="name"
                        placeholder="First Name" />
                 <label for="name" class="entypo-user"></label>
+                <span th:if="${#fields.hasErrors('name')}" th:errors="*{name}">First name error</span>
+
             </div>
 
             <div class="txt">
@@ -99,15 +119,14 @@
             <div class="buttons">
                 <input type="submit" value="Register" />
             </div>
-
-            <div class="container">
-            <span th:if="error != null">
-              <div class="row">
-                <p style="color:red;font-weight:bold;" th:text="${error}"></p>
-              </div>
-            </span>
-            </div>
-
         </form>
+        <div class="container">
+                <span th:if="error != null">
+                  <div class="row">
+                    <p style="color:red;font-weight:bold;" th:text="${error}"></p>
+                  </div>
+                </span>
+        </div>
+
     </body>
 </html>

@@ -1,0 +1,405 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <link rel="stylesheet"
+          href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css"
+          integrity="sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9Ifjh"
+          crossorigin="anonymous">
+    <link rel="stylesheet" href="css/common.css">
+
+
+
+    <script type="text/javascript">
+        var saveBtn = document.getElementById("saveInfo");
+
+        function editPasswordField() {
+
+            $("#newPassword").removeAttr("readonly");
+            $("#newPasswordDuplicate").removeAttr("readonly");
+
+            var saveBtn = document.getElementById("saveInfo");
+
+            if (saveBtn.style.display == 'none') {
+                saveBtn.style.display = 'block';
+            } else {
+                saveBtn.style.display = 'none';
+            }
+
+            var editBtn = document.getElementById("editButton");
+            if (editBtn.style.display == 'block') {
+                editBtn.style.display = 'none';
+            } else {
+                editBtn.style.display = 'block';
+            }
+        }
+
+        function editFirstNameField(){
+            $("#newName").removeAttr("readonly");
+            $("#newName").removeAttr("placeholder");
+            // var saveBtn = document.getElementById("saveInfo");
+
+            if (saveBtn.style.display == 'none') {
+                saveBtn.style.display = 'block';
+            } else {
+                saveBtn.style.display = 'none';
+            }
+
+            var editFirstNameBtn = document.getElementById("editFirstNameButton");
+            if (editFirstNameBtn.style.display === 'block') {
+                editFirstNameBtn.style.display = 'none';
+            } else {
+                editFirstNameBtn.style.display = 'block';
+            }
+        }
+
+        function editSurnameField(){
+            $("#newSurname").removeAttr("readonly");
+            $("#newSurname").removeAttr("placeholder");
+            // var saveBtn = document.getElementById("saveInfo");
+
+            if (saveBtn.style.display == 'none') {
+                saveBtn.style.display = 'block';
+            } else {
+                saveBtn.style.display = 'none';
+            }
+
+            var editSurnameBtn = document.getElementById("editSurnameButton");
+            if (editSurnameBtn.style.display == 'block') {
+                editSurnameBtn.style.display = 'none';
+            } else {
+                editSurnameBtn.style.display = 'block';
+            }
+        }
+
+        function editUsernameField(){
+            $("#newUsername").removeAttr("readonly");
+            $("#newUsername").removeAttr("placeholder");
+            // var saveBtn = document.getElementById("saveInfo");
+
+            if (saveBtn.style.display == 'none') {
+                saveBtn.style.display = 'block';
+            } else {
+                saveBtn.style.display = 'none';
+            }
+
+            var editUsernameBtn = document.getElementById("editUsernameButton");
+            if (editUsernameBtn.style.display == 'block') {
+                editUsernameBtn.style.display = 'none';
+            } else {
+                editUsernameBtn.style.display = 'block';
+            }
+        }
+
+        function editPhoneField(){
+            $("#newPhone").removeAttr("readonly");
+            $("#newPhone").removeAttr("placeholder");
+            // var saveBtn = document.getElementById("saveInfo");
+
+            if (saveBtn.style.display == 'none') {
+                saveBtn.style.display = 'block';
+            } else {
+                saveBtn.style.display = 'none';
+            }
+
+            var editPhoneBtn = document.getElementById("editPhoneButton");
+            if (editPhoneBtn.style.display == 'block') {
+                editPhoneBtn.style.display = 'none';
+            } else {
+                editPhoneBtn.style.display = 'block';
+            }
+        }
+
+        function editAddressField(){
+            $("#newAddress").removeAttr("readonly");
+            $("#newAddress").removeAttr("placeholder");
+            // var saveBtn = document.getElementById("saveInfo");
+
+            if (saveBtn.style.display == 'none') {
+                saveBtn.style.display = 'block';
+            } else {
+                saveBtn.style.display = 'none';
+            }
+
+            var editAddressBtn = document.getElementById("editAddressButton");
+            if (editAddressBtn.style.display == 'block') {
+                editAddressBtn.style.display = 'none';
+            } else {
+                editAddressBtn.style.display = 'block';
+            }
+        }
+
+        function editEmailField(){
+            $("#newEmail").removeAttr("readonly");
+            $("#newEmail").removeAttr("placeholder");
+            // var saveBtn = document.getElementById("saveInfo");
+
+            if (saveBtn.style.display == 'none') {
+                saveBtn.style.display = 'block';
+            } else {
+                saveBtn.style.display = 'none';
+            }
+
+            var editEmailBtn = document.getElementById("editEmailButton");
+            if (editEmailBtn.style.display == 'block') {
+                editEmailBtn.style.display = 'none';
+            } else {
+                editEmailBtn.style.display = 'block';
+            }
+        }
+
+        function editCardField(){
+            $("#newCredit_card_details").removeAttr("readonly");
+            $("#newCredit_card_details").removeAttr("placeholder");
+            // var saveBtn = document.getElementById("saveInfo");
+
+            if (saveBtn.style.display == 'none') {
+                saveBtn.style.display = 'block';
+            } else {
+                saveBtn.style.display = 'none';
+            }
+
+            var editCardBtn = document.getElementById("editCardButton");
+            if (editCardBtn.style.display == 'block') {
+                editCardBtn.style.display = 'none';
+            } else {
+                editCardBtn.style.display = 'block';
+            }
+        }
+
+
+
+
+
+
+        function saveNewUserInfo() {
+            var saveBtn = document.getElementById("saveInfo");
+
+            // disables/enables save button
+            if (saveBtn.style.display == 'none') {
+                saveBtn.style.display = 'block';
+            } else {
+                saveBtn.style.display = 'none'
+            }
+
+            // disables/enables edit button
+            var editBtn = document.getElementById("editButton");
+            if (editBtn.style.display == 'block') {
+                editBtn.style.display = 'none';
+            } else {
+                editBtn.style.display = 'block';
+            }
+
+            $("#newUsername").prop('readonly', true);
+            $("#password").prop('readonly', true);
+            $("#passwordDuplicate").prop('readonly', true);
+        }
+    </script>
+
+</head>
+
+<body>
+<!--<div th:replace="common/head.html"></div>-->
+
+<!-- <form action="GET" method="/userProfile"> -->
+    <div class="container-fluid" style="padding-top: 1%;">
+        <form method="POST" action="/editProfile">
+
+            <div class="row container-fluid">
+                <div class="col-1 align-self-center">
+                    <label
+                            style="font-family:'Courier New', Courier, monospace;">First Name: </label>
+                </div>
+                <div class="col-2">
+                    <input readonly type="text" name="newName"
+                           id="newName" class="form-control"
+                           th:placeholder="${user.getName()}" />
+                </div>
+
+                <a href="#" class="btn btn-primary" role="button"
+                   id="editFirstNameButton" style="display: block;"
+                   onclick="editFirstNameField()">Edit</a>
+            </div>
+
+            <div class="row container-fluid">
+                <div class="col-1 align-self-center">
+                    <label
+                            style="font-family:'Courier New', Courier, monospace;">Surname: </label>
+                </div>
+                    <div class="col-2">
+                        <input readonly type="text" name="newSurname"
+                               id="newSurname" class="form-control"
+                               th:placeholder="${user.getSurname()}" />
+                    </div>
+
+                <a href="#" class="btn btn-primary" role="button"
+                   id="editSurnameButton" style="display: block;"
+                   onclick="editSurnameField()">Edit</a>
+            </div>
+
+
+
+            <div class="row container-fluid">
+                <div class="col-1 align-self-center">
+                    <label
+                            style="font-family:'Courier New', Courier, monospace;">Username:</label>
+                </div>
+                    <div class="col-2">
+                        <input readonly type="text" name="newUsername"
+                               id="newUsername" class="form-control"
+                               th:placeholder="${user.getUsername()}" />
+                    </div>
+                <a href="#" class="btn btn-primary" role="button"
+                   id="editUsernameButton" style="display: block;"
+                   onclick="editUsernameField()">Edit</a>
+
+            </div>
+
+            <div class="row container-fluid">
+                <div class="col-1 align-self-center">
+                    <label
+                            style="font-family:'Courier New', Courier, monospace;">Phone: </label>
+                </div>
+                    <div class="col-2">
+                        <input readonly type="text" name="newPhone"
+                               id="newPhone" class="form-control"
+                               th:placeholder="${user.getPhone()}" />
+                </div>
+                <a href="#" class="btn btn-primary" role="button"
+                   id="editPhoneButton" style="display: block;"
+                   onclick="editPhoneField()">Edit</a>
+
+            </div>
+
+            <div class="row container-fluid">
+                <div class="col-1 align-self-center">
+                    <label
+                            style="font-family:'Courier New', Courier, monospace;">E-mail: </label>
+                </div>
+                <div class="col-2">
+                    <input readonly type="text" name="newEmail"
+                           id="newEmail" class="form-control"
+                           th:placeholder="${user.getEmail()}" />
+                </div>
+                <a href="#" class="btn btn-primary" role="button"
+                   id="editEmailButton" style="display: block;"
+                   onclick="editEmailField()">Edit</a>
+
+            </div>
+
+                <div class="row container-fluid">
+                    <div class="col-1 align-self-center">
+                        <label
+                                style="font-family:'Courier New', Courier, monospace;">Address: </label>
+                    </div>
+                    <div class="col-2">
+                        <input readonly type="text" name="newAddress"
+                               id="newAddress" class="form-control"
+                               th:placeholder="${user.getAddress()}" />
+                    </div>
+                    <a href="#" class="btn btn-primary" role="button"
+                       id="editAddressField" style="display: block;"
+                       onclick="editAddressField()">Edit</a>
+
+                </div>
+
+                <div class="row container-fluid">
+                    <div class="col-1 align-self-center">
+                        <label
+                                style="font-family:'Courier New', Courier, monospace;">Credit Card Details: </label>
+                    </div>
+                    <div class="col-2">
+                        <input readonly type="text" name="newCreditCardDetails"
+                               id="newCreditCardDetails" class="form-control"
+                               th:placeholder="${user.getCredit_card_details()}" />
+
+                    </div>
+                    <a href="#" class="btn btn-primary" role="button"
+                       id="editCardButton" style="display: block;"
+                       onclick="editCardField()">Edit</a>
+
+                </div>
+
+<!--                    <a href="#" class="btn btn-primary" role="button"-->
+<!--                       id="editButton" style="display: block;"-->
+<!--                       onclick="editInputField()">Edit</a>-->
+
+
+            <div class="row container-fluid" style="margin-top: 3px;">
+                <div class="col-1 align-self-center">
+                    <label
+                            style="font-family:'Courier New', Courier, monospace;">New Password:</label>
+                </div>
+                <div class="col-2">
+
+                    <input id="newPassword" type="password" name="newPassword"
+                           readonly placeholder="Set New Password"
+                           class="form-control" />
+
+                </div>
+            </div>
+
+            <div class="row container-fluid" style="margin-top: 3px;">
+                <div class="col-1 align-self-center">
+                    <label
+                            style="font-family:'Courier New', Courier, monospace;">Confirm New Password:</label>
+                </div>
+                <div class="col-2">
+                    <!-- <input readonly type="text" name="username"
+                        id="userConfirmPassword" class="form-control" /> -->
+
+                    <input id="newPasswordDuplicate" type="password"
+                           name="newPasswordDuplicate" readonly
+                           placeholder="Confirm New Password"
+                           class="form-control" />
+                </div>
+
+                <a href="#" class="btn btn-primary" role="button"
+                   id="editNewPasswordButton" style="display: block;"
+                   onclick="editPasswordField()">Edit</a>
+
+            </div>
+            <div class="row container-fluid">
+                <div class="col-1 align-self-center">
+                    <label
+                            style="font-family:'Courier New', Courier, monospace;">Confirm Current Password: </label>
+                </div>
+                <div class="col-2">
+                    <input type="password" name="password"
+                           id="password" class="form-control"
+                           placeholder="Enter Password" />
+                </div>
+
+<!--                <a href="#" class="btn btn-primary" role="button"-->
+<!--                   id="editEmailButton" style="display: block;"-->
+<!--                   onclick="editEmailField()">Edit</a>-->
+
+            </div>
+            <div class="buttons">
+                <input type="submit" value="Save">
+            </div>
+        </form>
+        <div>
+          <span th:if="error != null">
+              <div class="row">
+                  <p style="color:red;font-weight:bold;" th:text="${error}"></p>
+              </div>
+          </span>
+        </div>
+
+    </div>
+    <div>
+        <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js"
+                    integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo"
+                    crossorigin="anonymous"></script>
+        <script
+                src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js"
+                integrity="sha384-UO2eT0CpHqdSJQ6hJty5KVphtPhzWj9WO1clHTMGa3JDZwrnQq4sF86dIHNDz0W1"
+                crossorigin="anonymous"></script>
+        <script
+                src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"
+                integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM"
+                crossorigin="anonymous"></script>
+    </div>
+</body>
+</html>

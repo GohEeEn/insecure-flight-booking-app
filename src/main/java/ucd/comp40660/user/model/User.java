@@ -14,40 +14,41 @@ public class User {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long registrationID;
 
-    @NotBlank
+    @NotBlank(message = "First Name field must not be empty.")
     private String name;
 
-    @NotBlank
+    @NotBlank(message = "Surname field must not be empty.")
     private String surname;
 
-    @NotBlank
+    @NotBlank(message = "Role improperly initialised.")
     private String role;
 
     @Column(unique=true)
-    @NotBlank
+    @NotBlank(message = "Username field must not be empty.")
     private String username;
 
-    @NotBlank
+    @NotBlank(message = "Password field must not be empty.")
     private String password;
 
     @Column(unique=true)
-    @NotNull
+    @NotNull(message = "Password Duplicate field must not be empty.")
     private String phone;
 
     @Column(unique=true)
-    @NotBlank
+    @Email(message = "Valid e-mail address required.")
+    @NotBlank(message = "E-mail field must not be empty.")
     private String email;
 
-    @NotBlank
+    @NotBlank(message = "Address field must not be empty.")
     private String address;
 
-    @NotBlank
+    @NotBlank(message = "Credit Card Details field must not be empty.")
     private String credit_card_details;
 
-    @NotBlank
+//    @NotBlank(message = "Reservation History improperly initialised(blank).")
     private String reservation_history;
 
-    @NotBlank
+//    @NotBlank(message = "Upcoming Reservations improperly initialised(blank).")
     private String upcoming_reservations;
 
 

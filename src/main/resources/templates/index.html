@@ -1,5 +1,6 @@
 <!DOCTYPE html>
-<html lang="en">
+
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
 	<head>
 		<meta charset="utf-8">
 		<title>Home</title>
@@ -28,17 +29,50 @@
 
 	</head>
 	<body>
-		<div class="container">
+
+	<div class="container">
 		  <div class="row">
 		    <div class="col-8">
 		    	<h1>Secure Airways</h1>
 		    </div>
-		    <div class="col-2" style="margin-top: 15px">	
-		    	<button type="button" class="btn btn-outline-secondary">Sign up</button>
-		    </div>
-		    <div class="col-2" style="margin-top: 10px">	
-		    	<button type="button" class="btn btn-primary btn-lg">Log in</button>
-		    </div>
+			<div>
+<!--					<p>-->
+<!--					<p>-->
+<!--						<span th:text="'Today is: ' + ${#dates.format(#dates.createNow(), 'dd MMM yyyy HH:mm')}" th:remove="tag"></span>-->
+<!--					</p>-->
+<!--					</p>-->
+					<span th:if="${user != null}">
+						  <a class="btn btn-primary" href="/logout">Logout</a>
+						  <span>Logged in as </span>
+						  <span th:text="${user.getUsername()}"></span>
+					</span>
+<!--			</div>-->
+<!--			  <div class="col-2" style="margin-top: 15px">-->
+<!--		    	<button type="button" class="btn btn-outline-secondary">Sign up</button>-->
+<!--		    </div>-->
+<!--		    <div class="col-2" style="margin-top: 10px">	-->
+<!--		    	<button type="button" class="btn btn-primary btn-lg">Log in</button>-->
+<!--		    </div>-->
+		  </div>
+
+			  <ul>
+				  <li th:if="${user==null}" class="nav-item">
+					  <a class="nav-link js-scroll-trigger" href="/login">Login</a>
+				  </li>
+				  <li th:if="${user==null}" class="nav-item">
+					  <a class="nav-link js-scroll-trigger" href="/register">Register</a>
+				  </li>
+				  <li th:if="${user!=null} and ${user.getRole()=='member'}" class="nav-item">
+					  <a class="nav-link js-scroll-trigger" href="/viewProfile">View Profile</a>
+				  </li>
+				  <li th:if="${user!=null} and ${user.getRole()=='member'}" class="nav-item">
+					  <a class="nav-link js-scroll-trigger" href="/flight_history">Flight History</a>
+				  </li>
+				  <li th:if="${user!=null} and ${user.getRole()=='member'}" class="nav-item">
+					  <a class="nav-link js-scroll-trigger" href="/upcoming_flights">Upcoming Flights</a>
+				  </li>
+			  </ul>
+
 		  </div>
 		</div>
 		<hr style="color: green; display: block;" >
@@ -142,5 +176,6 @@
 
 		<script type="text/javascript" src="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/js/bootstrap.min.js"></script>
 		<script type="text/javascript" src="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/js/bootstrap.bundle.min.js"></script>
+
 	</body>
 	</html>
