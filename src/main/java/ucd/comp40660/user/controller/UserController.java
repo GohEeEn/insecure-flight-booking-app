@@ -160,11 +160,10 @@ public class UserController {
     }
 
     @PostMapping("/editProfile")
-    public String editProfile(String newName, String newSurname, String newPhone, String newEmail, String newAddress, String newCreditCardDetails,
+    public String editProfile(String newName, String newSurname, String newPhone, String newEmail, String newAddress, String newCredit_card_details,
                             String newUsername, String password, String newPassword, String newPasswordDuplicate, HttpServletResponse response, Model model)
             throws Exception {
 
-        System.out.println("\n\nNew Credit Card Details: " + newCreditCardDetails + "\n\n");
         User user = userSession.getUser();
 
 
@@ -200,8 +199,8 @@ public class UserController {
             else{
                 user.setPhone(user.getPhone());
             }
-            if(!(newCreditCardDetails.isEmpty())){
-                user.setCredit_card_details(newCreditCardDetails);
+            if(!(newCredit_card_details.isEmpty())){
+                user.setCredit_card_details(newCredit_card_details);
             }
             else{
                 user.setCredit_card_details(user.getCredit_card_details());
@@ -212,10 +211,10 @@ public class UserController {
             else{
                 user.setUsername(user.getUsername());
             }
-            if(newPassword.equals(newPasswordDuplicate) && (!(newPassword.isEmpty()))){
+            if(newPassword.equals(newPasswordDuplicate) && (!(newPassword.isEmpty())) && (!(newPassword.isBlank()))){
                 user.setPassword(newPassword);
             }
-            else{
+            else if(((!(newPassword.isBlank())) || (!(newPassword.isEmpty()))) && (!(newPassword.equals(newPasswordDuplicate)))){
                 user.setPassword(user.getPassword());
                 model.addAttribute("error", "\nNew Password entries do not match, password not updated.");
             }
