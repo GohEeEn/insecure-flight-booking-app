@@ -28,7 +28,7 @@ public class FlightController {
 
     private FlightSearch flightSearch = new FlightSearch();
     private Guest guest = new Guest();
-    private Reservation reservation = new Reservation();
+//    private Reservation reservation = new Reservation();
 
     @Autowired
     ReservationRepository reservationRepository;
@@ -133,8 +133,17 @@ public class FlightController {
                 out.println("</script>");
             }else{
                 List<Flight> allFlight = flightRepository.findAll();
-                Flight chosenFlight= allFlight.get(flightIndex);
-                temporaryFlightReference = chosenFlight.getFlightID();
+                List<Flight> flightOptions = flightCheck();
+                Flight userFlight = flightOptions.get(flightIndex - 1);
+                for(Flight aFlight: allFlight){
+                    if(aFlight.getDestination().equals(userFlight.getDestination()) && aFlight.getSource().equals(userFlight.getSource())
+                            && aFlight.getDeparture_date_time().equals(userFlight.getDeparture_date_time()) && aFlight.getArrival_date_time().equals(userFlight.getArrival_date_time()) ){
+                        temporaryFlightReference = aFlight.getFlightID();
+                    }
+                }
+//                chosen Flight
+//                Flight chosenFlight= allFlight.get(flightIndex);
+//                temporaryFlightReference = chosenFlight.getFlightID();
                 response.sendRedirect("/displayBookingPage");
             }
         }
@@ -167,6 +176,8 @@ public class FlightController {
     @PostMapping("/processPayment")
     public void processPayment(String credit_card_details, HttpServletResponse response) throws IOException {
 
+        Reservation reservation = new Reservation();
+
         guest.setCredit_card_details(credit_card_details);
 
         reservation.setEmail(guest.getEmail());
@@ -193,7 +204,10 @@ public class FlightController {
                 reservedLists = guestList.get(i).getReservations();
                 for(Reservation reservedList: reservedLists){
                     if(reservedList.getEmail().equals(reserved.getEmail()) && reservedList.getFlight_reference().equals(reserved.getFlight_reference())){
-                        guestReservationId.add(reserved);
+//                        String flightRef = Long.toString(temporaryFlightReference);
+                        if(reserved.getFlight_reference().equals(temporaryFlightReference)){
+                            guestReservationId.add(reserved);
+                        }
                     }
                 }
             }
