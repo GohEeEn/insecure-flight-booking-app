@@ -239,8 +239,10 @@ public class UserController {
                 user.setPassword(newPassword);
             }
             else{
-                model.addAttribute("error", "\nNew Password entries do not match, password not updated.");
+                model.addAttribute("error", "\nNew Password entries do not match, update denied.");
                 model.addAttribute("user", userSession.getUser());
+
+                return "editPassword.html";
             }
 
             userRepository.save(user);
