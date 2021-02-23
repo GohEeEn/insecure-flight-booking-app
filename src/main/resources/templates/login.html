@@ -1,45 +1,62 @@
 <!DOCTYPE html>
 
 <html lang="en" xmlns:th="http://www.thymeleaf.org">
-<head>
-    <title>Login</title>
 
-    <div th:replace="fragments/header :: header-data"></div>
-</head>
-<body>
+    <head>
+        <title>Login</title>
 
-<nav th:replace="fragments/header :: navigation-bar"></nav><div th:replace="fragments/footer :: footer"></div>
+        <div th:replace="fragments/header :: header-data"></div>
+    </head>
 
-    <form method="POST" action="/login">
-        <h1>Login</h1>
-        <div class="txt">
-            <input id="username" type="text" name="username"
-                   placeholder="Username" />
-            <label for="username" class="entypo-user"></label>
+    <body>
+        <nav th:replace="fragments/header :: navigation-bar"></nav>
+
+        <div class="container">
+
+            <h2>Login</h2>
+
+            <form method="POST" action="/login">
+
+                <div class="form-group">
+                    <label for="username"> Username</label>
+                    <input id="username" class="form-control form-control-lg" type="text" name="username" placeholder="Username" required/>
+                </div>
+
+                <div class="form-group">
+                    <label for="password"> Password</label>
+                    <input id="password" class="form-control form-control-lg" type="password" name="password" placeholder="Password" required/>
+                </div>
+
+                <div class="custom-control custom-checkbox mb-3">
+                    <input type="checkbox" onclick="showPwd()" class="custom-control-input" id="viewPwd">
+                    <label class="custom-control-label" for="viewPwd">Show Password</label>
+                </div>
+
+                <div class="container">
+                    <span th:if="error != null">
+                      <div class="row">
+                          <p class="error" th:text="${error}"></p>
+                      </div>
+                    </span>
+                </div>
+
+                <button type="submit" class="btn btn-primary">Login</button>
+                <a href="/register" class="btn btn-link">Register</a>
+            </form>
         </div>
 
-        <div class="txt">
-            <input id="password" type="password" name="password"
-                   placeholder="Password" />
-            <label for="password" class="entypo-lock"></label>
-            <div class="container">
-              <span th:if="error != null">
-                  <div class="row">
-                      <p style="color:red;font-weight:bold;" th:text="${error}"></p>
-                  </div>
-              </span>
-            </div>
+        <div th:replace="fragments/footer :: footer"></div>
 
-            <div class="buttons">
-                <input type="submit" value="Login" />
-                <span>
-              <a href="/register" class="entypo-user-add register">Register</a>
-                </span>
-            </div>
-        </div>
-    </form>
+        <script>
+            function showPwd() {
+                var x = document.getElementById("password");
 
-    <div th:replace="fragments/footer :: footer"></div>
-
-</body>
+                if(x.type === "password") {
+                    x.type = "text";
+                } else {
+                    x.type = "password";
+                }
+            }
+        </script>
+    </body>
 </html>
