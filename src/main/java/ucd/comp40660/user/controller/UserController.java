@@ -1,14 +1,11 @@
 package ucd.comp40660.user.controller;
 
-import org.springframework.validation.annotation.Validated;
 import ucd.comp40660.user.UserSession;
-import org.springframework.web.bind.annotation.RestController;
 import org.springframework.stereotype.Controller;
 import ucd.comp40660.user.exception.UserNotFoundException;
 import ucd.comp40660.user.model.User;
 import ucd.comp40660.user.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.ui.Model;
 
@@ -20,17 +17,14 @@ import java.sql.SQLIntegrityConstraintViolationException;
 import java.util.List;
 
 
-
 @Controller
 public class UserController {
 
     @Autowired
     private UserSession userSession;
 
-
     @Autowired
     UserRepository userRepository;
-
 
     @GetMapping("/")
     public String index(Model model){
@@ -147,6 +141,7 @@ public class UserController {
             }
         }
     }
+
     @GetMapping("/viewProfile")
     public String viewProfile(Model model) {
         model.addAttribute("user", userSession.getUser());
@@ -161,12 +156,9 @@ public class UserController {
 
     @PostMapping("/editProfile")
     public String editProfile(String newName, String newSurname, String newPhone, String newEmail, String newAddress, String newCreditCardDetails,
-                            String newUsername, String password, String newPassword, String newPasswordDuplicate, HttpServletResponse response, Model model)
-            throws Exception {
+                            String newUsername, String password, Model model) throws Exception {
 
-        System.out.println("\n\nNew Credit Card Details: " + newCreditCardDetails + "\n\n");
         User user = userSession.getUser();
-
 
         if (password.equals(user.getPassword())) {
 
@@ -212,33 +204,56 @@ public class UserController {
             else{
                 user.setUsername(user.getUsername());
             }
-            if(newPassword.equals(newPasswordDuplicate) && (!(newPassword.isEmpty()))){
-                user.setPassword(newPassword);
-            }
-            else{
-                user.setPassword(user.getPassword());
-                model.addAttribute("error", "\nNew Password entries do not match, password not updated.");
-            }
-//            user.setPassword(password);
+
             user.setUpcoming_reservations(user.getUpcoming_reservations());
             user.setReservation_history(user.getReservation_history());
             userRepository.save(user);
-//            userSession.setUser(user);
+
             model.addAttribute("user", userSession.getUser());
 
-            return "editProfile.html";
+            return "viewProfile.html";
 
         } else {
             System.out.println("\n\nPASSWORD FOUND TO BE INCORRECT\n\n");
             model.addAttribute("user", userSession.getUser());
-            model.addAttribute("error", "\nIncorrect Password, alterations failed.");
+            model.addAttribute("error", "\nIncorrect Password, alterations denied.");
             return "editProfile.html";
         }
     }
 
+    @GetMapping("/editPassword")
+    public String changePassword(Model model) {
+        model.addAttribute("user", userSession.getUser());
+        return "editPassword.html";
+    }
 
+    @PostMapping("/editPassword")
+    public String editPassword(String password, String newPassword, String newPasswordDuplicate, HttpServletResponse response, Model model)
+            throws Exception {
 
+        User user = userSession.getUser();
 
+        if (password.equals(user.getPassword())) {
 
+            if(newPassword.equals(newPasswordDuplicate) && (!(newPassword.isEmpty()))){
+                user.setPassword(newPassword);
+            }
+            else{
+                model.addAttribute("error", "\nNew Password entries do not match, password not updated.");
+                model.addAttribute("user", userSession.getUser());
+            }
 
+            userRepository.save(user);
+            model.addAttribute("user", userSession.getUser());
+
+            return "viewProfile.html";
+
+        } else {
+            System.out.println("\n\nPASSWORD FOUND TO BE INCORRECT\n\n");
+            model.addAttribute("user", userSession.getUser());
+            model.addAttribute("error", "\nIncorrect Password, alterations denied.");
+        }
+
+        return "editPassword.html";
+    }
 }

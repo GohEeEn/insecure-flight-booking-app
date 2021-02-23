@@ -52,7 +52,8 @@
             </div>
 
             <form method="GET" action="/editProfile">
-                <button type="submit" class="btn btn-primary">Edit</button>
+                <button type="submit" class="btn btn-primary">Edit Profile</button>
+                <a href="/editPassword" class="btn btn-secondary">Change Password</a>
                 <a th:href="@{/delete/{id}(id = ${user.getRegistrationID()})}" class="btn btn-danger">Delete</a>
             </form>
         </div>
