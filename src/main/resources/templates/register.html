@@ -60,16 +60,14 @@
                     <input id="creditCard" class="form-control" type="text" name="credit_card_details" placeholder="Credit Card Details" />
                 </div>
 
-                <button type="submit" class="btn btn-primary">Register</button>
-            </form>
-
-            <div class="container">
-                <span th:if="error != null">
+                <div class="container" th:if="error != null">
                     <div class="row">
                         <p class="error" th:text="${error}"></p>
                     </div>
-                </span>
-            </div>
+                </div>
+
+                <button type="submit" class="btn btn-primary">Register</button>
+            </form>
         </div>
 
         <div th:replace="fragments/footer :: footer"></div>
