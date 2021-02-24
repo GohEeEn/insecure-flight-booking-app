@@ -1,9 +1,16 @@
 package ucd.comp40660.user.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
+import ucd.comp40660.user.model.CreditCard;
+
 import javax.persistence.*;
 import javax.validation.constraints.*;
 
 import lombok.Data;
+
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity
 @Table(name = "users", uniqueConstraints={@UniqueConstraint(columnNames = {"username", "email", "phone"})})
@@ -44,6 +51,10 @@ public class User {
 
     @NotBlank(message = "Credit Card Details field must not be empty.")
     private String credit_card_details;
+
+    @OneToMany(fetch = FetchType.EAGER, mappedBy = "user")
+    @JsonIgnore
+    private List<CreditCard> credit_cards = new ArrayList<>();
 
 //    @NotBlank(message = "Reservation History improperly initialised(blank).")
     private String reservation_history;
