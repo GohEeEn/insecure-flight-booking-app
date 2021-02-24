@@ -1,74 +1,19 @@
 <!DOCTYPE html>
-<html>
+
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
 	<head>
-		<meta charset="utf-8">
 		<title>Home</title>
-		<meta name = "viewport" content="width = device-width, intial-scale = 1">
-		<link rel="stylesheet" type="text/css" href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css">
 
-		<style type="text/css">
-
-			.footer {
-				position: fixed;
-				left: 0;
-				bottom: 0;
-				width: 100%;
-				background-color: white;
-				color: black;
-				text-align: left;
-				padding-right: 1%;
-			}
-
-			table {
-			    counter-reset: tableCount;     
-			}
-
-			.counterCell:before {              
-			    content: counter(tableCount); 
-			    counter-increment: tableCount; 
-			}
-
-		</style>
-
-		<script src="https://code.jquery.com/jquery-3.5.0.js"></script>
-		<script src="javascript/script.js"></script>
-		<script src="script.js"></script>
-
-
+		<div th:replace="fragments/header :: header-data"></div>
 	</head>
+
 	<body>
-		<div class="container">
-		  <div class="row">
-		    <div class="col-8">
-		    	<div class="row">
-		    		<div class="col-6">
-		    			<h1>Secure Airways</h1>
-		    		</div>
-		    		<div class="col-2">
-		    			<form action="/home" class="form-inline" method="post">
-						  <button name="homeButton" type="submit" class="btn btn-primary mb-2" value="0">Home</button>
-						</form>
-		    		</div>
-		    	</div>
-<!-- 		    	<h1>Secure Airways</h1>
- -->		    </div>
-		    <div class="col-2" style="margin-top: 15px">	
-		    	<button type="button" class="btn btn-outline-secondary">Sign up</button>
-		    </div>
-		    <div class="col-2" style="margin-top: 10px">	
-		    	<button type="button" class="btn btn-primary btn-lg">Log in</button>
-<!-- 
-		    				<form action="/home" class="form-inline" method="post">
-							  <button name="homeButton" type="submit" class="btn btn-primary mb-2" value="0">Return to Home Page</button>
-							</form> -->
-		    </div>
-		  </div>
-		</div>
-		<hr style="color: green; display: block;" >
+
+		<nav th:replace="fragments/header :: navigation-bar"></nav>
 
 		<div class="container">
 			<div class="row">
-				<div class="col-12"><h5>Search Results</h5>
+				<div class="col-12"><h5>Thank For Booking with Secure Airways</h5>
 <!-- 					<h6>Select a Flight</h6>
  -->                        <div class="container">
                             <table class="table">
@@ -97,11 +42,8 @@
 				</div>
 			</div>
 		</div>
-		 <div class="footer">
-		 	<p>&copy; 2021 Email: <a href="mailto:olanipekun.akintola@ucdconnect.ie">olanipekun.akintola@ucdconnect.ie</a>.</p>
- 		 </div>
 
-		<script type="text/javascript" src="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/js/bootstrap.min.js"></script>
-		<script type="text/javascript" src="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/js/bootstrap.bundle.min.js"></script>
+		<div th:replace="fragments/footer :: footer"></div>
+
 	</body>
-    </html>
+</html>

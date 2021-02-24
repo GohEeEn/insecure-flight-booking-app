@@ -47,10 +47,10 @@ public class FlightController {
 
     Long temporaryFlightReference;
 
-    @GetMapping("/")
-    public String index(){
-        return "index.html";
-    }
+//    @GetMapping("/")
+//    public String index(){
+//        return "index.html";
+//    }
 
 
     @PostMapping("/home")
