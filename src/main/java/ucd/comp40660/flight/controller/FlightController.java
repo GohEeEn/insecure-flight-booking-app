@@ -23,8 +23,14 @@ import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.List;
 
+import ucd.comp40660.user.UserSession;
+import ucd.comp40660.user.model.User;
+
+
 @Controller
 public class FlightController {
+
+
 
     private FlightSearch flightSearch = new FlightSearch();
     private Guest guest = new Guest();
@@ -45,6 +51,7 @@ public class FlightController {
     public String index(){
         return "index.html";
     }
+
 
     @PostMapping("/home")
     public void home(String homeButton, HttpServletResponse response) throws IOException {

@@ -1,0 +1,38 @@
+<!DOCTYPE HTML>
+
+<html lang="en" xmlns:th="http://www.thymeleaf.org" >
+
+    <head>
+        <meta charset="utf-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <title>BAFlight : Page Not Found</title>
+        <meta name="description" content="">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+
+        <div th:replace="fragments/header :: header-data"></div>
+        <link rel="stylesheet" href="/css/error.css">
+    </head>
+
+    <body>
+
+        <div id="error-content" class="container text-center align-middle">
+
+            <h1>404</h1>
+
+            <div class="container ">
+                <p><em>HTTP 404 Not Found</em></p>
+                <p>Page or Server Not Found</p>
+                <p>The Requested Webpage has been Removed or Doesn't Exist on Our Server</p>
+
+                <div class="mt-5">
+                    <p>: Return to :</p>
+                    <a href="/" class="btn btn-light">Home</a> 
+                    <a href="javascript:history.back()" class="btn btn-primary">Back</a> 
+                </div>
+            </div>
+        </div>
+
+    </body>
+
+</html>
+
