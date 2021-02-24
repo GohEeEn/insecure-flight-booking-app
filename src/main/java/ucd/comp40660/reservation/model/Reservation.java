@@ -5,7 +5,8 @@ import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 
 import lombok.Data;
-
+import lombok.ToString;
+import ucd.comp40660.user.model.Guest;
 
 
 @Entity
@@ -15,7 +16,7 @@ public class Reservation {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long reservationID;
+    private Long id;
 
     @NotBlank
     private String email;
@@ -23,14 +24,18 @@ public class Reservation {
     @NotNull
     private Long flight_reference;
 
+    @ToString.Exclude
+    @ManyToOne
+    private Guest guest;
+
 
     public Reservation(){
         super();
     }
 
 
-    public Reservation(Long reservationID, String email, Long flight_reference){
-        this.reservationID = reservationID;
+    public Reservation(Long id, String email, Long flight_reference){
+        this.id = id;
         this.email = email;
         this.flight_reference = flight_reference;
     }

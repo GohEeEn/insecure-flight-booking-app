@@ -10,10 +10,16 @@ import ucd.comp40660.flight.repository.FlightRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import ucd.comp40660.reservation.model.Reservation;
+import ucd.comp40660.reservation.repository.ReservationRepository;
+import ucd.comp40660.user.model.Guest;
+import ucd.comp40660.user.repository.GuestRepository;
+
 
 import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
 import java.io.IOException;
+import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -27,14 +33,30 @@ public class FlightController {
 
 
     private FlightSearch flightSearch = new FlightSearch();
+    private Guest guest = new Guest();
+//    private Reservation reservation = new Reservation();
+
+    @Autowired
+    ReservationRepository reservationRepository;
 
     @Autowired
     FlightRepository flightRepository;
 
-//    @GetMapping("/")
-//    public String index(){
-//        return "index.html";
-//    }
+    @Autowired
+    GuestRepository guestRepository;
+
+    Long temporaryFlightReference;
+
+    @GetMapping("/")
+    public String index(){
+        return "index.html";
+    }
+
+
+    @PostMapping("/home")
+    public void home(String homeButton, HttpServletResponse response) throws IOException {
+        response.sendRedirect("/");
+    }
 
     //    Get all flights
     @GetMapping("/flights")
@@ -79,7 +101,7 @@ public class FlightController {
     @PostMapping("/processFlightSearch")
     public void processFlightSearch(String departure, String destinationInput, int passengers, String outboundDate, HttpServletResponse response) throws IOException {
 
-        System.out.println(outboundDate);
+//        System.out.println(outboundDate);
         flightSearch.setDeparture(departure);
         flightSearch.setDestinationInput(destinationInput);
         flightSearch.setPassengers(passengers);
@@ -95,6 +117,110 @@ public class FlightController {
 //        flightList = flightRepository.findAll();
         model.addAttribute("displayedFlights", flightList);
         return "flightResults.html";
+    }
+
+    @PostMapping("/selectFlight")
+    public void selectFlight(String flightIndexSelected, HttpServletResponse response) throws IOException {
+        boolean isNumber = flightIndexSelected.chars().allMatch( Character::isDigit);
+        if(!isNumber){
+            PrintWriter out = response.getWriter();
+            out.println("<script>");
+            out.println("alert('" + "Select from displayed Index"+"');");
+            out.println("window.location.replace('" + "/flightSearchResults" + "');");
+            out.println("</script>");
+        }
+        else{
+            List<Flight> flightList = flightCheck();
+            int flightIndex = Integer.parseInt(flightIndexSelected);
+            if(flightIndex <= 0 || flightIndex > flightList.size() ){
+                PrintWriter out = response.getWriter();
+                out.println("<script>");
+                out.println("alert('" + "Select from displayed Index"+"');");
+                out.println("window.location.replace('" + "/flightSearchResults" + "');");
+                out.println("</script>");
+            }else{
+                List<Flight> allFlight = flightRepository.findAll();
+                List<Flight> flightOptions = flightCheck();
+                Flight userFlight = flightOptions.get(flightIndex - 1);
+                for(Flight aFlight: allFlight){
+                    if(aFlight.getDestination().equals(userFlight.getDestination()) && aFlight.getSource().equals(userFlight.getSource())
+                            && aFlight.getDeparture_date_time().equals(userFlight.getDeparture_date_time()) && aFlight.getArrival_date_time().equals(userFlight.getArrival_date_time()) ){
+                        temporaryFlightReference = aFlight.getFlightID();
+                    }
+                }
+//                chosen Flight
+//                Flight chosenFlight= allFlight.get(flightIndex);
+//                temporaryFlightReference = chosenFlight.getFlightID();
+                response.sendRedirect("/displayBookingPage");
+            }
+        }
+    }
+
+    @GetMapping("/displayBookingPage")
+    public String guestBooking(){
+
+        return "bookingDetails.html";
+    }
+
+    @PostMapping("/processGuestPersonalDetails")
+    public void processGuestPersonalDetails(String name, String surname, String email, String phoneNumber, String address, HttpServletResponse response ) throws IOException {
+
+        guest.setName(name);
+        guest.setSurname(surname);
+        guest.setEmail(email);
+        guest.setPhone(phoneNumber);
+        guest.setAddress(address);
+
+        response.sendRedirect("/displayPaymentPage");
+    }
+
+    @GetMapping("/displayPaymentPage")
+    public String displayPaymentPage(){
+
+        return "displayPaymentPage.html";
+    }
+
+    @PostMapping("/processPayment")
+    public void processPayment(String credit_card_details, HttpServletResponse response) throws IOException {
+
+        Reservation reservation = new Reservation();
+
+        guest.setCredit_card_details(credit_card_details);
+
+        reservation.setEmail(guest.getEmail());
+        reservation.setFlight_reference(temporaryFlightReference);
+        reservation.setGuest(guest);
+
+        guest.getReservations().add(reservation);
+        guestRepository.save(guest);
+
+        reservationRepository.save(reservation);
+
+        response.sendRedirect("/displayReservationId");
+    }
+
+    @GetMapping("/displayReservationId")
+    public String displayReservationId(Model model){
+        List<Reservation> guestReservationId = new ArrayList<>();
+        List<Guest> guestList = guestRepository.findAll();
+        List<Reservation> reservationList = reservationRepository.findAll();
+
+        for(Reservation reserved: reservationList){
+            List<Reservation> reservedLists = new ArrayList<>();
+            for(int i = 0; i < guestList.size(); i++){
+                reservedLists = guestList.get(i).getReservations();
+                for(Reservation reservedList: reservedLists){
+                    if(reservedList.getEmail().equals(reserved.getEmail()) && reservedList.getFlight_reference().equals(reserved.getFlight_reference())){
+//                        String flightRef = Long.toString(temporaryFlightReference);
+                        if(reserved.getFlight_reference().equals(temporaryFlightReference)){
+                            guestReservationId.add(reserved);
+                        }
+                    }
+                }
+            }
+        }
+        model.addAttribute("guestReservationIds", guestReservationId);
+        return "displayReservation.html";
     }
 
     private List<Flight> flightCheck() {

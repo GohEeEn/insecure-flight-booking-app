@@ -77,8 +77,10 @@
 					<br>
 						<div class="row">
 							<div class="col">
-							<label for="passengers">Passengers</label>
-							<input type="text" class="form-control" id="passengers" placeholder="Number of Travellers" name="passengers" required="required">
+
+							<label for="name">Passengers</label>
+							<input type="number" class="form-control" placeholder="Number of Travellers" name="passengers" min="1" max="10" required="required">
+
 							</div>
 						</div>
 					<br>
@@ -87,7 +89,9 @@
 							<div class="form-group">
 								<label for="outboundDate">Date</label>
 								<br>
-								<input type="date" class="form-control" id="outboundDate" name="outboundDate" min="2020-11-28" max="2021-12-31">
+
+								<input type="date" id="outboundDate" name="outboundDate" min="2020-11-28" max="2021-12-31" required="required">
+
 							</div>
 						</div>
 <!-- 						<div class="col">

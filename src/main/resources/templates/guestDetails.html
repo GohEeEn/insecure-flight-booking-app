@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="utf-8">
+		<title>Home</title>
+		<meta name = "viewport" content="width = device-width, intial-scale = 1">
+		<link rel="stylesheet" type="text/css" href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css">
+
+		<style type="text/css">
+
+			.footer {
+				position: fixed;
+				left: 0;
+				bottom: 0;
+				width: 100%;
+				background-color: white;
+				color: black;
+				text-align: left;
+				padding-right: 1%;
+			}
+
+		</style>
+
+		<script src="https://code.jquery.com/jquery-3.5.0.js"></script>
+		<script src="javascript/script.js"></script>
+		<script src="script.js"></script>
+
+
+	</head>
+	<body>
+		<div class="container">
+		  <div class="row">
+		    <div class="col-8">
+		    	<h1>Secure Airways</h1>
+		    </div>
+		    <div class="col-2" style="margin-top: 15px">	
+		    	<button type="button" class="btn btn-outline-secondary">Sign up</button>
+		    </div>
+		    <div class="col-2" style="margin-top: 10px">	
+		    	<button type="button" class="btn btn-primary btn-lg">Log in</button>
+		    </div>
+		  </div>
+		</div>
+		<hr style="color: green; display: block;" >
+
+		<div class="container">
+			<div class="row">
+				<div class="col-8">
+					<h4>Enter Personal Details</h4>
+					<form action="/processGuestPersonalDetails" method="post">
+						 <div class="form-row">
+						    <div class="form-group col-md-6">
+						      <label for="firstName">FirstName</label>
+						      <input type="text" class="form-control" id="firstName" placeholder="name" name="name" required="required">
+						    </div>
+						    <div class="form-group col-md-6">
+						      <label for="lastName">LastName</label>
+						      <input type="text" class="form-control" id="lastName" placeholder="surname" name="surname" required="required">
+						    </div>
+						 </div>
+						 <div class="form-row">
+						    <div class="form-group col-md-6">
+						      <label for="inputEmail">Email</label>
+						      <input type="email" class="form-control" id="inputEmail" placeholder="email@example.com" name="email" required="required">
+						    </div>
+						    <div class="form-group col-md-6">
+						      <label for="inputPhoneNumber">Phone Number</label>
+						      <input type="text" class="form-control" id="inputPhoneNumber" placeholder="Phone Number" name="phoneNumber" required="required">
+						    </div>
+						 </div>
+						 <div class="form-group">
+						    <label for="inputAddress">Address</label>
+						    <input type="text" class="form-control" id="inputAddress" placeholder="1234 Main St" name="address" required="required">
+						 </div>
+						 <div class="form-group">
+						    <div class="form-check">
+						      <input class="form-check-input" type="checkbox" id="gridCheck">
+						      <label class="form-check-label" for="gridCheck">
+						        Use address for billing
+						      </label>
+						    </div>
+						 </div>
+						 <button type="submit" class="btn btn-primary">Continue to Payment</button>
+					</form>
+				</div>
+				<div class="col-4">
+<!-- 					<h4>Choose Flights</h4>
+					<form action="/processFlightSearch" method="post" >
+
+
+
+					<button type="submit" class="btn btn-primary">Submit</button>
+					</form> -->
+				</div>
+			</div>
+		</div>
+		 <div class="footer">
+		 	<p>&copy; 2020 Email: <a href="mailto:olanipekun.akintola@ucdconnect.ie">olanipekun.akintola@ucdconnect.ie</a>.</p>
+ 		 </div>
+
+		<script type="text/javascript" src="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/js/bootstrap.min.js"></script>
+		<script type="text/javascript" src="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/js/bootstrap.bundle.min.js"></script>
+	</body>
+	</html>

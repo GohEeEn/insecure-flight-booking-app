@@ -14,7 +14,7 @@ INSERT INTO flights(source, destination, departure_date_time, arrival_date_time)
 
 
 
-ALTER TABLE library.reservations MODIFY reservationID int NOT NULL AUTO_INCREMENT;
+ALTER TABLE library.reservations MODIFY id bigint NOT NULL AUTO_INCREMENT;
 
 INSERT INTO reservations(email, flight_reference) VALUES
 ('slav@ucdconnect.ie', 3),
@@ -31,3 +31,7 @@ INSERT INTO users(name, surname, username, password, role, phone, email, address
 ('vincent', 'goh', 'Vincent', 'Vincent1234', 'member', '0830881244', 'vincent@ucdconnect.ie', '69 miami bay area, awesomefield', '8418 5823 1153 8811', '17,18', '23,'),
 ('sean', 'mcloughlin', 'Sean', 'Sean1234', 'member', '0830881245', 'sean@ucdconnect.ie', '27 day dreams, bringfield', '8418 5823 1153 8812', '11,22', '');
 
+ALTER TABLE library.guests MODIFY id bigint NOT NULL AUTO_INCREMENT;
+
+INSERT INTO guests(name, surname, phone, email, address, credit_card_details ) VALUES
+('joe', 'blogg', '0892209191', 'olamoiakin@gmail.com', '1 no mans land, mainfield', '1234 5678 1234 5678');
