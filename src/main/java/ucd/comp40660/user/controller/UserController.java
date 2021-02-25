@@ -2,8 +2,11 @@ package ucd.comp40660.user.controller;
 
 import ucd.comp40660.user.UserSession;
 import org.springframework.stereotype.Controller;
+import ucd.comp40660.user.exception.CreditCardNotFoundException;
 import ucd.comp40660.user.exception.UserNotFoundException;
+import ucd.comp40660.user.model.CreditCard;
 import ucd.comp40660.user.model.User;
+import ucd.comp40660.user.repository.CreditCardRepository;
 import ucd.comp40660.user.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
@@ -25,6 +28,9 @@ public class UserController {
 
     @Autowired
     UserRepository userRepository;
+
+    @Autowired
+    CreditCardRepository creditCardRepository;
 
     @GetMapping("/")
     public String index(Model model){
@@ -227,6 +233,7 @@ public class UserController {
         return "editPassword.html";
     }
 
+
     @PostMapping("/editPassword")
     public String editPassword(String password, String newPassword, String newPasswordDuplicate, HttpServletResponse response, Model model)
             throws Exception {
@@ -258,4 +265,59 @@ public class UserController {
 
         return "editPassword.html";
     }
+
+    @GetMapping("/cards")
+    @ResponseBody
+    public List<CreditCard> getCreditCards() {
+        return creditCardRepository.findAll();
+    }
+
+
+    @PostMapping("/addMemberCreditCard")
+    public String addMemberCreditCard(String cardholder_name, String card_number, String card_type,
+                                int expiration_month, int expiration_year, String security_code, Model model){
+        User user = userSession.getUser();
+        model.addAttribute("user", userSession.getUser());
+        CreditCard newCard = new CreditCard(cardholder_name, card_number, card_type, expiration_month, expiration_year, security_code);
+        if(user!=null){
+            newCard.setUser(user);
+        }
+        else{
+            model.addAttribute("error", "\nError, No Member logged in to save card details.");
+            return "login.html";
+        }
+
+        creditCardRepository.save(newCard);
+        return "viewProfile.html";
+    }
+
+    @GetMapping("/viewMemberCreditCards")
+    public String viewMemberCreditCards(Model model){
+        model.addAttribute("user", userSession.getUser());
+        model.addAttribute("cards", creditCardRepository.findAllByUser(userSession.getUser()));
+        return "viewCreditCards.html";
+    }
+
+    @GetMapping("/registerCard")
+    public String registerCardView(Model model){
+
+        model.addAttribute("user", userSession.getUser());
+        return "registerCreditCard.html";
+    }
+
+    @GetMapping("/deleteCard/{id}")
+    public String deleteCard(@PathVariable(value = "id") Long id, Model model) throws CreditCardNotFoundException {
+        CreditCard card = creditCardRepository.findById(id)
+                .orElseThrow(() -> new CreditCardNotFoundException(id));
+
+        creditCardRepository.delete(card);
+        model.addAttribute("user", userSession.getUser());
+        model.addAttribute("cards", creditCardRepository.findAllByUser(userSession.getUser()));
+
+        return "viewCreditCards.html";
+    }
+
+
+//    @PostMapping("/registerCard")
+//    public String registerCard()
 }
