@@ -7,5 +7,5 @@ import ucd.comp40660.reservation.model.Reservation;
 
 @Repository
 public interface FlightRepository extends JpaRepository<Flight, Long> {
-    public Flight findFlightByReservations(Reservation reservation);
+    public Flight findFlightByReservation(Reservation reservation);
 }

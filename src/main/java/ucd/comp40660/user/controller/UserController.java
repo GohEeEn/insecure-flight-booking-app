@@ -334,7 +334,7 @@ public class UserController {
                 List<Flight> flights = new ArrayList<>();
 
                 for (Reservation reservation : reservations) {
-                    Flight flight = flightRepository.findFlightByReservations(reservation);
+                    Flight flight = flightRepository.findFlightByReservation(reservation);
 
                     if (flight != null) {
                         flights.add(flight);
@@ -342,7 +342,7 @@ public class UserController {
                 }
 
 //            add the flights to the model, so thymeleaf can display them
-                model.addAttribute("flights", flights);
+                model.addAttribute("flightsUser", flights);
 
 //            display the reservations on a new page
                 return "viewFlightsUser";

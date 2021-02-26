@@ -37,7 +37,7 @@
                 </tr>
                 </thead>
                 <tbody>
-                <tr th:each="flight: ${flights}">
+                <tr th:each="flight: ${flightsGuest}">
                     <td class="counterCell"></td>
                     <td th:text="${flight.source} "></td>
                     <td th:text="${flight.destination} "></td>

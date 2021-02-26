@@ -252,11 +252,13 @@ public class FlightController {
 
 //            retrieve all reservations and flights
             List<Reservation> reservations = reservationRepository.findAllByGuest(guest);
-            List<Flight> flights = new ArrayList<>();
 
             if (reservations.size() > 0) {
+
+                List<Flight> flights = new ArrayList<>();
+
                 for (Reservation reservation : reservations) {
-                    Flight flight = reservation.getFlight();
+                    Flight flight = flightRepository.findFlightByReservation(reservation);
 
                     if (flight != null) {
                         flights.add(flight);
@@ -264,13 +266,17 @@ public class FlightController {
                 }
 
 //            add all flights corresponding to the user to the model
-                model.addAttribute("flights", flights);
+                model.addAttribute("flightsGuest", flights);
+
+//                display the reservations on a new page
+                return "viewFlightsGuest";
 
             } else {
                 throw new ReservationNotFoundException();
             }
         }
-        return "viewFlightsGuest";
+//        if guest doesn't have any reservations - return to landing page
+        return "/";
     }
 
 }
