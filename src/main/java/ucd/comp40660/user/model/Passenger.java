@@ -1,61 +1,48 @@
 package ucd.comp40660.user.model;
 
+import lombok.Data;
+import lombok.ToString;
+
+import javax.persistence.*;
+import javax.validation.constraints.NotBlank;
+
+@Entity
+@Table(name = "passengers")
+@Data
 public class Passenger {
-    String nanme;
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
+
+    @NotBlank
+    String name;
+
+    @NotBlank
     String surname;
+
+    @NotBlank
     String phone;
+
+    @NotBlank
     String email;
+
+    @NotBlank
     String address;
 
-    public Passenger(String nanme, String surname, String phone, String email, String address) {
-        this.nanme = nanme;
+    @ToString.Exclude
+    @ManyToOne(cascade = CascadeType.PERSIST)
+    private Guest guest;
+
+    public Passenger(Long id, String name, String surname, String phone, String email, String address) {
+        this.id = id;
+        this.name = name;
         this.surname = surname;
         this.phone = phone;
         this.email = email;
         this.address = address;
     }
 
-    public Passenger() {
-    }
+    public Passenger() { super(); }
 
-    public String getNanme() {
-        return nanme;
-    }
-
-    public void setNanme(String nanme) {
-        this.nanme = nanme;
-    }
-
-    public String getSurname() {
-        return surname;
-    }
-
-    public void setSurname(String surname) {
-        this.surname = surname;
-    }
-
-    public String getPhone() {
-        return phone;
-    }
-
-    public void setPhone(String phone) {
-        this.phone = phone;
-    }
-
-    public String getEmail() {
-        return email;
-    }
-
-    public void setEmail(String email) {
-        this.email = email;
-    }
-
-    public String getAddress() {
-        return address;
-    }
-
-    public void setAddress(String address) {
-        this.address = address;
-    }
 }
 

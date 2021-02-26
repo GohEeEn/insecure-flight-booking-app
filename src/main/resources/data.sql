@@ -35,3 +35,8 @@ ALTER TABLE library.guests MODIFY id bigint NOT NULL AUTO_INCREMENT;
 
 INSERT INTO guests(name, surname, phone, email, address, credit_card_details ) VALUES
 ('joe', 'blogg', '0892209191', 'olamoiakin@gmail.com', '1 no mans land, mainfield', '1234 5678 1234 5678');
+
+ALTER TABLE library.passengers MODIFY id bigint NOT NULL AUTO_INCREMENT;
+
+INSERT INTO passengers(name, surname, phone, email, address) VALUES
+('passengername', 'passengerlastname', '0892209191', 'p1@gmail.com', 'no known residence, mainfield');

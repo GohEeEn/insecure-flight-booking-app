@@ -13,6 +13,7 @@ import org.springframework.web.bind.annotation.*;
 import ucd.comp40660.reservation.model.Reservation;
 import ucd.comp40660.reservation.repository.ReservationRepository;
 import ucd.comp40660.user.model.Guest;
+import ucd.comp40660.user.model.Passenger;
 import ucd.comp40660.user.repository.GuestRepository;
 
 
@@ -25,6 +26,7 @@ import java.util.List;
 
 import ucd.comp40660.user.UserSession;
 import ucd.comp40660.user.model.User;
+import ucd.comp40660.user.repository.PassengerRepository;
 
 
 @Controller
@@ -40,12 +42,19 @@ public class FlightController {
     ReservationRepository reservationRepository;
 
     @Autowired
+    PassengerRepository passengerRepository;
+
+    @Autowired
     FlightRepository flightRepository;
 
     @Autowired
     GuestRepository guestRepository;
 
     Long temporaryFlightReference;
+
+    int numberOfPassengers;
+
+    List<Passenger> listOfOtherPassengers = new ArrayList<>();
 
 //    @GetMapping("/")
 //    public String index(){
@@ -100,6 +109,8 @@ public class FlightController {
 
     @PostMapping("/processFlightSearch")
     public void processFlightSearch(String departure, String destinationInput, int passengers, String outboundDate, HttpServletResponse response) throws IOException {
+
+        numberOfPassengers = passengers;
 
 //        System.out.println(outboundDate);
         flightSearch.setDeparture(departure);
@@ -159,7 +170,43 @@ public class FlightController {
     @GetMapping("/displayBookingPage")
     public String guestBooking(){
 
-        return "bookingDetails.html";
+        if(numberOfPassengers > 1){
+            return "passengerDetails.html";
+        }else{
+            return "bookingDetails.html";
+        }
+    }
+
+    @PostMapping("/processOtherPassengerDetails")
+    public void processOtherPassengerDetails(String name, String surname, String email, String phoneNumber, String address, HttpServletResponse response) throws IOException {
+
+        Passenger passenger = new Passenger();
+
+        passenger.setName(name);
+        passenger.setSurname(surname);
+        passenger.setPhone(phoneNumber);
+        passenger.setAddress(address);
+        passenger.setEmail(email);
+        passenger.setGuest(guest);
+
+
+//        listOfOtherPassengers.add(passenger);
+
+        guest.getPassengers().add(passenger);
+
+        passengerRepository.save(passenger);
+
+        System.out.println("size: " + guest.getPassengers().size());
+
+        numberOfPassengers -= 1;
+        response.sendRedirect("/displayBookingPage");
+
+//        if(numberOfPassengers > 1){
+//            response.sendRedirect("/displayBookingPage");
+//        }else{
+//            response.sendRedirect("/bookingDetails");
+//        }
+
     }
 
     @PostMapping("/processGuestPersonalDetails")
@@ -203,6 +250,8 @@ public class FlightController {
     public String displayReservationId(Model model){
         List<Reservation> guestReservationId = new ArrayList<>();
         List<Guest> guestList = guestRepository.findAll();
+        System.out.println(guestList.get(1).getPassengers().size() );
+
         List<Reservation> reservationList = reservationRepository.findAll();
 
         for(Reservation reserved: reservationList){
