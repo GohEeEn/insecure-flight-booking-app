@@ -3,6 +3,7 @@ package ucd.comp40660.reservation.repository;
 import org.springframework.data.jpa.repository.JpaRepository;
 import ucd.comp40660.reservation.model.Reservation;
 import org.springframework.stereotype.Repository;
+import ucd.comp40660.user.model.Guest;
 import ucd.comp40660.user.model.User;
 
 import java.util.List;
