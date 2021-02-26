@@ -251,12 +251,12 @@ public class FlightController {
             model.addAttribute("guest", guest);
 
 //            retrieve all reservations and flights
-            List<Reservation> reservations = guest.getReservations();
+            List<Reservation> reservations = reservationRepository.findAllByGuest(guest);
             List<Flight> flights = new ArrayList<>();
 
             if (reservations.size() > 0) {
                 for (Reservation reservation : reservations) {
-                    Flight flight = flightRepository.findFlightByReservations(reservation);
+                    Flight flight = reservation.getFlight();
 
                     if (flight != null) {
                         flights.add(flight);
