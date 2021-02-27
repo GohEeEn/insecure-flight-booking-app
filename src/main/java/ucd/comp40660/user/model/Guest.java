@@ -36,9 +36,6 @@ public class Guest {
     @NotBlank
     private String address;
 
-    @NotBlank
-    private String credit_card_details;
-
     @Column
     @OneToMany(mappedBy = "guest")
     private List<Reservation> reservations = new ArrayList<>();
@@ -47,13 +44,12 @@ public class Guest {
         super();
     }
 
-    public Guest(String name, String surname, String phone, String email, String address, String credit_card_details, List<Reservation> reservations) {
+    public Guest(String name, String surname, String phone, String email, String address, List<Reservation> reservations) {
         this.name = name;
         this.surname = surname;
         this.phone = phone;
         this.email = email;
         this.address = address;
-        this.credit_card_details = credit_card_details;
         this.reservations = reservations;
     }
 }

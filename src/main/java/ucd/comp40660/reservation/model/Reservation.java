@@ -25,6 +25,9 @@ public class Reservation {
     @NotNull
     private Long flight_reference;
 
+    @NotNull
+    private boolean cancelled;
+
     @ToString.Exclude
     @ManyToOne
     private Guest guest;
@@ -43,5 +46,6 @@ public class Reservation {
         this.id = id;
         this.email = email;
         this.flight_reference = flight_reference;
+        this.cancelled = false;
     }
 }

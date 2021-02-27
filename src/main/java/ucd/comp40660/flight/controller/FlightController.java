@@ -34,7 +34,6 @@ public class FlightController {
 
     private FlightSearch flightSearch = new FlightSearch();
     private Guest guest = new Guest();
-//    private Reservation reservation = new Reservation();
 
     @Autowired
     ReservationRepository reservationRepository;
@@ -47,14 +46,8 @@ public class FlightController {
 
     Long temporaryFlightReference;
 
-//    @GetMapping("/")
-//    public String index(){
-//        return "index.html";
-//    }
-
-
     @PostMapping("/home")
-    public void home(String homeButton, HttpServletResponse response) throws IOException {
+    public void home(HttpServletResponse response) throws IOException {
         response.sendRedirect("/");
     }
 
@@ -112,8 +105,7 @@ public class FlightController {
 
     @GetMapping("/flightSearchResults")
     public String flightSearchResults(Model model) {
-        List<Flight> flightList = new ArrayList<>();
-        flightList = flightCheck();
+        List<Flight> flightList = flightCheck();
 //        flightList = flightRepository.findAll();
         model.addAttribute("displayedFlights", flightList);
         return "flightResults.html";
@@ -184,7 +176,7 @@ public class FlightController {
 
         Reservation reservation = new Reservation();
 
-        guest.setCredit_card_details(credit_card_details);
+        // TODO : Set guest's credit card detail required
 
         reservation.setEmail(guest.getEmail());
         reservation.setFlight_reference(temporaryFlightReference);

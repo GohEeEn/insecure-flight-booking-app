@@ -1,7 +1,7 @@
 package ucd.comp40660.reservation.controller;
 
 
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.stereotype.Controller;
 import ucd.comp40660.reservation.repository.ReservationRepository;
 import ucd.comp40660.reservation.model.Reservation;
 import ucd.comp40660.reservation.exception.ReservationNotFoundException;

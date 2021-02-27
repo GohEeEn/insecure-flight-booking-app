@@ -16,11 +16,11 @@ ALTER TABLE library.credit_cards MODIFY id bigint NOT NULL AUTO_INCREMENT;
 
 ALTER TABLE library.reservations MODIFY id bigint NOT NULL AUTO_INCREMENT;
 
-INSERT INTO reservations(email, flight_reference) VALUES
-('slav@ucdconnect.ie', 3),
-('sean@ucdconnect.ie', 2),
-('vincent@ucdconnect.ie', 5),
-('ola@ucdconnect.ie', 1);
+INSERT INTO reservations(email, flight_flightid, cancelled) VALUES
+('slav@ucdconnect.ie', 3, false),
+('sean@ucdconnect.ie', 2, false),
+('vincent@ucdconnect.ie', 5, false),
+('ola@ucdconnect.ie', 1, false);
 
 
 ALTER TABLE library.users MODIFY registrationID bigint NOT NULL AUTO_INCREMENT;
@@ -33,8 +33,8 @@ INSERT INTO users(name, surname, username, password, role, phone, email, address
 
 ALTER TABLE library.guests MODIFY id bigint NOT NULL AUTO_INCREMENT;
 
-INSERT INTO guests(name, surname, phone, email, address, credit_card_details ) VALUES
-('joe', 'blogg', '0892209191', 'olamoiakin@gmail.com', '1 no mans land, mainfield', '1234 5678 1234 5678');
+INSERT INTO guests(name, surname, phone, email, address) VALUES
+('joe', 'blogg', '0892209191', 'olamoiakin@gmail.com', '1 no mans land, mainfield');
 
 INSERT INTO credit_cards(cardholder_name, card_number, type, expiration_month, expiration_year, security_code) VALUES
 ("Sean", "111-222-3333", "VISA", 10, 2022, "666");
