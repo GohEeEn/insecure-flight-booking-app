@@ -12,7 +12,7 @@ INSERT INTO flights(source, destination, departure_date_time, arrival_date_time)
 ('Pyongyang, North Korea', 'Dublin, Ireland', '2021-03-05 20:30', '2021-03-05 00:30'),
 ('Tokyo, Japan', 'Dublin, Ireland', '2021-03-05 20:30', '2021-03-05 00:30');
 
-
+ALTER TABLE library.credit_cards MODIFY id bigint NOT NULL AUTO_INCREMENT;
 
 ALTER TABLE library.reservations MODIFY id bigint NOT NULL AUTO_INCREMENT;
 
@@ -23,7 +23,7 @@ INSERT INTO reservations(email, flight_reference) VALUES
 ('ola@ucdconnect.ie', 1);
 
 
-ALTER TABLE library.users MODIFY registrationID int NOT NULL AUTO_INCREMENT;
+ALTER TABLE library.users MODIFY registrationID bigint NOT NULL AUTO_INCREMENT;
 
 INSERT INTO users(name, surname, username, password, role, phone, email, address, credit_card_details, reservation_history, upcoming_reservations) VALUES
 ('slav', 'denisov', 'Slav', 'Slav1234', 'member', '0830881242', 'slav@ucdconnect.ie', '10 beach bay, smithfield', '8418 5823 1153 8818', '1,2', '7,12'),
@@ -40,3 +40,7 @@ ALTER TABLE library.passengers MODIFY id bigint NOT NULL AUTO_INCREMENT;
 
 INSERT INTO passengers(name, surname, phone, email, address) VALUES
 ('passengername', 'passengerlastname', '0892209191', 'p1@gmail.com', 'no known residence, mainfield');
+
+INSERT INTO credit_cards(cardholder_name, card_number, type, expiration_month, expiration_year, security_code) VALUES
+("Sean", "111-222-3333", "VISA", 10, 2022, "666");
+
