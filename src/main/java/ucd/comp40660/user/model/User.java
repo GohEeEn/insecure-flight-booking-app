@@ -1,9 +1,7 @@
 package ucd.comp40660.user.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.annotation.JsonManagedReference;
 import ucd.comp40660.reservation.model.Reservation;
-import ucd.comp40660.user.model.CreditCard;
 
 import javax.persistence.*;
 import javax.validation.constraints.*;
@@ -50,9 +48,6 @@ public class User {
     @NotBlank(message = "Address field must not be empty.")
     private String address;
 
-    @NotBlank(message = "Credit Card Details field must not be empty.")
-    private String credit_card_details;
-
     @OneToMany(fetch = FetchType.EAGER, mappedBy = "user")
     @JsonIgnore
     private List<CreditCard> credit_cards = new ArrayList<>();
@@ -65,7 +60,7 @@ public class User {
         super();
     }
 
-    public User(String name, String surname, String username, String role, String phone, String email, String address, String credit_card_details, String password, List<Reservation> reservations) {
+    public User(String name, String surname, String username, String role, String phone, String email, String address, String password, List<Reservation> reservations) {
         this.name = name;
         this.surname = surname;
         this.username = username;
@@ -73,7 +68,6 @@ public class User {
         this.phone = phone;
         this.email = email;
         this.address = address;
-        this.credit_card_details = credit_card_details;
         this.password = password;
         this.reservations = reservations;
     }
