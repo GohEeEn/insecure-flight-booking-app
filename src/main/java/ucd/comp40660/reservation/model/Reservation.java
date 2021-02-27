@@ -7,6 +7,7 @@ import javax.validation.constraints.NotNull;
 import lombok.Data;
 import lombok.ToString;
 import ucd.comp40660.user.model.Guest;
+import ucd.comp40660.user.model.User;
 
 
 @Entity
@@ -27,6 +28,10 @@ public class Reservation {
     @ToString.Exclude
     @ManyToOne
     private Guest guest;
+
+    @ManyToOne
+    private User user;
+
 
 
     public Reservation(){

@@ -2,6 +2,7 @@ package ucd.comp40660.user.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
+import ucd.comp40660.reservation.model.Reservation;
 import ucd.comp40660.user.model.CreditCard;
 
 import javax.persistence.*;
@@ -10,7 +11,9 @@ import javax.validation.constraints.*;
 import lombok.Data;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 @Entity
 @Table(name = "users", uniqueConstraints={@UniqueConstraint(columnNames = {"username", "email", "phone"})})
@@ -54,7 +57,11 @@ public class User {
 
     @OneToMany(fetch = FetchType.EAGER, mappedBy = "user")
     @JsonIgnore
-    private List<CreditCard> credit_cards = new ArrayList<>();
+    private Set<CreditCard> credit_cards = new HashSet<CreditCard>();
+
+    @OneToMany(fetch = FetchType.EAGER, mappedBy = "user")
+    @JsonIgnore
+    private Set<Reservation> reservations = new HashSet<Reservation>();
 
 //    @NotBlank(message = "Reservation History improperly initialised(blank).")
     private String reservation_history;

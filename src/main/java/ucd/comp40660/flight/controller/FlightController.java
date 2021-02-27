@@ -12,7 +12,9 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import ucd.comp40660.reservation.model.Reservation;
 import ucd.comp40660.reservation.repository.ReservationRepository;
+import ucd.comp40660.user.model.CreditCard;
 import ucd.comp40660.user.model.Guest;
+import ucd.comp40660.user.repository.CreditCardRepository;
 import ucd.comp40660.user.repository.GuestRepository;
 
 
@@ -44,6 +46,13 @@ public class FlightController {
 
     @Autowired
     GuestRepository guestRepository;
+
+    @Autowired
+    CreditCardRepository creditCardRepository;
+
+    @Autowired
+    private UserSession userSession;
+
 
     Long temporaryFlightReference;
 
@@ -99,13 +108,15 @@ public class FlightController {
     }
 
     @PostMapping("/processFlightSearch")
-    public void processFlightSearch(String departure, String destinationInput, int passengers, String outboundDate, HttpServletResponse response) throws IOException {
-
+    public void processFlightSearch(String departure, String destinationInput, int passengers, String outboundDate,
+                                    Model model, HttpServletResponse response) throws IOException {
 //        System.out.println(outboundDate);
         flightSearch.setDeparture(departure);
         flightSearch.setDestinationInput(destinationInput);
         flightSearch.setPassengers(passengers);
         flightSearch.setOutboundDate(outboundDate);
+        model.addAttribute("user", userSession.getUser());
+
 
         response.sendRedirect("/flightSearchResults");
     }
@@ -116,11 +127,13 @@ public class FlightController {
         flightList = flightCheck();
 //        flightList = flightRepository.findAll();
         model.addAttribute("displayedFlights", flightList);
+        model.addAttribute("user", userSession.getUser());
+
         return "flightResults.html";
     }
 
     @PostMapping("/selectFlight")
-    public void selectFlight(String flightIndexSelected, HttpServletResponse response) throws IOException {
+    public void selectFlight(String flightIndexSelected, Model model, HttpServletResponse response) throws IOException {
         boolean isNumber = flightIndexSelected.chars().allMatch( Character::isDigit);
         if(!isNumber){
             PrintWriter out = response.getWriter();
@@ -151,19 +164,24 @@ public class FlightController {
 //                chosen Flight
 //                Flight chosenFlight= allFlight.get(flightIndex);
 //                temporaryFlightReference = chosenFlight.getFlightID();
+                model.addAttribute("user", userSession.getUser());
+
                 response.sendRedirect("/displayBookingPage");
             }
         }
     }
 
     @GetMapping("/displayBookingPage")
-    public String guestBooking(){
+    public String guestBooking(Model model){
+
+        model.addAttribute("user", userSession.getUser());
 
         return "bookingDetails.html";
     }
 
     @PostMapping("/processGuestPersonalDetails")
-    public void processGuestPersonalDetails(String name, String surname, String email, String phoneNumber, String address, HttpServletResponse response ) throws IOException {
+    public void processGuestPersonalDetails(String name, String surname, String email, String phoneNumber, String address,
+                                            Model model, HttpServletResponse response ) throws IOException {
 
         guest.setName(name);
         guest.setSurname(surname);
@@ -171,24 +189,41 @@ public class FlightController {
         guest.setPhone(phoneNumber);
         guest.setAddress(address);
 
+        model.addAttribute("user", userSession.getUser());
+
+
+
         response.sendRedirect("/displayPaymentPage");
     }
 
     @GetMapping("/displayPaymentPage")
-    public String displayPaymentPage(){
+    public String displayPaymentPage(Model model){
+
+        model.addAttribute("user", userSession.getUser());
+        if(userSession.getUser()!=null){
+            List<CreditCard> cards = creditCardRepository.findAllByUser(userSession.getUser());
+            model.addAttribute("cards", cards);
+        }
 
         return "displayPaymentPage.html";
     }
 
-    @PostMapping("/processPayment")
-    public void processPayment(String credit_card_details, HttpServletResponse response) throws IOException {
+    @PostMapping("/processGuestPayment")
+    public void processGuestPayment(String cardholder_name, String card_number, String card_type, int expiration_month,
+                            int expiration_year, String security_code, Model model,  HttpServletResponse response) throws IOException {
 
         Reservation reservation = new Reservation();
 
-        guest.setCredit_card_details(credit_card_details);
+        CreditCard card = new CreditCard(cardholder_name, card_number, card_type, expiration_month, expiration_year, security_code);
+        guest.setCredit_card(card);
+        card.setGuest(guest);
+        creditCardRepository.save(card);
 
         reservation.setEmail(guest.getEmail());
+
+        //TODO Change to Flight Object
         reservation.setFlight_reference(temporaryFlightReference);
+
         reservation.setGuest(guest);
 
         guest.getReservations().add(reservation);
@@ -196,10 +231,28 @@ public class FlightController {
 
         reservationRepository.save(reservation);
 
-        response.sendRedirect("/displayReservationId");
+        response.sendRedirect("/displayReservation");
     }
 
-    @GetMapping("/displayReservationId")
+    @PostMapping("/processMemberPayment")
+    public String processMemberPayment(Model model, HttpServletResponse response) throws IOException {
+        User user = userSession.getUser();
+        Reservation reservation = new Reservation();
+        user.getReservations().add(reservation);
+        reservation.setUser(user);
+
+        //TODO Create flight object via tempflightreference and flightrepo
+
+        reservationRepository.save(reservation);
+        model.addAttribute("user", user);
+        model.addAttribute("reservation", reservation);
+        //TODO add Flight object to model for display @ displayReservation.html
+//        model.addAttribute("flight", reservation.getFlight());
+        return "displayReservation.html";
+
+    }
+
+    @GetMapping("/displayReservation")
     public String displayReservationId(Model model){
         List<Reservation> guestReservationId = new ArrayList<>();
         List<Guest> guestList = guestRepository.findAll();
