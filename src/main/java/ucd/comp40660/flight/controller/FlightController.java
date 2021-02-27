@@ -1,6 +1,5 @@
 package ucd.comp40660.flight.controller;
 
-
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import ucd.comp40660.flight.exception.FlightNotFoundException;
@@ -16,7 +15,6 @@ import ucd.comp40660.reservation.repository.ReservationRepository;
 import ucd.comp40660.user.model.Guest;
 import ucd.comp40660.user.repository.GuestRepository;
 
-
 import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
 import java.io.IOException;
@@ -24,17 +22,14 @@ import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.List;
 
-import ucd.comp40660.user.UserSession;
-import ucd.comp40660.user.model.User;
+import lombok.extern.log4j.Log4j2;
 
-
+@Log4j2
 @Controller
 public class FlightController {
 
-
     private FlightSearch flightSearch = new FlightSearch();
     private Guest guest = new Guest();
-//    private Reservation reservation = new Reservation();
 
     @Autowired
     ReservationRepository reservationRepository;
@@ -46,12 +41,6 @@ public class FlightController {
     GuestRepository guestRepository;
 
     Long temporaryFlightReference;
-
-//    @GetMapping("/")
-//    public String index(){
-//        return "index.html";
-//    }
-
 
     @PostMapping("/home")
     public void home(String homeButton, HttpServletResponse response) throws IOException {
@@ -195,6 +184,9 @@ public class FlightController {
 
         reservationRepository.save(reservation);
 
+//        re-instantiate the guest to avoid persistence of the same guest
+        guest = new Guest();
+
         response.sendRedirect("/displayReservationId");
     }
 
@@ -244,39 +236,25 @@ public class FlightController {
     }
 
     @GetMapping("/getGuestReservations")
-    public String getGuestReservations(Model model) throws ReservationNotFoundException {
-        if (guest != null) {
+    public String getGuestReservations(Model model) {
 
-//            add guest to the model
+//        obtain flight and guest objects
+        Flight flight = flightRepository.findFlightByFlightID(temporaryFlightReference);
+        Guest guest = guestRepository.findTopByOrderByIdDesc();
+
+//        backend log messages
+        log.info(String.format("Guest info: " + guest.toString()));
+        log.info(String.format("Flight info: " + flight.toString()));
+
+//        pass flight and guest objects to Thymeleaf frontend
+        if (flight != null) {
             model.addAttribute("guest", guest);
-
-//            retrieve all reservations and flights
-            List<Reservation> reservations = reservationRepository.findAllByGuest(guest);
-
-            if (reservations.size() > 0) {
-
-                List<Flight> flights = new ArrayList<>();
-
-                for (Reservation reservation : reservations) {
-                    Flight flight = flightRepository.findFlightByReservation(reservation);
-
-                    if (flight != null) {
-                        flights.add(flight);
-                    }
-                }
-
-//            add all flights corresponding to the user to the model
-                model.addAttribute("flightsGuest", flights);
-
-//                display the reservations on a new page
-                return "viewFlightsGuest";
-
-            } else {
-                throw new ReservationNotFoundException();
-            }
+            model.addAttribute("flightGuest", flight);
+            return "viewFlightsGuest";
+        } else {
+            model.addAttribute("error", "Flight is null");
+            return "viewFlightsGuest";
         }
-//        if guest doesn't have any reservations - return to landing page
-        return "/";
     }
 
 }

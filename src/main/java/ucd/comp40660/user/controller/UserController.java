@@ -316,45 +316,4 @@ public class UserController {
 
         return "viewCreditCards.html";
     }
-
-    @GetMapping("/getUserReservations")
-    public String getUserReservations(Model model) throws ReservationNotFoundException {
-        if (userSession.getUser() != null) {
-            User user = userSession.getUser();
-
-//            add current user to the model
-            model.addAttribute("user", user);
-
-//            find all reservations associated with a user
-            List<Reservation> reservations = reservationRepository.findAllByUser(user);
-
-            if (reservations.size() > 0) {
-
-//            loop through each reservation and find the flights associated
-                List<Flight> flights = new ArrayList<>();
-
-                for (Reservation reservation : reservations) {
-                    Flight flight = flightRepository.findFlightByReservation(reservation);
-
-                    if (flight != null) {
-                        flights.add(flight);
-                    }
-                }
-
-//            add the flights to the model, so thymeleaf can display them
-                model.addAttribute("flightsUser", flights);
-
-//            display the reservations on a new page
-                return "viewFlightsUser";
-            } else { // throw an error if there are no reservations
-                throw new ReservationNotFoundException();
-            }
-        }
-
-//        if user doesn't have any reservations (past/future)
-//        bring them back to their profile page
-        return "viewProfile";
-
-    }
-
 }
