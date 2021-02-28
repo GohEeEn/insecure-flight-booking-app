@@ -27,6 +27,7 @@ public class Reservation {
     private Long flight_reference;
 
     @ToString.Exclude
+    @JsonIgnore
     @ManyToOne
     private Guest guest;
 
