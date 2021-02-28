@@ -4,10 +4,12 @@ import javax.persistence.*;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Data;
 import lombok.ToString;
+import ucd.comp40660.flight.model.Flight;
 import ucd.comp40660.user.model.Guest;
-
+import ucd.comp40660.user.model.User;
 
 @Entity
 @Table(name = "reservations")
@@ -25,16 +27,23 @@ public class Reservation {
     private Long flight_reference;
 
     @ToString.Exclude
+    @JsonIgnore
     @ManyToOne
     private Guest guest;
 
+    @ManyToOne
+    @JsonIgnore
+    private User user;
 
-    public Reservation(){
+    @ManyToOne
+    @JsonIgnore
+    private Flight flight;
+
+    public Reservation() {
         super();
     }
 
-
-    public Reservation(Long id, String email, Long flight_reference){
+    public Reservation(Long id, String email, Long flight_reference) {
         this.id = id;
         this.email = email;
         this.flight_reference = flight_reference;
