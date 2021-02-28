@@ -49,12 +49,14 @@ public class FlightController {
 
     //    Get all flights
     @GetMapping("/flights")
+    @ResponseBody
     public List<Flight> getAllFlights() {
         return flightRepository.findAll();
     }
 
     //    Get a single flight
     @GetMapping("/flights/{id}")
+    @ResponseBody
     public Flight getFlightById(@PathVariable(value = "id") Long flightID) throws FlightNotFoundException {
         return flightRepository.findById(flightID)
                 .orElseThrow(() -> new FlightNotFoundException(flightID));
@@ -62,6 +64,7 @@ public class FlightController {
 
     //    Update flight details
     @PutMapping("/flights/{id}")
+    @ResponseBody
     public Flight updateFlight(@PathVariable(value = "id") Long flightID, @Valid @RequestBody Flight flightDetails) throws FlightNotFoundException {
         Flight flight = flightRepository.findById(flightID)
                 .orElseThrow(() -> new FlightNotFoundException(flightID));
@@ -78,6 +81,7 @@ public class FlightController {
 
     //    Delete a flight record
     @DeleteMapping("/flights/{id}")
+    @ResponseBody
     public ResponseEntity<?> deleteFlight(@PathVariable(value = "id") Long flightID) throws FlightNotFoundException {
         Flight flight = flightRepository.findById(flightID)
                 .orElseThrow(() -> new FlightNotFoundException(flightID));
