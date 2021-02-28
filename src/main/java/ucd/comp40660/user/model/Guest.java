@@ -12,7 +12,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Entity
-@Table(name = "guests", uniqueConstraints={@UniqueConstraint(columnNames = {"email", "phone"})})
+@Table(name = "guests", uniqueConstraints = {@UniqueConstraint(columnNames = {"email", "phone"})})
 @Data
 public class Guest {
 
@@ -26,11 +26,11 @@ public class Guest {
     @NotBlank
     private String surname;
 
-    @Column(unique=true)
+    @Column(unique = true)
     @NotNull
     private String phone;
 
-    @Column(unique=true)
+    @Column(unique = true)
     @NotBlank
     private String email;
 
@@ -51,9 +51,6 @@ public class Guest {
     public Guest() {
         super();
     }
-
-//    public User(Long registrationID, String name, Long phone, String email, String address, String credit_card_details, String reservation_history, String upcoming_reservations) {
-//    }
 
     public Guest(String name, String surname, String phone, String email, String address, String credit_card_details, List<Reservation> reservations) {
         this.name = name;

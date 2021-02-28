@@ -4,6 +4,10 @@ import javax.persistence.*;
 import javax.validation.constraints.NotBlank;
 
 import lombok.Data;
+import ucd.comp40660.reservation.model.Reservation;
+
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity
 @Table(name = "flights")
@@ -25,6 +29,10 @@ public class Flight {
 
     @NotBlank
     private String arrival_date_time;
+
+    @Column
+    @OneToMany(mappedBy = "flight")
+    private List<Reservation> reservations = new ArrayList<>();
 
     public Flight() {
         super();

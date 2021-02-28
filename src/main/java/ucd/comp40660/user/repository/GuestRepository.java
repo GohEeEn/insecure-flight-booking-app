@@ -7,4 +7,5 @@ import ucd.comp40660.user.model.Guest;
 import java.util.Optional;
 @Repository
 public interface GuestRepository  extends JpaRepository<Guest, Long>{
+   Guest findTopByOrderByIdDesc();
 }
