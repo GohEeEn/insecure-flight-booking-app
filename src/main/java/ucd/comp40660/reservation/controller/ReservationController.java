@@ -82,7 +82,7 @@ public class ReservationController {
             User user = userSession.getUser();
 
 //            backend log messages
-//            log.info(String.format("UserSession user info: " + user.toString()));
+            log.info(String.format("UserSession user info: " + user.toString()));
 
 //            add current user to the model
             model.addAttribute("user", user);

@@ -2,6 +2,8 @@ package ucd.comp40660.user.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
+import org.hibernate.annotations.LazyCollection;
+import org.hibernate.annotations.LazyCollectionOption;
 import ucd.comp40660.reservation.model.Reservation;
 import ucd.comp40660.user.model.CreditCard;
 
@@ -58,8 +60,9 @@ public class User {
     @JsonIgnore
     private List<CreditCard> credit_cards = new ArrayList<>();
 
-    @Column
     @OneToMany(mappedBy = "user")
+    @LazyCollection(LazyCollectionOption.FALSE)
+    @JsonIgnore
     private List<Reservation> reservations = new ArrayList<>();
 
     public User() {
