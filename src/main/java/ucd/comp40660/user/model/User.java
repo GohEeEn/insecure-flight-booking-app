@@ -58,13 +58,10 @@ public class User {
     @NotBlank(message = "Credit Card Details field must not be empty.")
     private String credit_card_details;
 
-    @OneToMany(fetch = FetchType.EAGER, mappedBy = "user")
+    @OneToMany(mappedBy = "user")
+    @LazyCollection(LazyCollectionOption.FALSE)
     @JsonIgnore
-    private Set<CreditCard> credit_cards = new HashSet<CreditCard>();
-
-    @OneToMany(fetch = FetchType.EAGER, mappedBy = "user")
-    @JsonIgnore
-    private Set<Reservation> reservations = new HashSet<Reservation>();
+    private List<CreditCard> credit_cards = new ArrayList<>();
 
     @OneToMany(mappedBy = "user")
     @LazyCollection(LazyCollectionOption.FALSE)

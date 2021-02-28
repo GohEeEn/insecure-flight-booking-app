@@ -12,10 +12,13 @@ import org.springframework.web.bind.annotation.*;
 import ucd.comp40660.reservation.exception.ReservationNotFoundException;
 import ucd.comp40660.reservation.model.Reservation;
 import ucd.comp40660.reservation.repository.ReservationRepository;
+import ucd.comp40660.user.UserSession;
 import ucd.comp40660.user.model.CreditCard;
 import ucd.comp40660.user.model.Guest;
+import ucd.comp40660.user.model.User;
 import ucd.comp40660.user.repository.CreditCardRepository;
 import ucd.comp40660.user.repository.GuestRepository;
+
 
 import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
@@ -25,6 +28,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import lombok.extern.log4j.Log4j2;
+import ucd.comp40660.user.repository.UserRepository;
 
 @Log4j2
 @Controller
@@ -44,6 +48,9 @@ public class FlightController {
 
     @Autowired
     CreditCardRepository creditCardRepository;
+
+    @Autowired
+    UserRepository userRepository;
 
     @Autowired
     private UserSession userSession;
@@ -127,7 +134,7 @@ public class FlightController {
 
     @PostMapping("/selectFlight")
 
-    public void selectFlight(String flightIndexSelected, HttpServletResponse response) throws IOException {
+    public void selectFlight(String flightIndexSelected, Model model, HttpServletResponse response) throws IOException {
         boolean isNumber = flightIndexSelected.chars().allMatch(Character::isDigit);
         if (!isNumber) {
             PrintWriter out = response.getWriter();
@@ -164,7 +171,7 @@ public class FlightController {
         }
     }
 
-
+    @GetMapping("/displayBookingPage")
     public String guestBooking(Model model){
 
         model.addAttribute("user", userSession.getUser());
@@ -207,11 +214,13 @@ public class FlightController {
         User user = userSession.getUser();
         Reservation reservation = new Reservation();
         user.getReservations().add(reservation);
+        userRepository.flush();
         reservation.setUser(user);
 
         //TODO Create flight object via tempflightreference and flightrepo
 
-        reservationRepository.save(reservation);
+        reservationRepository.saveAndFlush(reservation);
+//        userRepository.save(user);
         model.addAttribute("user", user);
         model.addAttribute("reservation", reservation);
         //TODO add Flight object to model for display @ displayReservation.html
