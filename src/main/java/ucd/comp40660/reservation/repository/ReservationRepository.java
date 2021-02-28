@@ -13,5 +13,5 @@ import java.util.Optional;
 public interface ReservationRepository extends JpaRepository<Reservation, Long> {
     Optional<Reservation> findByEmail(String email);
     public List<Reservation> findAllByUser(User user);
-    public List<Reservation> findOneByGuest(Guest guest);
+    public Reservation findOneByGuest(Guest guest);
 }
