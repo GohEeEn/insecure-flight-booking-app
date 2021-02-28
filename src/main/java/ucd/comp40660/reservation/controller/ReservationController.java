@@ -51,6 +51,7 @@ public class ReservationController {
 
     //    Update the details of a reservation record
     @PutMapping("/reservations/{id}")
+    @ResponseBody
     public Reservation updateReservation(@PathVariable(value = "id") Long reservationID, @Valid @RequestBody Reservation reservationDetails) throws ReservationNotFoundException {
         Reservation reservation = reservationRepository.findById(reservationID)
                 .orElseThrow(() -> new ReservationNotFoundException(reservationID));
@@ -65,6 +66,7 @@ public class ReservationController {
 
     //    Delete a reservation record
     @DeleteMapping("/reservations/{id}")
+    @ResponseBody
     public ResponseEntity<?> deleteReservation(@PathVariable(value = "id") Long reservationID) throws ReservationNotFoundException {
         Reservation reservation = reservationRepository.findById(reservationID)
                 .orElseThrow(() -> new ReservationNotFoundException(reservationID));
