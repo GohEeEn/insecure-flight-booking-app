@@ -243,17 +243,26 @@ public class FlightController {
         Guest guest = guestRepository.findTopByOrderByIdDesc();
 
 //        backend log messages
-        log.info(String.format("Guest info: " + guest.toString()));
-        log.info(String.format("Flight info: " + flight.toString()));
+        if (guest != null) {
+            log.info(String.format("getGuestReservations(): Guest info: " + guest.toString()));
+        } else {
+            log.info(String.format("getGuestReservations(): Guest is null"));
+        }
+
+        if (flight != null) {
+            log.info(String.format("getGuestReservations(): Flight info: " + flight.toString()));
+        } else {
+            log.info(String.format("getGuestReservations(): Flight is null"));
+        }
 
 //        pass flight and guest objects to Thymeleaf frontend
         if (flight != null) {
             model.addAttribute("guest", guest);
             model.addAttribute("flightGuest", flight);
-            return "viewFlightsGuest";
+            return "viewFlightsGuest.html";
         } else {
             model.addAttribute("error", "Flight is null");
-            return "viewFlightsGuest";
+            return "viewFlightsGuest.html";
         }
     }
 

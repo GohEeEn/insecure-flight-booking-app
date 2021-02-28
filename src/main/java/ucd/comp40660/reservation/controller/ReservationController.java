@@ -36,12 +36,14 @@ public class ReservationController {
 
     //    Get all reservations
     @GetMapping("/reservations")
+    @ResponseBody
     public List<Reservation> getAllReservations() {
         return reservationRepository.findAll();
     }
 
     //    Get a single reservation by id
     @GetMapping("/reservations/{id}")
+    @ResponseBody
     public Reservation getReservationById(@PathVariable(value = "id") Long reservationID) throws ReservationNotFoundException {
         return reservationRepository.findById(reservationID)
                 .orElseThrow(() -> new ReservationNotFoundException(reservationID));
@@ -78,7 +80,7 @@ public class ReservationController {
             User user = userSession.getUser();
 
 //            backend log messages
-            log.info(String.format("UserSession user info: " + user.toString()));
+//            log.info(String.format("UserSession user info: " + user.toString()));
 
 //            add current user to the model
             model.addAttribute("user", user);
@@ -108,7 +110,7 @@ public class ReservationController {
             }
         }
 
-        return "viewFlightsUser";
+        return "viewFlightsUser.html";
 
     }
 
