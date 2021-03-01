@@ -61,11 +61,13 @@ public class User {
     @OneToMany(mappedBy = "user")
     @LazyCollection(LazyCollectionOption.FALSE)
     @JsonIgnore
+    @ToString.Exclude
     private List<CreditCard> credit_cards = new ArrayList<>();
 
     @OneToMany(mappedBy = "user")
     @LazyCollection(LazyCollectionOption.FALSE)
     @JsonIgnore
+    @ToString.Exclude
     private List<Reservation> reservations = new ArrayList<>();
 
     public User() {
