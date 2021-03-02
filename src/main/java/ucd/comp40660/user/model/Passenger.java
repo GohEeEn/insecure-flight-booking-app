@@ -30,11 +30,13 @@ public class Passenger {
     String address;
 
     @ToString.Exclude
-    @ManyToOne(cascade = CascadeType.PERSIST)
+    @ManyToOne(cascade = CascadeType.ALL)
     private Guest guest;
 
-    public Passenger(Long id, String name, String surname, String phone, String email, String address) {
-        this.id = id;
+
+//    public Passenger(Long id, String name, String surname, String phone, String email, String address) {
+    public Passenger(String name, String surname, String phone, String email, String address) {
+
         this.name = name;
         this.surname = surname;
         this.phone = phone;

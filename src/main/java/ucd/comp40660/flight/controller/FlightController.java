@@ -187,14 +187,21 @@ public class FlightController {
         passenger.setPhone(phoneNumber);
         passenger.setAddress(address);
         passenger.setEmail(email);
+
+        guest.getPassengers().add(passenger);
+        guestRepository.saveAndFlush(guest);
+
+        passengerRepository.saveAndFlush(passenger);
+        passenger.setGuest(guest);
+
         passenger.setGuest(guest);
 
 
 //        listOfOtherPassengers.add(passenger);
 
-        guest.getPassengers().add(passenger);
 
-        passengerRepository.save(passenger);
+
+//        passengerRepository.save(passenger);
 
         System.out.println("size: " + guest.getPassengers().size());
 
@@ -239,9 +246,12 @@ public class FlightController {
         reservation.setGuest(guest);
 
         guest.getReservations().add(reservation);
+        reservationRepository.save(reservation);
+
         guestRepository.save(guest);
 
-        reservationRepository.save(reservation);
+//        reservationRepository.save(reservation);
+//        reservationRepository.saveAndFlush(reservation);
 
         response.sendRedirect("/displayReservationId");
     }
