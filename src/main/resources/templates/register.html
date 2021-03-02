@@ -55,11 +55,6 @@
                     <input id="address" class="form-control" type="text" name="address" placeholder="Living Address" required/>
                 </div>
 
-                <div class="form-group">
-                    <label for="creditCard">Credit Card Number</label>
-                    <input id="creditCard" class="form-control" type="text" name="credit_card_details" placeholder="Credit Card Details" />
-                </div>
-
                 <div class="container" th:if="error != null">
                     <div class="row">
                         <p class="error" th:text="${error}"></p>

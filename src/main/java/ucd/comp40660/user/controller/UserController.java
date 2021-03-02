@@ -78,13 +78,8 @@ public class UserController {
         user.setEmail(userDetails.getEmail());
         user.setPhone(userDetails.getPhone());
         user.setSurname(user.getSurname());
-        user.setCredit_card_details(userDetails.getCredit_card_details());
-//        user.setUpcoming_reservations(userDetails.getUpcoming_reservations());
-//        user.setReservation_history(user.getReservation_history());
 
-        User updatedUser = userRepository.save(user);
-
-        return updatedUser;
+        return userRepository.save(user);
     }
 
     //    Delete a registration record
@@ -112,16 +107,12 @@ public class UserController {
     }
 
     @PostMapping("/register")
-//    public User createUser(@Valid @RequestParam User user) {
-//        return userRepository.save(user);
-//    }
-    public String createUser(String name, String surname, String username, String phone, String address, String email, String credit_card_details,
-                             String password, String passwordDuplicate, HttpServletResponse response, Model model) throws SQLIntegrityConstraintViolationException, IOException {
+    public String createUser(String name, String surname, String username, String phone, String address, String email,
+                             String password, String passwordDuplicate, Model model) throws SQLIntegrityConstraintViolationException, IOException {
 
         if (userRepository.existsByUsername(username)) {
             System.out.println("\n\nDUPLICATE USERNAME DETECTED\n\n");
             model.addAttribute("error", "Username already exists.");
-//            response.sendRedirect("/register");
             return "register.html";
         } else if (userRepository.existsByEmail(email)) {
             model.addAttribute("error", "E-mail address already in use.");
@@ -138,21 +129,14 @@ public class UserController {
                 user.setPhone(phone);
                 user.setAddress(address);
                 user.setEmail(email);
-                user.setCredit_card_details(credit_card_details);
                 user.setRole("member");
                 user.setPassword(password);
-//                user.setReservation_history("None");
-//                user.setUpcoming_reservations("None");
                 userRepository.save(user);
                 userSession.setUser(user);
-//                response.sendRedirect("/");
                 return "index.html";
-
             } else {
                 userSession.setLoginFailed(true);
-//                response.sendRedirect("/register");
                 return "register.html";
-
             }
         }
     }
@@ -202,19 +186,12 @@ public class UserController {
             } else {
                 user.setPhone(user.getPhone());
             }
-            if (!(newCreditCardDetails.isEmpty())) {
-                user.setCredit_card_details(newCreditCardDetails);
-            } else {
-                user.setCredit_card_details(user.getCredit_card_details());
-            }
             if (!(newUsername.isEmpty())) {
                 user.setUsername(newUsername);
             } else {
                 user.setUsername(user.getUsername());
             }
 
-//            user.setUpcoming_reservations(user.getUpcoming_reservations());
-//            user.setReservation_history(user.getReservation_history());
             userRepository.save(user);
 
             model.addAttribute("user", userSession.getUser());
@@ -266,5 +243,4 @@ public class UserController {
 
         return "editPassword.html";
     }
-
 }
