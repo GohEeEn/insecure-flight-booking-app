@@ -16,25 +16,25 @@ ALTER TABLE library.credit_cards MODIFY id bigint NOT NULL AUTO_INCREMENT;
 
 ALTER TABLE library.reservations MODIFY id bigint NOT NULL AUTO_INCREMENT;
 
-INSERT INTO reservations(email, flight_reference) VALUES
-('slav@ucdconnect.ie', 3),
-('sean@ucdconnect.ie', 2),
-('vincent@ucdconnect.ie', 5),
-('ola@ucdconnect.ie', 1);
+INSERT INTO reservations(email, flight_flightid, cancelled) VALUES
+('slav@ucdconnect.ie', 3, false),
+('sean@ucdconnect.ie', 2, false),
+('vincent@ucdconnect.ie', 5, false),
+('ola@ucdconnect.ie', 1, false);
 
 
 ALTER TABLE library.users MODIFY registrationID bigint NOT NULL AUTO_INCREMENT;
 
-INSERT INTO users(name, surname, username, password, role, phone, email, address, credit_card_details) VALUES
-('slav', 'denisov', 'Slav', 'Slav1234', 'member', '0830881242', 'slav@ucdconnect.ie', '10 beach bay, smithfield', '8418 5823 1153 8818'),
-('ola', 'akintola', 'Ola', 'Ola1234', 'member', '0830881243', 'ola@ucdconnect.ie', '13 gunners bay , automaticfield', '8418 5823 1153 8819'),
-('vincent', 'goh', 'Vincent', 'Vincent1234', 'member', '0830881244', 'vincent@ucdconnect.ie', '69 miami bay area, awesomefield', '8418 5823 1153 8811'),
-('sean', 'mcloughlin', 'Sean', 'Sean1234', 'member', '0830881245', 'sean@ucdconnect.ie', '27 day dreams, bringfield', '8418 5823 1153 8812');
+INSERT INTO users(name, surname, username, password, role, phone, email, address) VALUES
+('slav', 'denisov', 'Slav', 'Slav1234', 'member', '0830881242', 'slav@ucdconnect.ie', '10 beach bay, smithfield'),
+('ola', 'akintola', 'Ola', 'Ola1234', 'member', '0830881243', 'ola@ucdconnect.ie', '13 gunners bay , automaticfield'),
+('vincent', 'goh', 'Vincent', 'Vincent1234', 'member', '0830881244', 'vincent@ucdconnect.ie', '69 miami bay area, awesomefield'),
+('sean', 'mcloughlin', 'Sean', 'Sean1234', 'member', '0830881245', 'sean@ucdconnect.ie', '27 day dreams, bringfield');
 
 ALTER TABLE library.guests MODIFY id bigint NOT NULL AUTO_INCREMENT;
 
-INSERT INTO guests(name, surname, phone, email, address, credit_card_details ) VALUES
-('joe', 'blogg', '0892209191', 'olamoiakin@gmail.com', '1 no mans land, mainfield', '1234 5678 1234 5678');
+INSERT INTO guests(name, surname, phone, email, address) VALUES
+('joe', 'blogg', '0892209191', 'olamoiakin@gmail.com', '1 no mans land, mainfield');
 
 ALTER TABLE library.passengers MODIFY id bigint NOT NULL AUTO_INCREMENT;
 
