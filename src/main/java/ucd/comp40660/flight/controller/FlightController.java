@@ -10,7 +10,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import ucd.comp40660.reservation.exception.ReservationNotFoundException;
 import ucd.comp40660.reservation.model.Reservation;
 import ucd.comp40660.reservation.repository.ReservationRepository;
 import ucd.comp40660.user.UserSession;
@@ -29,9 +28,6 @@ import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.List;
 
-
-import ucd.comp40660.user.UserSession;
-import ucd.comp40660.user.model.User;
 import ucd.comp40660.user.repository.PassengerRepository;
 
 import lombok.extern.log4j.Log4j2;
@@ -42,7 +38,7 @@ import ucd.comp40660.user.repository.UserRepository;
 @Controller
 public class FlightController {
 
-    private FlightSearch flightSearch = new FlightSearch();
+    private final FlightSearch flightSearch = new FlightSearch();
     private Guest guest = new Guest();
 
     @Autowired
@@ -69,8 +65,6 @@ public class FlightController {
 
     Long temporaryFlightReference;
     int numberOfPassengers;
-
-    List<Passenger> listOfOtherPassengers = new ArrayList<>();
 
     @PostMapping("/home")
     public void home(HttpServletResponse response) throws IOException {
@@ -127,7 +121,6 @@ public class FlightController {
                                     Model model, HttpServletResponse response) throws IOException {
 
         numberOfPassengers = passengers;
-//        System.out.println(outboundDate);
         flightSearch.setDeparture(departure);
         flightSearch.setDestinationInput(destinationInput);
         flightSearch.setPassengers(passengers);
@@ -176,9 +169,6 @@ public class FlightController {
                         temporaryFlightReference = aFlight.getFlightID();
                     }
                 }
-//                chosen Flight
-//                Flight chosenFlight= allFlight.get(flightIndex);
-//                temporaryFlightReference = chosenFlight.getFlightID();
                 model.addAttribute("user", userSession.getUser());
 
                 response.sendRedirect("/displayBookingPage");
@@ -278,12 +268,11 @@ public class FlightController {
         flight.getReservations().add(reservation);
         flightRepository.saveAndFlush(flight);
         reservationRepository.saveAndFlush(reservation);
-//        userRepository.save(user);
         model.addAttribute("user", user);
         model.addAttribute("reservation", reservation);
         model.addAttribute("flight", flight);
         //TODO add Flight object to model for display @ displayReservation.html
-//        model.addAttribute("flight", reservation.getFlight());
+
         return "displayReservation.html";
 
     }
@@ -330,12 +319,10 @@ public class FlightController {
         List<Reservation> reservationList = reservationRepository.findAll();
 
         for (Reservation reserved : reservationList) {
-            List<Reservation> reservedLists = new ArrayList<>();
-            for (int i = 0; i < guestList.size(); i++) {
-                reservedLists = guestList.get(i).getReservations();
+            for (Guest value : guestList) {
+                List<Reservation> reservedLists = value.getReservations();
                 for (Reservation reservedList : reservedLists) {
                     if (reservedList.getEmail().equals(reserved.getEmail()) && reservedList.getFlight_reference().equals(reserved.getFlight_reference())) {
-//                        String flightRef = Long.toString(temporaryFlightReference);
                         if (reserved.getFlight_reference().equals(temporaryFlightReference)) {
                             guestReservationId.add(reserved);
                         }
@@ -348,23 +335,21 @@ public class FlightController {
     }
 
     private List<Flight> flightCheck() {
-        List<Flight> availableFlights = new ArrayList<>();
+
         List<Flight> userFlightOptions = new ArrayList<>();
+        List<Flight> availableFlights = flightRepository.findAll();
 
-        availableFlights = flightRepository.findAll();
-
-        int i = 0;
-        for (i = 0; i < availableFlights.size(); i++) {
-            String flightStringFormat = availableFlights.get(i).getDeparture_date_time().toString().substring(0, 11).trim();
+        for (Flight availableFlight : availableFlights) {
+            String flightStringFormat = availableFlight.getDeparture_date_time().substring(0, 11).trim();
             if (flightStringFormat.equals(flightSearch.getOutboundDate())) {
-                if (availableFlights.get(i).getSource().equals(flightSearch.getDeparture())
-                        && availableFlights.get(i).getDestination().equals(flightSearch.getDestinationInput())) {
-                    userFlightOptions.add(availableFlights.get(i));
+                if (availableFlight.getSource().equals(flightSearch.getDeparture())
+                        && availableFlight.getDestination().equals(flightSearch.getDestinationInput())) {
+                    userFlightOptions.add(availableFlight);
                 }
             }
 
         }
-//        userFlightOptions.add(availableFlights.get(0));
+
         return userFlightOptions;
     }
 
