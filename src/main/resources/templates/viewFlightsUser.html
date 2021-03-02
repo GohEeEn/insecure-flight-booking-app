@@ -37,12 +37,12 @@
                 </tr>
                 </thead>
                 <tbody>
-                <tr th:each="flight: ${flights}">
+                <tr th:each="flight: ${flightsUser}">
                     <td class="counterCell"></td>
-                    <td th:text="${flight.source} "></td>
-                    <td th:text="${flight.destination} "></td>
-                    <td th:text="${flight.departure_date_time} "></td>
-                    <td th:text="${flight.arrival_date_time} "></td>
+                    <td th:text="${flight?.source} "></td>
+                    <td th:text="${flight?.destination} "></td>
+                    <td th:text="${flight?.departure_date_time} "></td>
+                    <td th:text="${flight?.arrival_date_time} "></td>
                 </tr>
                 </tbody>
             </table>

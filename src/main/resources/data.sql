@@ -36,6 +36,11 @@ ALTER TABLE library.guests MODIFY id bigint NOT NULL AUTO_INCREMENT;
 INSERT INTO guests(name, surname, phone, email, address) VALUES
 ('joe', 'blogg', '0892209191', 'olamoiakin@gmail.com', '1 no mans land, mainfield');
 
+ALTER TABLE library.passengers MODIFY id bigint NOT NULL AUTO_INCREMENT;
+
+INSERT INTO passengers(name, surname, phone, email, address) VALUES
+('passengername', 'passengerlastname', '0892209191', 'p1@gmail.com', 'no known residence, mainfield');
+
 INSERT INTO credit_cards(cardholder_name, card_number, type, expiration_month, expiration_year, security_code) VALUES
 ("Sean", "111-222-3333", "VISA", 10, 2022, "666");
 

@@ -8,38 +8,65 @@
 	</head>
 
 	<body>
+	<nav th:replace="fragments/header :: navigation-bar"></nav>
 
-		<nav th:replace="fragments/header :: navigation-bar"></nav>
+		<div class="col-12"><h5>Thank For Booking with Secure Airways</h5>
+			<span th:if="user != null">
+-->                <div class="container">
+					<table class="table">
+						<thead>
+						<tr>
+							<th>Reservation ID</th>
+							<th>Name</th>
+
+							<th></th>
+						</tr>
+						</thead>
+						<tbody>
+							<td><span th:text="${reservation.id}" ></span></td>
+							<td><span th:text="${user.name}" ></span></td>
+						</tr>
+						</tbody>
+					</table>
+				</div>
+				<br>
+
+			</span>
+
+		</div>
 
 		<div class="container">
 			<div class="row">
-				<div class="col-12"><h5>Thank For Booking with Secure Airways</h5>
-<!-- 					<h6>Select a Flight</h6>
- -->                        <div class="container">
-                            <table class="table">
-                            	<thead>
-  								<tr>
-                                	<th>#</th>
-                                    <th>Reservation ID</th>
-                                </tr>
-								</thead>
-								<tbody>
-                                <tr th:each="guestReservationId : ${guestReservationIds}">
-                                	<td class="counterCell"></td>
-                                    <td th:text="${guestReservationId.id} "></td>
-                                </tr>
-                                </tbody>
-                            </table>
-                        </div>
-                        <br>
-						  <div class="form-group row">
-<!-- 							<form action="/home" class="form-inline" method="post">
-							  <button name="homeButton" type="submit" class="btn btn-primary mb-2" value="0">Return to Home Page</button>
-							</form> -->
-						  </div>
+				<span th:if="user == null">
+
+					<div class="col-12"><h5>Thank For Booking with Secure Airways</h5>
+	<!-- 					<h6>Select a Flight</h6>
+	 -->                        <div class="container">
+								<table class="table">
+									<thead>
+									<tr>
+										<th>#</th>
+										<th>Reservation ID</th>
+									</tr>
+									</thead>
+									<tbody>
+									<tr th:each="guestReservationId : ${guestReservationIds}">
+										<td class="counterCell"></td>
+										<td th:text="${guestReservationId.id} "></td>
+									</tr>
+									</tbody>
+								</table>
+							</div>
+							<br>
+							  <div class="form-group row">
+	<!-- 							<form action="/home" class="form-inline" method="post">
+								  <button name="homeButton" type="submit" class="btn btn-primary mb-2" value="0">Return to Home Page</button>
+								</form> -->
+							  </div>
+							<br>
 						<br>
-					<br>
-				</div>
+					</div>
+				</span>
 			</div>
 		</div>
 

@@ -3,7 +3,6 @@ package ucd.comp40660.user.model;
 import javax.persistence.*;
 import javax.validation.constraints.*;
 
-import jdk.dynalink.linker.LinkerServices;
 import lombok.Data;
 import ucd.comp40660.reservation.model.Reservation;
 
@@ -36,21 +35,30 @@ public class Guest {
     @NotBlank
     private String address;
 
+    @OneToOne
+    private CreditCard credit_card = new CreditCard();
+
     @Column
-    @OneToMany(mappedBy = "guest")
+    @OneToMany(mappedBy = "guest", orphanRemoval = true, cascade = CascadeType.ALL)
     private List<Reservation> reservations = new ArrayList<>();
+
+    @Column
+    @OneToMany(mappedBy = "guest", orphanRemoval = true, cascade = CascadeType.ALL)
+    private List<Passenger> passengers = new ArrayList<>();
 
     public Guest() {
         super();
     }
 
-    public Guest(String name, String surname, String phone, String email, String address, List<Reservation> reservations) {
+    public Guest(String name, String surname, String phone, String email, String address, List<Reservation> reservations, List<Passenger> passengers) {
+
         this.name = name;
         this.surname = surname;
         this.phone = phone;
         this.email = email;
         this.address = address;
         this.reservations = reservations;
+        this.passengers = passengers;
     }
 }
 

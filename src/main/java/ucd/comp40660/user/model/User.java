@@ -1,15 +1,20 @@
 package ucd.comp40660.user.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import org.hibernate.annotations.LazyCollection;
+import org.hibernate.annotations.LazyCollectionOption;
 import ucd.comp40660.reservation.model.Reservation;
 
 import javax.persistence.*;
 import javax.validation.constraints.*;
 
 import lombok.Data;
+import lombok.ToString;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 @Entity
 @Table(name = "users", uniqueConstraints = {@UniqueConstraint(columnNames = {"username", "email", "phone"})})
@@ -48,12 +53,16 @@ public class User {
     @NotBlank(message = "Address field must not be empty.")
     private String address;
 
-    @OneToMany(fetch = FetchType.EAGER, mappedBy = "user")
+    @OneToMany(mappedBy = "user")
+    @LazyCollection(LazyCollectionOption.FALSE)
     @JsonIgnore
+    @ToString.Exclude
     private List<CreditCard> credit_cards = new ArrayList<>();
 
-    @Column
     @OneToMany(mappedBy = "user")
+    @LazyCollection(LazyCollectionOption.FALSE)
+    @JsonIgnore
+    @ToString.Exclude
     private List<Reservation> reservations = new ArrayList<>();
 
     public User() {

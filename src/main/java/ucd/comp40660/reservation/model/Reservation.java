@@ -4,11 +4,18 @@ import javax.persistence.*;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Data;
+
 import lombok.ToString;
-import ucd.comp40660.flight.model.Flight;
+import org.w3c.dom.stylesheets.LinkStyle;
+
 import ucd.comp40660.user.model.Guest;
+import ucd.comp40660.user.model.Passenger;
+import ucd.comp40660.flight.model.Flight;
 import ucd.comp40660.user.model.User;
+
+import java.util.List;
 
 @Entity
 @Table(name = "reservations")
@@ -29,13 +36,16 @@ public class Reservation {
     private boolean cancelled;
 
     @ToString.Exclude
+    @JsonIgnore
     @ManyToOne
     private Guest guest;
 
     @ManyToOne
+    @JsonIgnore
     private User user;
 
     @ManyToOne
+    @JsonIgnore
     private Flight flight;
 
     public Reservation() {
