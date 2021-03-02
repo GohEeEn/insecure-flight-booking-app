@@ -8,7 +8,7 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Data;
 
 import lombok.ToString;
-import org.w3c.dom.stylesheets.LinkStyle
+import org.w3c.dom.stylesheets.LinkStyle;
 
 import ucd.comp40660.user.model.Guest;
 import ucd.comp40660.user.model.Passenger;
