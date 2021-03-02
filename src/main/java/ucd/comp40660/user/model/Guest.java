@@ -45,14 +45,23 @@ public class Guest {
     private String credit_card_details;
 
     @Column
-    @OneToMany(mappedBy = "guest")
+    @OneToMany(mappedBy = "guest", orphanRemoval = true, cascade = CascadeType.ALL)
     private List<Reservation> reservations = new ArrayList<>();
+
+    @Column
+    @OneToMany(mappedBy = "guest", orphanRemoval = true, cascade = CascadeType.ALL)
+    private List<Passenger> passengers = new ArrayList<>();
 
     public Guest() {
         super();
     }
 
-    public Guest(String name, String surname, String phone, String email, String address, String credit_card_details, List<Reservation> reservations) {
+
+//    public User(Long registrationID, String name, Long phone, String email, String address, String credit_card_details, String reservation_history, String upcoming_reservations) {
+//    }
+
+    public Guest(String name, String surname, String phone, String email, String address, String credit_card_details, List<Reservation> reservations, List<Passenger> passengers) {
+
         this.name = name;
         this.surname = surname;
         this.phone = phone;
@@ -60,6 +69,7 @@ public class Guest {
         this.address = address;
         this.credit_card_details = credit_card_details;
         this.reservations = reservations;
+        this.passengers = passengers;
     }
 }
 

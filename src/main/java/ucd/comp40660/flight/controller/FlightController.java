@@ -9,12 +9,14 @@ import ucd.comp40660.flight.repository.FlightRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+
 import ucd.comp40660.reservation.exception.ReservationNotFoundException;
 import ucd.comp40660.reservation.model.Reservation;
 import ucd.comp40660.reservation.repository.ReservationRepository;
 import ucd.comp40660.user.UserSession;
 import ucd.comp40660.user.model.CreditCard;
 import ucd.comp40660.user.model.Guest;
+import ucd.comp40660.user.model.Passenger;
 import ucd.comp40660.user.model.User;
 import ucd.comp40660.user.repository.CreditCardRepository;
 import ucd.comp40660.user.repository.GuestRepository;
@@ -27,8 +29,14 @@ import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.List;
 
+
+import ucd.comp40660.user.UserSession;
+import ucd.comp40660.user.model.User;
+import ucd.comp40660.user.repository.PassengerRepository;
+
 import lombok.extern.log4j.Log4j2;
 import ucd.comp40660.user.repository.UserRepository;
+
 
 @Log4j2
 @Controller
@@ -39,6 +47,9 @@ public class FlightController {
 
     @Autowired
     ReservationRepository reservationRepository;
+
+    @Autowired
+    PassengerRepository passengerRepository;
 
     @Autowired
     FlightRepository flightRepository;
@@ -57,6 +68,17 @@ public class FlightController {
 
 
     Long temporaryFlightReference;
+
+
+    int numberOfPassengers;
+
+    List<Passenger> listOfOtherPassengers = new ArrayList<>();
+
+//    @GetMapping("/")
+//    public String index(){
+//        return "index.html";
+//    }
+
 
     @PostMapping("/home")
     public void home(String homeButton, HttpServletResponse response) throws IOException {
@@ -108,6 +130,7 @@ public class FlightController {
     }
 
     @PostMapping("/processFlightSearch")
+
     public void processFlightSearch(String departure, String destinationInput, int passengers, String outboundDate,
                                     Model model, HttpServletResponse response) throws IOException {
 //        System.out.println(outboundDate);
@@ -176,7 +199,50 @@ public class FlightController {
 
         model.addAttribute("user", userSession.getUser());
 
-        return "bookingDetails.html";
+        if(numberOfPassengers > 1){
+            return "passengerDetails.html";
+        }else{
+            return "bookingDetails.html";
+        }
+    }
+
+    @PostMapping("/processOtherPassengerDetails")
+    public void processOtherPassengerDetails(String name, String surname, String email, String phoneNumber, String address, HttpServletResponse response) throws IOException {
+
+        Passenger passenger = new Passenger();
+
+        passenger.setName(name);
+        passenger.setSurname(surname);
+        passenger.setPhone(phoneNumber);
+        passenger.setAddress(address);
+        passenger.setEmail(email);
+
+        guest.getPassengers().add(passenger);
+        guestRepository.saveAndFlush(guest);
+
+        passengerRepository.saveAndFlush(passenger);
+        passenger.setGuest(guest);
+
+        passenger.setGuest(guest);
+
+
+//        listOfOtherPassengers.add(passenger);
+
+
+
+//        passengerRepository.save(passenger);
+
+        System.out.println("size: " + guest.getPassengers().size());
+
+        numberOfPassengers -= 1;
+        response.sendRedirect("/displayBookingPage");
+
+//        if(numberOfPassengers > 1){
+//            response.sendRedirect("/displayBookingPage");
+//        }else{
+//            response.sendRedirect("/bookingDetails");
+//        }
+
     }
 
     @PostMapping("/processGuestPersonalDetails")
@@ -249,9 +315,12 @@ public class FlightController {
         reservation.setGuest(guest);
 
         guest.getReservations().add(reservation);
+        reservationRepository.save(reservation);
+
         guestRepository.save(guest);
 
-        reservationRepository.save(reservation);
+//        reservationRepository.save(reservation);
+//        reservationRepository.saveAndFlush(reservation);
 
 
 //        re-instantiate the guest to avoid persistence of the same guest
@@ -264,6 +333,8 @@ public class FlightController {
     public String displayReservationId(Model model) {
         List<Reservation> guestReservationId = new ArrayList<>();
         List<Guest> guestList = guestRepository.findAll();
+        System.out.println(guestList.get(1).getPassengers().size() );
+
         List<Reservation> reservationList = reservationRepository.findAll();
 
         for (Reservation reserved : reservationList) {
