@@ -1,9 +1,17 @@
 package ucd.comp40660.user.controller;
 
+import ucd.comp40660.flight.model.Flight;
+import ucd.comp40660.flight.repository.FlightRepository;
+import ucd.comp40660.reservation.exception.ReservationNotFoundException;
+import ucd.comp40660.reservation.model.Reservation;
+import ucd.comp40660.reservation.repository.ReservationRepository;
 import ucd.comp40660.user.UserSession;
 import org.springframework.stereotype.Controller;
+import ucd.comp40660.user.exception.CreditCardNotFoundException;
 import ucd.comp40660.user.exception.UserNotFoundException;
+import ucd.comp40660.user.model.CreditCard;
 import ucd.comp40660.user.model.User;
+import ucd.comp40660.user.repository.CreditCardRepository;
 import ucd.comp40660.user.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
@@ -14,6 +22,7 @@ import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
 import java.io.IOException;
 import java.sql.SQLIntegrityConstraintViolationException;
+import java.util.ArrayList;
 import java.util.List;
 
 
@@ -26,8 +35,17 @@ public class UserController {
     @Autowired
     UserRepository userRepository;
 
+    @Autowired
+    CreditCardRepository creditCardRepository;
+
+    @Autowired
+    ReservationRepository reservationRepository;
+
+    @Autowired
+    FlightRepository flightRepository;
+
     @GetMapping("/")
-    public String index(Model model){
+    public String index(Model model) {
         model.addAttribute("user", userSession.getUser());
         return "index.html";
     }
@@ -61,8 +79,8 @@ public class UserController {
         user.setPhone(userDetails.getPhone());
         user.setSurname(user.getSurname());
         user.setCredit_card_details(userDetails.getCredit_card_details());
-        user.setUpcoming_reservations(userDetails.getUpcoming_reservations());
-        user.setReservation_history(user.getReservation_history());
+//        user.setUpcoming_reservations(userDetails.getUpcoming_reservations());
+//        user.setReservation_history(user.getReservation_history());
 
         User updatedUser = userRepository.save(user);
 
@@ -82,12 +100,12 @@ public class UserController {
     }
 
     @GetMapping("/register")
-    public String register(Model model, HttpServletResponse response) throws Exception{
-        if(userSession.isLoginFailed()){
+    public String register(Model model, HttpServletResponse response) throws Exception {
+        if (userSession.isLoginFailed()) {
             model.addAttribute("error", "Unable to create account, passwords do not match");
             userSession.setLoginFailed(false);
         }
-        if (userSession.getUser() != null){
+        if (userSession.getUser() != null) {
             response.sendRedirect("/logout");
         }
         return "register.html";
@@ -98,23 +116,20 @@ public class UserController {
 //        return userRepository.save(user);
 //    }
     public String createUser(String name, String surname, String username, String phone, String address, String email, String credit_card_details,
-                           String password, String passwordDuplicate, HttpServletResponse response, Model model) throws SQLIntegrityConstraintViolationException, IOException {
+                             String password, String passwordDuplicate, HttpServletResponse response, Model model) throws SQLIntegrityConstraintViolationException, IOException {
 
-        if(userRepository.existsByUsername(username)){
+        if (userRepository.existsByUsername(username)) {
             System.out.println("\n\nDUPLICATE USERNAME DETECTED\n\n");
             model.addAttribute("error", "Username already exists.");
 //            response.sendRedirect("/register");
             return "register.html";
-        }
-        else if(userRepository.existsByEmail(email)){
+        } else if (userRepository.existsByEmail(email)) {
             model.addAttribute("error", "E-mail address already in use.");
             return "register.html";
-        }
-        else if(userRepository.existsByPhone(phone)){
+        } else if (userRepository.existsByPhone(phone)) {
             model.addAttribute("error", "Phone number already in use.");
             return "register.html";
-        }
-        else {
+        } else {
             if (password.equals(passwordDuplicate)) {
                 User user = new User();
                 user.setName(name);
@@ -126,8 +141,8 @@ public class UserController {
                 user.setCredit_card_details(credit_card_details);
                 user.setRole("member");
                 user.setPassword(password);
-                user.setReservation_history("None");
-                user.setUpcoming_reservations("None");
+//                user.setReservation_history("None");
+//                user.setUpcoming_reservations("None");
                 userRepository.save(user);
                 userSession.setUser(user);
 //                response.sendRedirect("/");
@@ -156,57 +171,50 @@ public class UserController {
 
     @PostMapping("/editProfile")
     public String editProfile(String newName, String newSurname, String newPhone, String newEmail, String newAddress, String newCreditCardDetails,
-                            String newUsername, String password, Model model) throws Exception {
+                              String newUsername, String password, Model model) throws Exception {
 
         User user = userSession.getUser();
 
         if (password.equals(user.getPassword())) {
 
-            if(!(newName.isEmpty())){
+            if (!(newName.isEmpty())) {
                 user.setName(newName);
-            }
-            else{
+            } else {
                 user.setName(user.getName());
             }
-            if(!(newSurname.isEmpty())){
+            if (!(newSurname.isEmpty())) {
                 user.setSurname(newSurname);
-            }
-            else{
+            } else {
                 user.setSurname(user.getSurname());
             }
-            if(!(newAddress.isEmpty())){
+            if (!(newAddress.isEmpty())) {
                 user.setAddress(newAddress);
-            }
-            else{
+            } else {
                 user.setAddress(user.getAddress());
             }
-            if(!(newEmail.isEmpty())){
+            if (!(newEmail.isEmpty())) {
                 user.setEmail(newEmail);
-            }
-            else{
+            } else {
                 user.setEmail(user.getEmail());
             }
-            if(!(newPhone.isEmpty())){
+            if (!(newPhone.isEmpty())) {
                 user.setPhone(newPhone);
-            }
-            else{
+            } else {
                 user.setPhone(user.getPhone());
             }
-            if(!(newCreditCardDetails.isEmpty())){
+            if (!(newCreditCardDetails.isEmpty())) {
                 user.setCredit_card_details(newCreditCardDetails);
-            }
-            else{
+            } else {
                 user.setCredit_card_details(user.getCredit_card_details());
             }
-            if(!(newUsername.isEmpty())){
+            if (!(newUsername.isEmpty())) {
                 user.setUsername(newUsername);
-            }
-            else{
+            } else {
                 user.setUsername(user.getUsername());
             }
 
-            user.setUpcoming_reservations(user.getUpcoming_reservations());
-            user.setReservation_history(user.getReservation_history());
+//            user.setUpcoming_reservations(user.getUpcoming_reservations());
+//            user.setReservation_history(user.getReservation_history());
             userRepository.save(user);
 
             model.addAttribute("user", userSession.getUser());
@@ -227,6 +235,7 @@ public class UserController {
         return "editPassword.html";
     }
 
+
     @PostMapping("/editPassword")
     public String editPassword(String password, String newPassword, String newPasswordDuplicate, HttpServletResponse response, Model model)
             throws Exception {
@@ -235,10 +244,9 @@ public class UserController {
 
         if (password.equals(user.getPassword())) {
 
-            if(newPassword.equals(newPasswordDuplicate) && (!(newPassword.isEmpty()))){
+            if (newPassword.equals(newPasswordDuplicate) && (!(newPassword.isEmpty()))) {
                 user.setPassword(newPassword);
-            }
-            else{
+            } else {
                 model.addAttribute("error", "\nNew Password entries do not match, update denied.");
                 model.addAttribute("user", userSession.getUser());
 
@@ -257,5 +265,55 @@ public class UserController {
         }
 
         return "editPassword.html";
+    }
+
+    @GetMapping("/cards")
+    @ResponseBody
+    public List<CreditCard> getCreditCards() {
+        return creditCardRepository.findAll();
+    }
+
+
+    @PostMapping("/addMemberCreditCard")
+    public String addMemberCreditCard(String cardholder_name, String card_number, String card_type,
+                                      int expiration_month, int expiration_year, String security_code, Model model) {
+        User user = userSession.getUser();
+        model.addAttribute("user", userSession.getUser());
+        CreditCard newCard = new CreditCard(cardholder_name, card_number, card_type, expiration_month, expiration_year, security_code);
+        if (user != null) {
+            newCard.setUser(user);
+        } else {
+            model.addAttribute("error", "\nError, No Member logged in to save card details.");
+            return "login.html";
+        }
+
+        creditCardRepository.save(newCard);
+        return "viewProfile.html";
+    }
+
+    @GetMapping("/viewMemberCreditCards")
+    public String viewMemberCreditCards(Model model) {
+        model.addAttribute("user", userSession.getUser());
+        model.addAttribute("cards", creditCardRepository.findAllByUser(userSession.getUser()));
+        return "viewCreditCards.html";
+    }
+
+    @GetMapping("/registerCard")
+    public String registerCardView(Model model) {
+
+        model.addAttribute("user", userSession.getUser());
+        return "registerCreditCard.html";
+    }
+
+    @GetMapping("/deleteCard/{id}")
+    public String deleteCard(@PathVariable(value = "id") Long id, Model model) throws CreditCardNotFoundException {
+        CreditCard card = creditCardRepository.findById(id)
+                .orElseThrow(() -> new CreditCardNotFoundException(id));
+
+        creditCardRepository.delete(card);
+        model.addAttribute("user", userSession.getUser());
+        model.addAttribute("cards", creditCardRepository.findAllByUser(userSession.getUser()));
+
+        return "viewCreditCards.html";
     }
 }

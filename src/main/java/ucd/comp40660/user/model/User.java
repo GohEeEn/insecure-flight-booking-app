@@ -1,12 +1,23 @@
 package ucd.comp40660.user.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
+import org.hibernate.annotations.LazyCollection;
+import org.hibernate.annotations.LazyCollectionOption;
+import ucd.comp40660.reservation.model.Reservation;
+import ucd.comp40660.user.model.CreditCard;
+
 import javax.persistence.*;
 import javax.validation.constraints.*;
 
 import lombok.Data;
+import lombok.ToString;
+
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity
-@Table(name = "users", uniqueConstraints={@UniqueConstraint(columnNames = {"username", "email", "phone"})})
+@Table(name = "users", uniqueConstraints = {@UniqueConstraint(columnNames = {"username", "email", "phone"})})
 @Data
 public class User {
 
@@ -23,18 +34,18 @@ public class User {
     @NotBlank(message = "Role improperly initialised.")
     private String role;
 
-    @Column(unique=true)
+    @Column(unique = true)
     @NotBlank(message = "Username field must not be empty.")
     private String username;
 
     @NotBlank(message = "Password field must not be empty.")
     private String password;
 
-    @Column(unique=true)
+    @Column(unique = true)
     @NotNull(message = "Password Duplicate field must not be empty.")
     private String phone;
 
-    @Column(unique=true)
+    @Column(unique = true)
     @Email(message = "Valid e-mail address required.")
     @NotBlank(message = "E-mail field must not be empty.")
     private String email;
@@ -45,29 +56,20 @@ public class User {
     @NotBlank(message = "Credit Card Details field must not be empty.")
     private String credit_card_details;
 
-//    @NotBlank(message = "Reservation History improperly initialised(blank).")
-    private String reservation_history;
+    @OneToMany(fetch = FetchType.EAGER, mappedBy = "user")
+    @JsonIgnore
+    private List<CreditCard> credit_cards = new ArrayList<>();
 
-//    @NotBlank(message = "Upcoming Reservations improperly initialised(blank).")
-    private String upcoming_reservations;
-
+    @OneToMany(mappedBy = "user")
+    @LazyCollection(LazyCollectionOption.FALSE)
+    @JsonIgnore
+    private List<Reservation> reservations = new ArrayList<>();
 
     public User() {
         super();
     }
 
-//    public User(Long registrationID, String name, Long phone, String email, String address, String credit_card_details, String reservation_history, String upcoming_reservations) {
-//        this.registrationID = registrationID;
-//        this.name = name;
-//        this.phone = phone;
-//        this.email = email;
-//        this.address = address;
-//        this.credit_card_details = credit_card_details;
-//        this.reservation_history = reservation_history;
-//        this.upcoming_reservations = upcoming_reservations;
-//    }
-
-    public User(String name, String surname, String username, String role, String phone, String email, String address, String credit_card_details, String password, String reservation_history, String upcoming_reservations) {
+    public User(String name, String surname, String username, String role, String phone, String email, String address, String credit_card_details, String password, List<Reservation> reservations) {
         this.name = name;
         this.surname = surname;
         this.username = username;
@@ -77,8 +79,7 @@ public class User {
         this.address = address;
         this.credit_card_details = credit_card_details;
         this.password = password;
-        this.reservation_history = reservation_history;
-        this.upcoming_reservations = upcoming_reservations;
+        this.reservations = reservations;
     }
 }
 
