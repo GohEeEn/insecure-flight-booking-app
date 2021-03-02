@@ -46,11 +46,6 @@
                 <input id="address" class="form-control" name="address" th:value="${user.getAddress()}" readonly/>
             </div>
 
-            <div class="form-group">
-                <label for="creditCard">Credit Card Number</label>
-                <input id="creditCard" class="form-control" name="creditCard" th:value="${user.getCredit_card_details()}" readonly/>
-            </div>
-
             <form method="GET" action="/editProfile">
                 <button type="submit" class="btn btn-primary">Edit Profile</button>
                 <a href="/viewMemberCreditCards" class="btn btn-secondary">View Credit Cards</a>

@@ -16,10 +16,8 @@
 					<h4>Payment Method</h4>
 				</div>
 			</div>
-		</div>
 
-		<div>
-			<span th:if="user != null">
+			<div th:if="user != null">
 				<form action="/processMemberPayment" method="post">
 					<table>
 						<thead>
@@ -49,10 +47,10 @@
 					<button type="submit" class="btn btn-primary">Select Payment Option</button>
 
 				</form>
-<!--			Member Booking Logic Here-->
-			</span>
+				<!--			Member Booking Logic Here-->
+			</div>
 
-			<span th:if="user == null">
+			<div th:if="user == null">
 
 				<form action="/processGuestPayment" method="post" >
 					<div class="form-group">
@@ -71,10 +69,12 @@
 							</div>
 						</div>
 					</div>
+
 					<div class="form-group">
 						<label for="card_number">CARD NUMBER</label>
 						<input type="text" class="form-control" id="card_number" name="card_number" required="required">
 					</div>
+
 					<div class="form-row">
 						<div class="form-group col-md-6">
 							<label for="expiration_month">EXPIRES</label>
@@ -84,7 +84,7 @@
 							<label for="expiration_year">.</label>
 							<input type="number" class="form-control" id="expiration_year" placeholder="Year" name="expiration_year" min="2021" max="2050" required="required">
 						</div>
-					</div>
+`					</div>
 					<br>
 					<div class="form-row">
 						<div class="form-group col-md-6">
@@ -106,9 +106,8 @@
 					<button type="submit" class="btn btn-primary">Add to Account</button>
 				</form>
 
-			</span>
+			</div>
 		</div>
-
 
 		<div th:replace="fragments/footer :: footer"></div>
 

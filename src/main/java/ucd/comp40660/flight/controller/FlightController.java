@@ -68,20 +68,12 @@ public class FlightController {
 
 
     Long temporaryFlightReference;
-
-
     int numberOfPassengers;
 
     List<Passenger> listOfOtherPassengers = new ArrayList<>();
 
-//    @GetMapping("/")
-//    public String index(){
-//        return "index.html";
-//    }
-
-
     @PostMapping("/home")
-    public void home(String homeButton, HttpServletResponse response) throws IOException {
+    public void home(HttpServletResponse response) throws IOException {
         response.sendRedirect("/");
     }
 
@@ -146,8 +138,7 @@ public class FlightController {
 
     @GetMapping("/flightSearchResults")
     public String flightSearchResults(Model model) {
-        List<Flight> flightList = new ArrayList<>();
-        flightList = flightCheck();
+        List<Flight> flightList = flightCheck();
 //        flightList = flightRepository.findAll();
         model.addAttribute("displayedFlights", flightList);
         model.addAttribute("user", userSession.getUser());
@@ -302,11 +293,11 @@ public class FlightController {
 
         Reservation reservation = new Reservation();
 
+        // TODO : Set guest's credit card detail required
         CreditCard card = new CreditCard(cardholder_name, card_number, card_type, expiration_month, expiration_year, security_code);
         guest.setCredit_card(card);
         card.setGuest(guest);
         creditCardRepository.save(card);
-
         reservation.setEmail(guest.getEmail());
 
         //TODO Change to Flight Object
