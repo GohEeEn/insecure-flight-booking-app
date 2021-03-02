@@ -5,6 +5,7 @@ import javax.validation.constraints.*;
 
 import jdk.dynalink.linker.LinkerServices;
 import lombok.Data;
+import lombok.ToString;
 import ucd.comp40660.reservation.model.Reservation;
 import ucd.comp40660.user.model.CreditCard;
 
@@ -37,6 +38,7 @@ public class Guest {
     @NotBlank
     private String address;
 
+    @ToString.Exclude
     @OneToOne(cascade = CascadeType.ALL)
     private CreditCard credit_card = new CreditCard();
 

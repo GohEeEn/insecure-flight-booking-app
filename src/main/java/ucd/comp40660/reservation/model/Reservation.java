@@ -38,14 +38,18 @@ public class Reservation {
     @ManyToOne
     private Guest guest;
 
+
+    @ToString.Exclude
     @ManyToOne
     @JsonIgnore
     private User user;
 
+    @ToString.Exclude
     @ManyToOne
     @JsonIgnore
     private Flight flight;
 
+    @ToString.Exclude
     @OneToMany(mappedBy = "reservation")
     @JsonIgnore
     private List<Passenger> passengers = new ArrayList<>();
