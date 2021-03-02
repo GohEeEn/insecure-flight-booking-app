@@ -14,7 +14,9 @@ import lombok.Data;
 import lombok.ToString;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 @Entity
 @Table(name = "users", uniqueConstraints = {@UniqueConstraint(columnNames = {"username", "email", "phone"})})
@@ -56,13 +58,16 @@ public class User {
     @NotBlank(message = "Credit Card Details field must not be empty.")
     private String credit_card_details;
 
-    @OneToMany(fetch = FetchType.EAGER, mappedBy = "user")
+    @OneToMany(mappedBy = "user")
+    @LazyCollection(LazyCollectionOption.FALSE)
     @JsonIgnore
+    @ToString.Exclude
     private List<CreditCard> credit_cards = new ArrayList<>();
 
     @OneToMany(mappedBy = "user")
     @LazyCollection(LazyCollectionOption.FALSE)
     @JsonIgnore
+    @ToString.Exclude
     private List<Reservation> reservations = new ArrayList<>();
 
     public User() {

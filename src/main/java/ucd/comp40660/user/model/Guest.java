@@ -6,6 +6,7 @@ import javax.validation.constraints.*;
 import jdk.dynalink.linker.LinkerServices;
 import lombok.Data;
 import ucd.comp40660.reservation.model.Reservation;
+import ucd.comp40660.user.model.CreditCard;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -35,6 +36,10 @@ public class Guest {
 
     @NotBlank
     private String address;
+
+    @OneToOne
+    private CreditCard credit_card = new CreditCard();
+
 
     @NotBlank
     private String credit_card_details;
