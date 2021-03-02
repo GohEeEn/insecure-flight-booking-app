@@ -15,6 +15,7 @@ import ucd.comp40660.user.model.Passenger;
 import ucd.comp40660.flight.model.Flight;
 import ucd.comp40660.user.model.User;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Entity
@@ -44,6 +45,10 @@ public class Reservation {
     @ManyToOne
     @JsonIgnore
     private Flight flight;
+
+    @OneToMany(mappedBy = "reservation")
+    @JsonIgnore
+    private List<Passenger> passengers = new ArrayList<>();
 
     public Reservation() {
         super();

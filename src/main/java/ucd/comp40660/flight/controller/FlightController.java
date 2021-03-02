@@ -133,6 +133,8 @@ public class FlightController {
 
     public void processFlightSearch(String departure, String destinationInput, int passengers, String outboundDate,
                                     Model model, HttpServletResponse response) throws IOException {
+
+        numberOfPassengers = passengers;
 //        System.out.println(outboundDate);
         flightSearch.setDeparture(departure);
         flightSearch.setDestinationInput(destinationInput);
@@ -156,7 +158,6 @@ public class FlightController {
     }
 
     @PostMapping("/selectFlight")
-
     public void selectFlight(String flightIndexSelected, Model model, HttpServletResponse response) throws IOException {
         boolean isNumber = flightIndexSelected.chars().allMatch(Character::isDigit);
         if (!isNumber) {
@@ -201,8 +202,12 @@ public class FlightController {
 
         if(numberOfPassengers > 1){
             return "passengerDetails.html";
-        }else{
+        }else if(userSession.getUser()==null){
             return "bookingDetails.html";
+        }
+        else{
+            model.addAttribute("cards", userSession.getUser().getCredit_cards());
+            return "displayPaymentPage.html";
         }
     }
 
@@ -217,37 +222,32 @@ public class FlightController {
         passenger.setAddress(address);
         passenger.setEmail(email);
 
-        guest.getPassengers().add(passenger);
-        guestRepository.saveAndFlush(guest);
+        User user = userSession.getUser();
 
-        passengerRepository.saveAndFlush(passenger);
-        passenger.setGuest(guest);
+        if (user == null) {
+            guest.getPassengers().add(passenger);
+            guestRepository.save(guest);
 
-        passenger.setGuest(guest);
+            passengerRepository.saveAndFlush(passenger);
+            passenger.setGuest(guest);
 
+            System.out.println("size: " + guest.getPassengers().size());
+        }
+        else{
+            user.getPassengers().add(passenger);
+            userRepository.saveAndFlush(user);
 
-//        listOfOtherPassengers.add(passenger);
-
-
-
-//        passengerRepository.save(passenger);
-
-        System.out.println("size: " + guest.getPassengers().size());
+            passengerRepository.saveAndFlush(passenger);
+            passenger.setUser(user);
+        }
 
         numberOfPassengers -= 1;
         response.sendRedirect("/displayBookingPage");
 
-//        if(numberOfPassengers > 1){
-//            response.sendRedirect("/displayBookingPage");
-//        }else{
-//            response.sendRedirect("/bookingDetails");
-//        }
-
     }
 
     @PostMapping("/processGuestPersonalDetails")
-
-    public void processGuestPersonalDetails(String name, String surname, String email, String phoneNumber, String address,
+    public String processGuestPersonalDetails(String name, String surname, String email, String phoneNumber, String address,
                                             Model model, HttpServletResponse response ) throws IOException {
 
         guest.setName(name);
@@ -258,20 +258,18 @@ public class FlightController {
 
         model.addAttribute("user", userSession.getUser());
 
-
-
-        response.sendRedirect("/displayPaymentPage");
+        return "/displayPaymentPage";
     }
 
     @GetMapping("/displayPaymentPage")
     public String displayPaymentPage(Model model){
 
-        model.addAttribute("user", userSession.getUser());
         if(userSession.getUser()!=null){
             List<CreditCard> cards = creditCardRepository.findAllByUser(userSession.getUser());
             model.addAttribute("cards", cards);
         }
 
+        model.addAttribute("user", userSession.getUser());
         return "displayPaymentPage.html";
     }
   
@@ -284,11 +282,15 @@ public class FlightController {
         reservation.setUser(user);
 
         //TODO Create flight object via tempflightreference and flightrepo
-
+        Flight flight = flightRepository.findFlightByFlightID(temporaryFlightReference);
+        reservation.setFlight(flight);
+        flight.getReservations().add(reservation);
+        flightRepository.saveAndFlush(flight);
         reservationRepository.saveAndFlush(reservation);
 //        userRepository.save(user);
         model.addAttribute("user", user);
         model.addAttribute("reservation", reservation);
+        model.addAttribute("flight", flight);
         //TODO add Flight object to model for display @ displayReservation.html
 //        model.addAttribute("flight", reservation.getFlight());
         return "displayReservation.html";
@@ -303,27 +305,25 @@ public class FlightController {
         Reservation reservation = new Reservation();
 
         CreditCard card = new CreditCard(cardholder_name, card_number, card_type, expiration_month, expiration_year, security_code);
+        creditCardRepository.saveAndFlush(card);
+
         guest.setCredit_card(card);
+        guestRepository.save(guest);
+
         card.setGuest(guest);
-        creditCardRepository.save(card);
 
         reservation.setEmail(guest.getEmail());
 
         //TODO Change to Flight Object
-        reservation.setFlight_reference(temporaryFlightReference);
+        reservation.setFlight_reference(temporaryFlightReference);//Should be made redundant with Flight object now used
+        reservation.setFlight(flightRepository.findFlightByFlightID(temporaryFlightReference));
 
+        reservationRepository.saveAndFlush(reservation);
         reservation.setGuest(guest);
 
         guest.getReservations().add(reservation);
-        reservationRepository.save(reservation);
 
         guestRepository.save(guest);
-
-//        reservationRepository.save(reservation);
-//        reservationRepository.saveAndFlush(reservation);
-
-
-//        re-instantiate the guest to avoid persistence of the same guest
         guest = new Guest();
 
         response.sendRedirect("/displayReservationId");

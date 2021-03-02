@@ -11,13 +11,19 @@
 	<nav th:replace="fragments/header :: navigation-bar"></nav>
 
 		<div class="col-12"><h5>Thank For Booking with Secure Airways</h5>
-			<span th:if="user != null">
+			<span th:if="${user != null}">
 -->                <div class="container">
 					<table class="table">
 						<thead>
 						<tr>
 							<th>Reservation ID</th>
 							<th>Name</th>
+							<th>Departure</th>
+							<th>Destination</th>
+							<th>Departure Date</th>
+							<th>Arrival Date</th>
+							<th></th>
+
 
 							<th></th>
 						</tr>
@@ -25,7 +31,13 @@
 						<tbody>
 							<td><span th:text="${reservation.id}" ></span></td>
 							<td><span th:text="${user.name}" ></span></td>
-						</tr>
+							<td><span th:text="${flight.source}" ></span></td>
+							<td><span th:text="${flight.destination}" ></span></td>
+							<td><span th:text="${flight.departure_date_time}" ></span></td>
+							<td><span th:text="${flight.arrival_date_time}" ></span></td>
+
+
+							</tr>
 						</tbody>
 					</table>
 				</div>
@@ -37,7 +49,7 @@
 
 		<div class="container">
 			<div class="row">
-				<span th:if="user == null">
+				<span th:if="${user == null}">
 
 					<div class="col-12"><h5>Thank For Booking with Secure Airways</h5>
 	<!-- 					<h6>Select a Flight</h6>

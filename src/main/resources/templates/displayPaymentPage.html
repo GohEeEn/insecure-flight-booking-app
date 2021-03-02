@@ -19,7 +19,7 @@
 		</div>
 
 		<div>
-			<span th:if="user != null">
+			<span th:if="${user != null}">
 				<form action="/processMemberPayment" method="post">
 					<table>
 						<thead>
@@ -49,10 +49,9 @@
 					<button type="submit" class="btn btn-primary">Select Payment Option</button>
 
 				</form>
-<!--			Member Booking Logic Here-->
 			</span>
 
-			<span th:if="user == null">
+			<span th:if="${user == null}">
 
 				<form action="/processGuestPayment" method="post" >
 					<div class="form-group">
@@ -62,8 +61,8 @@
 					<div class="row">
 						<div class="col">
 							<div class="form-group">
-								<label for="formSelect1">CREDIT/DEBIT CARD</label>
-								<select class="form-control" id="formSelect1" name="card_type" required>
+								<label for="card_type">CREDIT/DEBIT CARD</label>
+								<select class="form-control" id="card_type" name="card_type" required>
 									<option value="">Choose ...</option>
 									<option value="Visa Debit">Visa Debit</option>
 									<option value="Visa Electron">Visa Electron</option>
@@ -73,23 +72,23 @@
 					</div>
 					<div class="form-group">
 						<label for="card_number">CARD NUMBER</label>
-						<input type="text" class="form-control" id="card_number" name="card_number" required="required">
+						<input type="text" class="form-control" id="card_number" name="card_number" required>
 					</div>
 					<div class="form-row">
 						<div class="form-group col-md-6">
 							<label for="expiration_month">EXPIRES</label>
-							<input type="number" class="form-control" id="expiration_month" placeholder="Month" name="expiration_month" min="1" max="12" required="required">
+							<input type="number" class="form-control" id="expiration_month" placeholder="Month" name="expiration_month" min="1" max="12" required>
 						</div>
 						<div class="form-group col-md-6">
 							<label for="expiration_year">.</label>
-							<input type="number" class="form-control" id="expiration_year" placeholder="Year" name="expiration_year" min="2021" max="2050" required="required">
+							<input type="number" class="form-control" id="expiration_year" placeholder="Year" name="expiration_year" min="2021" max="2050" required>
 						</div>
 					</div>
 					<br>
 					<div class="form-row">
 						<div class="form-group col-md-6">
 							<label for="security_code">SECURITY CODE</label>
-							<input type="text" class="form-control" id="security_code" name="security_code" required="required">
+							<input type="text" class="form-control" id="security_code" name="security_code" required>
 						</div>
 						<div class="form-group col-md-6">
 						</div>

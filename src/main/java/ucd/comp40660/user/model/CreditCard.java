@@ -39,6 +39,7 @@ public class CreditCard {
     private User user;
 
     @OneToOne
+    @JsonIgnore
     private Guest guest;
 
     public CreditCard() { super(); }

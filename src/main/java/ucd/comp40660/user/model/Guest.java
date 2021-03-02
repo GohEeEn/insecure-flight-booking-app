@@ -37,7 +37,7 @@ public class Guest {
     @NotBlank
     private String address;
 
-    @OneToOne
+    @OneToOne(cascade = CascadeType.ALL)
     private CreditCard credit_card = new CreditCard();
 
 
