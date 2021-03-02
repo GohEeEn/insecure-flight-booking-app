@@ -101,7 +101,7 @@ public class FlightController {
 
         flight.setSource(flightDetails.getSource());
         flight.setDestination(flightDetails.getDestination());
-        flight.setArrival_date_time(flightDetails.getArrival_date_time());
+        flight.setArrivalDateTime(flightDetails.getArrivalDateTime());
         flight.setDeparture_date_time(flightDetails.getDeparture_date_time());
 
         Flight updatedFlight = flightRepository.save(flight);
@@ -172,7 +172,7 @@ public class FlightController {
                 Flight userFlight = flightOptions.get(flightIndex - 1);
                 for (Flight aFlight : allFlight) {
                     if (aFlight.getDestination().equals(userFlight.getDestination()) && aFlight.getSource().equals(userFlight.getSource())
-                            && aFlight.getDeparture_date_time().equals(userFlight.getDeparture_date_time()) && aFlight.getArrival_date_time().equals(userFlight.getArrival_date_time())) {
+                            && aFlight.getDeparture_date_time().equals(userFlight.getDeparture_date_time()) && aFlight.getArrivalDateTime().equals(userFlight.getArrivalDateTime())) {
                         temporaryFlightReference = aFlight.getFlightID();
                     }
                 }

@@ -15,7 +15,10 @@ import ucd.comp40660.user.UserSession;
 import ucd.comp40660.user.model.User;
 
 import javax.validation.Valid;
+import java.sql.Timestamp;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 import lombok.extern.log4j.Log4j2;
@@ -93,9 +96,20 @@ public class ReservationController {
             if (reservations.size() > 0) {
 //            loop through each reservation and find the flights associated
                 List<Flight> flights = new ArrayList<>();
+                List<Flight> upcoming = new ArrayList<>();
+                List<Flight> past = new ArrayList<>();
+                List<Flight> upcoming_cancellable = new ArrayList<>();
+
+                Date date = new Date();
+                Timestamp ts = new Timestamp(date.getTime());
+                Timestamp cancellable = new Timestamp(date.getTime() + (3600*1000*24));
 
                 for (Reservation reservation : reservations) {
                     Flight flight = flightRepository.findFlightByReservations(reservation);
+                    upcoming_cancellable.addAll(flightRepository.findAllByReservationsAndArrivalDateTimeAfter(reservation, cancellable));
+                    upcoming.addAll(flightRepository.findAllByReservationsAndArrivalDateTimeBetween(reservation, ts, cancellable));
+                    past.addAll(flightRepository.findAllByReservationsAndArrivalDateTimeBefore(reservation, ts ));
+
 
                     if (flight != null) {
                         flights.add(flight);
@@ -104,6 +118,9 @@ public class ReservationController {
 
 //            add the flights to the model, so thymeleaf can display them
                 model.addAttribute("flightsUser", flights);
+                model.addAttribute("upcoming", upcoming);
+                model.addAttribute("past", past);
+                model.addAttribute("cancellable", upcoming_cancellable);
                 log.info(String.format("Added flights to front end as \'flightsUser\'"));
 
             } else { // throw an error if there are no reservations
