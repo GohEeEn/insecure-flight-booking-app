@@ -10,7 +10,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import ucd.comp40660.reservation.exception.ReservationNotFoundException;
 import ucd.comp40660.reservation.model.Reservation;
 import ucd.comp40660.reservation.repository.ReservationRepository;
 import ucd.comp40660.user.UserSession;
@@ -29,9 +28,6 @@ import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.List;
 
-
-import ucd.comp40660.user.UserSession;
-import ucd.comp40660.user.model.User;
 import ucd.comp40660.user.repository.PassengerRepository;
 
 import lombok.extern.log4j.Log4j2;
@@ -42,7 +38,7 @@ import ucd.comp40660.user.repository.UserRepository;
 @Controller
 public class FlightController {
 
-    private FlightSearch flightSearch = new FlightSearch();
+    private final FlightSearch flightSearch = new FlightSearch();
     private Guest guest = new Guest();
 
     @Autowired
@@ -69,8 +65,6 @@ public class FlightController {
 
     Long temporaryFlightReference;
     int numberOfPassengers;
-
-    List<Passenger> listOfOtherPassengers = new ArrayList<>();
 
     @PostMapping("/home")
     public void home(HttpServletResponse response) throws IOException {
@@ -125,7 +119,8 @@ public class FlightController {
 
     public void processFlightSearch(String departure, String destinationInput, int passengers, String outboundDate,
                                     Model model, HttpServletResponse response) throws IOException {
-//        System.out.println(outboundDate);
+
+        numberOfPassengers = passengers;
         flightSearch.setDeparture(departure);
         flightSearch.setDestinationInput(destinationInput);
         flightSearch.setPassengers(passengers);
@@ -147,7 +142,6 @@ public class FlightController {
     }
 
     @PostMapping("/selectFlight")
-
     public void selectFlight(String flightIndexSelected, Model model, HttpServletResponse response) throws IOException {
         boolean isNumber = flightIndexSelected.chars().allMatch(Character::isDigit);
         if (!isNumber) {
@@ -175,9 +169,6 @@ public class FlightController {
                         temporaryFlightReference = aFlight.getFlightID();
                     }
                 }
-//                chosen Flight
-//                Flight chosenFlight= allFlight.get(flightIndex);
-//                temporaryFlightReference = chosenFlight.getFlightID();
                 model.addAttribute("user", userSession.getUser());
 
                 response.sendRedirect("/displayBookingPage");
@@ -192,8 +183,12 @@ public class FlightController {
 
         if(numberOfPassengers > 1){
             return "passengerDetails.html";
-        }else{
+        }else if(userSession.getUser()==null){
             return "bookingDetails.html";
+        }
+        else{
+            model.addAttribute("cards", userSession.getUser().getCredit_cards());
+            return "displayPaymentPage.html";
         }
     }
 
@@ -208,37 +203,32 @@ public class FlightController {
         passenger.setAddress(address);
         passenger.setEmail(email);
 
-        guest.getPassengers().add(passenger);
-        guestRepository.saveAndFlush(guest);
+        User user = userSession.getUser();
 
-        passengerRepository.saveAndFlush(passenger);
-        passenger.setGuest(guest);
+        if (user == null) {
+            guest.getPassengers().add(passenger);
+            guestRepository.save(guest);
 
-        passenger.setGuest(guest);
+            passengerRepository.saveAndFlush(passenger);
+            passenger.setGuest(guest);
 
+            System.out.println("size: " + guest.getPassengers().size());
+        }
+        else{
+            user.getPassengers().add(passenger);
+            userRepository.saveAndFlush(user);
 
-//        listOfOtherPassengers.add(passenger);
-
-
-
-//        passengerRepository.save(passenger);
-
-        System.out.println("size: " + guest.getPassengers().size());
+            passengerRepository.saveAndFlush(passenger);
+            passenger.setUser(user);
+        }
 
         numberOfPassengers -= 1;
         response.sendRedirect("/displayBookingPage");
 
-//        if(numberOfPassengers > 1){
-//            response.sendRedirect("/displayBookingPage");
-//        }else{
-//            response.sendRedirect("/bookingDetails");
-//        }
-
     }
 
     @PostMapping("/processGuestPersonalDetails")
-
-    public void processGuestPersonalDetails(String name, String surname, String email, String phoneNumber, String address,
+    public String processGuestPersonalDetails(String name, String surname, String email, String phoneNumber, String address,
                                             Model model, HttpServletResponse response ) throws IOException {
 
         guest.setName(name);
@@ -249,20 +239,18 @@ public class FlightController {
 
         model.addAttribute("user", userSession.getUser());
 
-
-
-        response.sendRedirect("/displayPaymentPage");
+        return "/displayPaymentPage";
     }
 
     @GetMapping("/displayPaymentPage")
     public String displayPaymentPage(Model model){
 
-        model.addAttribute("user", userSession.getUser());
         if(userSession.getUser()!=null){
             List<CreditCard> cards = creditCardRepository.findAllByUser(userSession.getUser());
             model.addAttribute("cards", cards);
         }
 
+        model.addAttribute("user", userSession.getUser());
         return "displayPaymentPage.html";
     }
   
@@ -275,13 +263,16 @@ public class FlightController {
         reservation.setUser(user);
 
         //TODO Create flight object via tempflightreference and flightrepo
-
+        Flight flight = flightRepository.findFlightByFlightID(temporaryFlightReference);
+        reservation.setFlight(flight);
+        flight.getReservations().add(reservation);
+        flightRepository.saveAndFlush(flight);
         reservationRepository.saveAndFlush(reservation);
-//        userRepository.save(user);
         model.addAttribute("user", user);
         model.addAttribute("reservation", reservation);
+        model.addAttribute("flight", flight);
         //TODO add Flight object to model for display @ displayReservation.html
-//        model.addAttribute("flight", reservation.getFlight());
+
         return "displayReservation.html";
 
     }
@@ -295,26 +286,25 @@ public class FlightController {
 
         // TODO : Set guest's credit card detail required
         CreditCard card = new CreditCard(cardholder_name, card_number, card_type, expiration_month, expiration_year, security_code);
+        creditCardRepository.saveAndFlush(card);
+
         guest.setCredit_card(card);
+        guestRepository.save(guest);
+
         card.setGuest(guest);
-        creditCardRepository.save(card);
+
         reservation.setEmail(guest.getEmail());
 
         //TODO Change to Flight Object
-        reservation.setFlight_reference(temporaryFlightReference);
+        reservation.setFlight_reference(temporaryFlightReference);//Should be made redundant with Flight object now used
+        reservation.setFlight(flightRepository.findFlightByFlightID(temporaryFlightReference));
 
+        reservationRepository.saveAndFlush(reservation);
         reservation.setGuest(guest);
 
         guest.getReservations().add(reservation);
-        reservationRepository.save(reservation);
 
         guestRepository.save(guest);
-
-//        reservationRepository.save(reservation);
-//        reservationRepository.saveAndFlush(reservation);
-
-
-//        re-instantiate the guest to avoid persistence of the same guest
         guest = new Guest();
 
         response.sendRedirect("/displayReservationId");
@@ -329,12 +319,10 @@ public class FlightController {
         List<Reservation> reservationList = reservationRepository.findAll();
 
         for (Reservation reserved : reservationList) {
-            List<Reservation> reservedLists = new ArrayList<>();
-            for (int i = 0; i < guestList.size(); i++) {
-                reservedLists = guestList.get(i).getReservations();
+            for (Guest value : guestList) {
+                List<Reservation> reservedLists = value.getReservations();
                 for (Reservation reservedList : reservedLists) {
                     if (reservedList.getEmail().equals(reserved.getEmail()) && reservedList.getFlight_reference().equals(reserved.getFlight_reference())) {
-//                        String flightRef = Long.toString(temporaryFlightReference);
                         if (reserved.getFlight_reference().equals(temporaryFlightReference)) {
                             guestReservationId.add(reserved);
                         }
@@ -347,23 +335,21 @@ public class FlightController {
     }
 
     private List<Flight> flightCheck() {
-        List<Flight> availableFlights = new ArrayList<>();
+
         List<Flight> userFlightOptions = new ArrayList<>();
+        List<Flight> availableFlights = flightRepository.findAll();
 
-        availableFlights = flightRepository.findAll();
-
-        int i = 0;
-        for (i = 0; i < availableFlights.size(); i++) {
-            String flightStringFormat = availableFlights.get(i).getDeparture_date_time().toString().substring(0, 11).trim();
+        for (Flight availableFlight : availableFlights) {
+            String flightStringFormat = availableFlight.getDeparture_date_time().substring(0, 11).trim();
             if (flightStringFormat.equals(flightSearch.getOutboundDate())) {
-                if (availableFlights.get(i).getSource().equals(flightSearch.getDeparture())
-                        && availableFlights.get(i).getDestination().equals(flightSearch.getDestinationInput())) {
-                    userFlightOptions.add(availableFlights.get(i));
+                if (availableFlight.getSource().equals(flightSearch.getDeparture())
+                        && availableFlight.getDestination().equals(flightSearch.getDestinationInput())) {
+                    userFlightOptions.add(availableFlight);
                 }
             }
 
         }
-//        userFlightOptions.add(availableFlights.get(0));
+
         return userFlightOptions;
     }
 

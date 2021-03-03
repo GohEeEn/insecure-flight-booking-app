@@ -4,6 +4,7 @@ import javax.persistence.*;
 import javax.validation.constraints.*;
 
 import lombok.Data;
+import lombok.ToString;
 import ucd.comp40660.reservation.model.Reservation;
 
 import java.util.ArrayList;
@@ -35,7 +36,8 @@ public class Guest {
     @NotBlank
     private String address;
 
-    @OneToOne
+    @ToString.Exclude
+    @OneToOne(cascade = CascadeType.ALL)
     private CreditCard credit_card = new CreditCard();
 
     @Column

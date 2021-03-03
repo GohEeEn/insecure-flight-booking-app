@@ -65,6 +65,12 @@ public class User {
     @ToString.Exclude
     private List<Reservation> reservations = new ArrayList<>();
 
+    @Column
+    @OneToMany(mappedBy = "user", fetch = FetchType.EAGER, orphanRemoval = true, cascade = CascadeType.ALL)
+    @ToString.Exclude
+    private List<Passenger> passengers = new ArrayList<>();
+
+
     public User() {
         super();
     }
