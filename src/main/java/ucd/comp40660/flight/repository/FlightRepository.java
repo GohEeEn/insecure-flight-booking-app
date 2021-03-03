@@ -12,9 +12,9 @@ import java.util.List;
 public interface FlightRepository extends JpaRepository<Flight, Long> {
     Flight findFlightByReservations(Reservation reservation);
     Flight findFlightByFlightID(Long flightID);
+    List<Flight> findByReservations(Reservation reservation);
     List<Flight> findAllByReservationsAndArrivalDateTimeBefore(Reservation reservation, Date date);
     List<Flight> findAllByReservationsAndArrivalDateTimeAfter(Reservation reservation, Date date);
     List<Flight> findAllByReservationsAndArrivalDateTimeBetween(Reservation reservation, Date start, Date finish);
-
 
 }

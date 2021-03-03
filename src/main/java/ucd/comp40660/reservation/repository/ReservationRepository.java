@@ -16,4 +16,10 @@ public interface ReservationRepository extends JpaRepository<Reservation, Long> 
     public List<Reservation> findAllByUser(User user);
     public Reservation findOneByGuest(Guest guest);
     public Reservation findByFlight(Flight flight);
+    public Reservation findByUserAndFlight(User user, Flight flight);
+    public List <Reservation> findAllByUserAndCancelledIsTrue(User user);
+    public List <Reservation> findAllByUserAndCancelledIsFalse(User user);
+
+
+    public Reservation findByUserAndFlightAndCancelledIsTrue(User user, Flight flight);
 }

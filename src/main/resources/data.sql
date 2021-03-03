@@ -11,7 +11,8 @@ INSERT INTO flights(source, destination, departure_date_time, arrival_date_time)
 ('Seoul, South Korea', 'Dublin, Ireland', '2021-03-05 20:30:00', '2021-03-05 00:30:00'),
 ('Pyongyang, North Korea', 'Dublin, Ireland', '2021-03-05 20:30:00', '2021-03-05 00:30:00'),
 ('Tokyo, Japan', 'Dublin, Ireland', '2021-03-05 20:30:00', '2021-03-05 00:30:00'),
- ('Sofia, Bulgaria', 'Dublin, Ireland', '2021-03-01 20:30:00', '2021-03-02 00:30:00');
+ ('Sofia, Bulgaria', 'Dublin, Ireland', '2021-03-01 20:30:00', '2021-03-02 00:30:00'),
+('Sofia, Bulgaria', 'Dublin, Ireland', '2021-03-03 20:30:00', '2021-03-04 00:30:00');
 
 ALTER TABLE library.credit_cards MODIFY id bigint NOT NULL AUTO_INCREMENT;
 
