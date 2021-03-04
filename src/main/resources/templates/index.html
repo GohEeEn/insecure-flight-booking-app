@@ -14,13 +14,25 @@
 		<div class="container">
 			<div class="row">
 				<div class="col-8"><h3>Flights</h3>
-					<table>
-						<tr>
-<!-- 						We can use this space to display result???
- -->						</tr>
-					</table>
+					<div class="row">
+						<form class="form-inline" action="/getGuestReservations" method="post">
+						  	<div class="form-group mb-2">
+						      <label for="ReservationText">Retrieve Reservation</label>
+						    </div>
+						    <div class="form-group mx-sm-3 mb-2">
+						      <label class="sr-only" for="inputEmail">Email</label>
+						      <input type="text" class="form-control" id="inputEmail" name="inputEmail" placeholder="Enter Email Address">
+						    </div>
+						    <div class="form-group mx-sm-3 mb-2">
+						      <label class="sr-only" for="inputReservationID">Reservation ID</label>
+						      <input type="text" class="form-control" id="inputReservationID" name="inputReservationID" placeholder="Enter Reservation ID">
+						    </div>
+						    <div >
+						      <button type="submit" class="btn btn-primary mb-2">Submit</button>
+						    </div>
+					</form>							
+					</div>
 					<br>
-
 				</div>
 				<div class="col-4">
 					<h4>Choose Flights</h4>
