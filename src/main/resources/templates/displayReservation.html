@@ -11,8 +11,16 @@
 	<nav th:replace="fragments/header :: navigation-bar"></nav>
 
 		<div class="container">
-			<h5>Thank For Booking with Secure Airways</h5>
-
+			<div class="row">
+				<form action="/home" class="inline" method="post">
+					<button type="submit" class="btn btn-primary btn-lg">Return to Home Page</button>
+				</form>
+			</div>
+			<div class="row">
+				<h5>Thank For Booking with Secure Airways</h5>
+			</div>
+<!-- 			<h5>Thank For Booking with Secure Airways</h5>
+ -->
 			<table th:if="${user != null}" class="table">
 				<thead>
 					<tr>
