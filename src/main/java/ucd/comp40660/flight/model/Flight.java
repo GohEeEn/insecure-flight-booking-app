@@ -6,6 +6,8 @@ import javax.validation.constraints.NotBlank;
 import lombok.Data;
 import ucd.comp40660.reservation.model.Reservation;
 
+import java.sql.Timestamp;
+import java.util.Date;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -25,10 +27,15 @@ public class Flight {
     private String destination;
 
     @NotBlank
-    private String departure_date_time;
+    @Temporal(TemporalType.TIMESTAMP)
+    private Date departure_date_time;
+
+    @Temporal(TemporalType.TIMESTAMP)
+    private Date cancelLimitTime;
 
     @NotBlank
-    private String arrival_date_time;
+    @Temporal(TemporalType.TIMESTAMP)
+    private Date arrivalDateTime;
 
     @Column
     @OneToMany(mappedBy = "flight")
@@ -39,11 +46,18 @@ public class Flight {
     }
 
 
-    public Flight(Long flightID, String from, String destination, String departureDateTime, String arrivalDateTime) {
+    public Flight(Long flightID, String from, String destination, Date departureDateTime, Date arrivalDateTime) {
         this.flightID = flightID;
         this.source= from;
         this.destination= destination;
         this.departure_date_time= departureDateTime;
-        this.arrival_date_time= arrivalDateTime;
+        this.arrivalDateTime = arrivalDateTime;
+        this.cancelLimitTime = setCancelTime(departureDateTime);
+    }
+
+    public Timestamp setCancelTime(Date departureDateTime){
+        Timestamp ct = new Timestamp(0);
+        ct.setTime(this.departure_date_time.getTime() - (3600 * 1000 * 24));
+        return ct;
     }
 }

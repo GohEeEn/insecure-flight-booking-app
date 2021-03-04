@@ -14,8 +14,13 @@ import org.springframework.web.bind.annotation.*;
 import ucd.comp40660.user.UserSession;
 import ucd.comp40660.user.model.User;
 
+import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
+import java.io.IOException;
+import java.sql.Timestamp;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 import lombok.extern.log4j.Log4j2;
@@ -88,23 +93,46 @@ public class ReservationController {
             model.addAttribute("user", user);
 
 //            find all reservations associated with a user
-            List<Reservation> reservations = reservationRepository.findAllByUser(user);
+            List<Reservation> reservations = reservationRepository.findAllByUserAndCancelledIsFalse(user);
+            List<Reservation> cancelled_reservations = reservationRepository.findAllByUserAndCancelledIsTrue(user);
+//            reservations.removeAll(cancelled_reservations);
 
             if (reservations.size() > 0) {
 //            loop through each reservation and find the flights associated
                 List<Flight> flights = new ArrayList<>();
+                List<Flight> upcoming = new ArrayList<>();
+                List<Flight> past = new ArrayList<>();
+                List<Flight> upcoming_cancellable = new ArrayList<>();
+                List<Flight> cancelled_flights = new ArrayList<>();
+
+                Date date = new Date();
+                Timestamp ts = new Timestamp(date.getTime());
+                Timestamp cancellable = new Timestamp(date.getTime() + (3600*1000*24));
 
                 for (Reservation reservation : reservations) {
                     Flight flight = flightRepository.findFlightByReservations(reservation);
+                    upcoming_cancellable.addAll(flightRepository.findAllByReservationsAndArrivalDateTimeAfter(reservation, cancellable));
+                    upcoming.addAll(flightRepository.findAllByReservationsAndArrivalDateTimeBetween(reservation, ts, cancellable));
+                    past.addAll(flightRepository.findAllByReservationsAndArrivalDateTimeBefore(reservation, ts ));
+
 
                     if (flight != null) {
                         flights.add(flight);
                     }
                 }
 
+                for(Reservation cancelled_reservation : cancelled_reservations){
+                    cancelled_flights.add(flightRepository.findFlightByReservations(cancelled_reservation));
+                }
+
 //            add the flights to the model, so thymeleaf can display them
                 model.addAttribute("flightsUser", flights);
+                model.addAttribute("upcoming", upcoming);
+                model.addAttribute("past", past);
+                model.addAttribute("cancelled_flights", cancelled_flights);
+                model.addAttribute("upcoming_cancellable", upcoming_cancellable);
                 log.info(String.format("Added flights to front end as \'flightsUser\'"));
+                log.info("Cancelled Flights: " + cancelled_flights);
 
             } else { // throw an error if there are no reservations
 //                throw new ReservationNotFoundException();
@@ -115,5 +143,17 @@ public class ReservationController {
         return "viewFlightsUser.html";
 
     }
+
+    @GetMapping("/reservations/cancel/{id}")
+    public void cancelReservation(@PathVariable(value = "id") Long flightID, Model model, HttpServletResponse response) throws ReservationNotFoundException, IOException {
+        Flight flight = flightRepository.findFlightByFlightID(flightID);
+        User user = userSession.getUser();
+        Reservation reservation = reservationRepository.findByUserAndFlight(user, flight);
+        reservation.setCancelled(true);
+        reservationRepository.saveAndFlush(reservation);
+        model.addAttribute("user", user);
+        response.sendRedirect("/getUserReservations");
+    }
+
 
 }

@@ -2,15 +2,17 @@
 ALTER TABLE library.flights MODIFY flightID bigint NOT NULL AUTO_INCREMENT;
 
 INSERT INTO flights(source, destination, departure_date_time, arrival_date_time) VALUES
-('Sofia, Bulgaria', 'Dublin, Ireland', '2021-03-05 20:30', '2021-03-05 00:30'),
-('Stockholm, Sweden', 'Dublin, Ireland', '2021-03-06 11:30', '2021-03-06 13:30'),
-('Oslo, Norway', 'Dublin, Ireland', '2021-03-07 08:00', '2021-03-05 10:30'),
-('Rio de Janeiro, Brazil', 'Dublin, Ireland', '2021-03-05 20:30', '2021-03-05 00:30'),
-('Bucharest, Romania', 'Dublin, Ireland', '2021-03-05 20:30', '2021-03-05 00:30'),
-('Manila, Philippines', 'Dublin, Ireland', '2021-03-05 20:30', '2021-03-05 00:30'),
-('Seoul, South Korea', 'Dublin, Ireland', '2021-03-05 20:30', '2021-03-05 00:30'),
-('Pyongyang, North Korea', 'Dublin, Ireland', '2021-03-05 20:30', '2021-03-05 00:30'),
-('Tokyo, Japan', 'Dublin, Ireland', '2021-03-05 20:30', '2021-03-05 00:30');
+('Sofia, Bulgaria', 'Dublin, Ireland', '2021-03-05 20:30:00', '2021-03-05 00:30:00'),
+('Stockholm, Sweden', 'Dublin, Ireland', '2021-03-06 11:30:00', '2021-03-06 13:30:00'),
+('Oslo, Norway', 'Dublin, Ireland', '2021-03-07 08:00:00', '2021-03-05 10:30:00'),
+('Rio de Janeiro, Brazil', 'Dublin, Ireland', '2021-03-05 20:30:00', '2021-03-05 00:30:00'),
+('Bucharest, Romania', 'Dublin, Ireland', '2021-03-05 20:30:00', '2021-03-05 00:30:00'),
+('Manila, Philippines', 'Dublin, Ireland', '2021-03-05 20:30:00', '2021-03-05 00:30:00'),
+('Seoul, South Korea', 'Dublin, Ireland', '2021-03-05 20:30:00', '2021-03-05 00:30:00'),
+('Pyongyang, North Korea', 'Dublin, Ireland', '2021-03-05 20:30:00', '2021-03-05 00:30:00'),
+('Tokyo, Japan', 'Dublin, Ireland', '2021-03-05 20:30:00', '2021-03-05 00:30:00'),
+ ('Sofia, Bulgaria', 'Dublin, Ireland', '2021-03-01 20:30:00', '2021-03-02 00:30:00'),
+('Sofia, Bulgaria', 'Dublin, Ireland', '2021-03-03 20:30:00', '2021-03-04 00:30:00');
 
 ALTER TABLE library.credit_cards MODIFY id bigint NOT NULL AUTO_INCREMENT;
 
