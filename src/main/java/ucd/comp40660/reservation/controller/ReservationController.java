@@ -165,22 +165,33 @@ public class ReservationController {
             log.info(String.format("getGuestReservations(): Reservation ID: " + inputReservationID));
         }
 
-//        find the reservation via email and reservation id
-        Reservation reservation = reservationRepository.findAllByEmailAndId(inputEmail, Long.parseLong(inputReservationID));
+        Long id;
 
-//        find the flight via the reservation object
-        Flight flight = flightRepository.findFlightByReservations(reservation);
-
-        if (flight != null) {
-            log.info(String.format("getGuestReservations(): Flight info: '%s'", flight));
-
-            model.addAttribute("flightGuest", flight);
-        } else {
-            model.addAttribute("error", "Flight not found");
+        try {
+            id = Long.parseLong(inputReservationID);
+        } catch (NumberFormatException e) {
             return "index.html";
         }
 
-        return "viewFlightsGuest.html";
+//        find the reservation via email and reservation id
+        Reservation reservation = reservationRepository.findOneByEmailAndId(inputEmail, id);
+
+        if (reservation != null) {
+            log.info(String.format("getGuestReservations(): Reservation info: '%s'", reservation));
+
+            //        find the flight via the reservation object
+            Flight flight = flightRepository.findFlightByReservations(reservation);
+
+            log.info(String.format("getGuestReservations(): Flight info: '%s'", flight));
+
+//            add flight to the model
+            model.addAttribute("flightGuest", flight);
+
+            return "viewFlightsGuest.html";
+        } else {
+//            if no reservation found with the provided details, keep user on the same page
+            return "index.html";
+        }
     }
 
 }
