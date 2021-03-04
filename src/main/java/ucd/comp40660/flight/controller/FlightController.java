@@ -177,16 +177,15 @@ public class FlightController {
     }
 
     @GetMapping("/displayBookingPage")
-    public String guestBooking(Model model){
+    public String guestBooking(Model model) {
 
         model.addAttribute("user", userSession.getUser());
 
-        if(numberOfPassengers > 1){
+        if (numberOfPassengers > 1) {
             return "passengerDetails.html";
-        }else if(userSession.getUser()==null){
+        } else if (userSession.getUser() == null) {
             return "bookingDetails.html";
-        }
-        else{
+        } else {
             model.addAttribute("cards", userSession.getUser().getCredit_cards());
             return "displayPaymentPage.html";
         }
@@ -213,8 +212,7 @@ public class FlightController {
             passenger.setGuest(guest);
 
             System.out.println("size: " + guest.getPassengers().size());
-        }
-        else{
+        } else {
             user.getPassengers().add(passenger);
             userRepository.saveAndFlush(user);
 
@@ -229,7 +227,7 @@ public class FlightController {
 
     @PostMapping("/processGuestPersonalDetails")
     public String processGuestPersonalDetails(String name, String surname, String email, String phoneNumber, String address,
-                                            Model model, HttpServletResponse response ) throws IOException {
+                                              Model model, HttpServletResponse response) throws IOException {
 
         guest.setName(name);
         guest.setSurname(surname);
@@ -243,9 +241,9 @@ public class FlightController {
     }
 
     @GetMapping("/displayPaymentPage")
-    public String displayPaymentPage(Model model){
+    public String displayPaymentPage(Model model) {
 
-        if(userSession.getUser()!=null){
+        if (userSession.getUser() != null) {
             List<CreditCard> cards = creditCardRepository.findAllByUser(userSession.getUser());
             model.addAttribute("cards", cards);
         }
@@ -253,22 +251,27 @@ public class FlightController {
         model.addAttribute("user", userSession.getUser());
         return "displayPaymentPage.html";
     }
+
   
   @PostMapping("/processMemberPayment")
-    public String processMemberPayment(Model model, HttpServletResponse response) throws IOException {
+    public String processMemberPayment(Model model, HttpServletResponse response, CreditCard card) throws IOException {
+
         User user = userSession.getUser();
         Reservation reservation = new Reservation();
         user.getReservations().add(reservation);
         userRepository.flush();
         reservation.setUser(user);
 
-        //TODO Create flight object via tempflightreference and flightrepo
+
+      //TODO Create flight object via tempflightreference and flightrepo
         Flight flight = flightRepository.findFlightByFlightID(temporaryFlightReference);
         reservation.setFlight(flight);
         flight.getReservations().add(reservation);
         flightRepository.saveAndFlush(flight);
         reservationRepository.saveAndFlush(reservation);
-        model.addAttribute("user", user);
+        reservation.setCredit_card(card);
+
+      model.addAttribute("user", user);
         model.addAttribute("reservation", reservation);
         model.addAttribute("flight", flight);
         //TODO add Flight object to model for display @ displayReservation.html
@@ -280,22 +283,23 @@ public class FlightController {
 
     @PostMapping("/processGuestPayment")
     public void processGuestPayment(String cardholder_name, String card_number, String card_type, int expiration_month,
-                            int expiration_year, String security_code, Model model,  HttpServletResponse response) throws IOException {
+                                    int expiration_year, String security_code, Model model, HttpServletResponse response) throws IOException {
 
         Reservation reservation = new Reservation();
 
-        // TODO : Set guest's credit card detail required
         CreditCard card = new CreditCard(cardholder_name, card_number, card_type, expiration_month, expiration_year, security_code);
         creditCardRepository.saveAndFlush(card);
 
-        guest.setCredit_card(card);
+//        guest.setCredit_card(card);
         guestRepository.save(guest);
+        reservation.setCredit_card(card);
 
-        card.setGuest(guest);
+//        card.setGuest(guest);
+        card.getReservations().add(reservation);
 
         reservation.setEmail(guest.getEmail());
 
-        //TODO Change to Flight Object
+
         reservation.setFlight_reference(temporaryFlightReference);//Should be made redundant with Flight object now used
         reservation.setFlight(flightRepository.findFlightByFlightID(temporaryFlightReference));
 
@@ -314,7 +318,7 @@ public class FlightController {
     public String displayReservationId(Model model) {
         List<Reservation> guestReservationId = new ArrayList<>();
         List<Guest> guestList = guestRepository.findAll();
-        System.out.println(guestList.get(1).getPassengers().size() );
+        System.out.println(guestList.get(1).getPassengers().size());
 
         List<Reservation> reservationList = reservationRepository.findAll();
 

@@ -19,7 +19,7 @@
 
 
 		<div>
-			<span th:if="${user != null}">
+			<span th:if="${user != null && cards.size() > 0 }">
 				<form action="/processMemberPayment" method="post">
 					<table>
 						<thead>
@@ -49,6 +49,13 @@
 					<button type="submit" class="btn btn-primary">Select Payment Option</button>
 
 				</form>
+			</span>
+
+			<span th:if="${user != null && cards.size() == 0}"}>
+				<h3>No stored payment methods detected. Please add a Payment Method and restart the booking process.</h3>
+			</span>
+			<span th:if="${user != null}">
+        		<a href="/registerCard" class="btn btn-secondary">Add New Card</a>
 			</span>
 
 			<span th:if="${user == null}">

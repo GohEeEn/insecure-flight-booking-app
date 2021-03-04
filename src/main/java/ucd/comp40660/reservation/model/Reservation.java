@@ -10,6 +10,7 @@ import lombok.Data;
 import lombok.ToString;
 import org.w3c.dom.stylesheets.LinkStyle;
 
+import ucd.comp40660.user.model.CreditCard;
 import ucd.comp40660.user.model.Guest;
 import ucd.comp40660.user.model.Passenger;
 import ucd.comp40660.flight.model.Flight;
@@ -47,15 +48,25 @@ public class Reservation {
     @JsonIgnore
     private User user;
 
-    @ToString.Exclude
+
     @ManyToOne
     @JsonIgnore
+    @ToString.Exclude
     private Flight flight;
+
+
+    @ManyToOne
+    @ToString.Exclude
+    @JsonIgnore
+    private CreditCard credit_card;
+
 
     @ToString.Exclude
     @OneToMany(mappedBy = "reservation")
     @JsonIgnore
     private List<Passenger> passengers = new ArrayList<>();
+
+
 
     public Reservation() {
         super();
