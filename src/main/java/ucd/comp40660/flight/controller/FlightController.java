@@ -340,7 +340,7 @@ public class FlightController {
         List<Flight> availableFlights = flightRepository.findAll();
 
         for (Flight availableFlight : availableFlights) {
-            String flightStringFormat = availableFlight.getDeparture_date_time().substring(0, 11).trim();
+            String flightStringFormat = availableFlight.getDeparture_date_time().toString().substring(0, 11).trim();
             if (flightStringFormat.equals(flightSearch.getOutboundDate())) {
                 if (availableFlight.getSource().equals(flightSearch.getDeparture())
                         && availableFlight.getDestination().equals(flightSearch.getDestinationInput())) {
