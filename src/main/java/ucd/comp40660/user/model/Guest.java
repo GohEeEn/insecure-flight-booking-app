@@ -3,6 +3,7 @@ package ucd.comp40660.user.model;
 import javax.persistence.*;
 import javax.validation.constraints.*;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Data;
 import lombok.ToString;
 import ucd.comp40660.reservation.model.Reservation;
@@ -36,15 +37,20 @@ public class Guest {
     @NotBlank
     private String address;
 
-    @ToString.Exclude
-    @OneToOne(cascade = CascadeType.ALL)
-    private CreditCard credit_card = new CreditCard();
+//    @OneToOne(cascade = CascadeType.ALL)
+//    @ToString.Exclude
+//    @JsonIgnore
+//    private CreditCard credit_card = new CreditCard();
 
-    @Column
+
     @OneToMany(mappedBy = "guest", orphanRemoval = true, cascade = CascadeType.ALL)
+    @ToString.Exclude
+    @JsonIgnore
     private List<Reservation> reservations = new ArrayList<>();
 
     @Column
+    @JsonIgnore
+    @ToString.Exclude
     @OneToMany(mappedBy = "guest", orphanRemoval = true, cascade = CascadeType.ALL)
     private List<Passenger> passengers = new ArrayList<>();
 

@@ -252,21 +252,26 @@ public class FlightController {
         return "displayPaymentPage.html";
     }
 
-    @PostMapping("/processMemberPayment")
-    public String processMemberPayment(Model model, HttpServletResponse response) throws IOException {
+  
+  @PostMapping("/processMemberPayment")
+    public String processMemberPayment(Model model, HttpServletResponse response, CreditCard card) throws IOException {
+
         User user = userSession.getUser();
         Reservation reservation = new Reservation();
         user.getReservations().add(reservation);
         userRepository.flush();
         reservation.setUser(user);
 
-        //TODO Create flight object via tempflightreference and flightrepo
+
+      //TODO Create flight object via tempflightreference and flightrepo
         Flight flight = flightRepository.findFlightByFlightID(temporaryFlightReference);
         reservation.setFlight(flight);
         flight.getReservations().add(reservation);
         flightRepository.saveAndFlush(flight);
         reservationRepository.saveAndFlush(reservation);
-        model.addAttribute("user", user);
+        reservation.setCredit_card(card);
+
+      model.addAttribute("user", user);
         model.addAttribute("reservation", reservation);
         model.addAttribute("flight", flight);
         //TODO add Flight object to model for display @ displayReservation.html
@@ -282,18 +287,19 @@ public class FlightController {
 
         Reservation reservation = new Reservation();
 
-        // TODO : Set guest's credit card detail required
         CreditCard card = new CreditCard(cardholder_name, card_number, card_type, expiration_month, expiration_year, security_code);
         creditCardRepository.saveAndFlush(card);
 
-        guest.setCredit_card(card);
+//        guest.setCredit_card(card);
         guestRepository.save(guest);
+        reservation.setCredit_card(card);
 
-        card.setGuest(guest);
+//        card.setGuest(guest);
+        card.getReservations().add(reservation);
 
         reservation.setEmail(guest.getEmail());
 
-        //TODO Change to Flight Object
+
         reservation.setFlight_reference(temporaryFlightReference);//Should be made redundant with Flight object now used
         reservation.setFlight(flightRepository.findFlightByFlightID(temporaryFlightReference));
 

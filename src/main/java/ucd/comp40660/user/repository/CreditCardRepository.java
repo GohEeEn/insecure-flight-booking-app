@@ -14,5 +14,5 @@ public interface CreditCardRepository extends JpaRepository<CreditCard, Long> {
 
     public List<CreditCard> findAllByUser(User user);
 
-    public CreditCard findOneByGuest(Guest guest);
+//    public CreditCard findOneByGuest(Guest guest);
 }
