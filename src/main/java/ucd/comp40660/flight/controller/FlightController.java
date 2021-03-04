@@ -177,16 +177,15 @@ public class FlightController {
     }
 
     @GetMapping("/displayBookingPage")
-    public String guestBooking(Model model){
+    public String guestBooking(Model model) {
 
         model.addAttribute("user", userSession.getUser());
 
-        if(numberOfPassengers > 1){
+        if (numberOfPassengers > 1) {
             return "passengerDetails.html";
-        }else if(userSession.getUser()==null){
+        } else if (userSession.getUser() == null) {
             return "bookingDetails.html";
-        }
-        else{
+        } else {
             model.addAttribute("cards", userSession.getUser().getCredit_cards());
             return "displayPaymentPage.html";
         }
@@ -213,8 +212,7 @@ public class FlightController {
             passenger.setGuest(guest);
 
             System.out.println("size: " + guest.getPassengers().size());
-        }
-        else{
+        } else {
             user.getPassengers().add(passenger);
             userRepository.saveAndFlush(user);
 
@@ -229,7 +227,7 @@ public class FlightController {
 
     @PostMapping("/processGuestPersonalDetails")
     public String processGuestPersonalDetails(String name, String surname, String email, String phoneNumber, String address,
-                                            Model model, HttpServletResponse response ) throws IOException {
+                                              Model model, HttpServletResponse response) throws IOException {
 
         guest.setName(name);
         guest.setSurname(surname);
@@ -243,9 +241,9 @@ public class FlightController {
     }
 
     @GetMapping("/displayPaymentPage")
-    public String displayPaymentPage(Model model){
+    public String displayPaymentPage(Model model) {
 
-        if(userSession.getUser()!=null){
+        if (userSession.getUser() != null) {
             List<CreditCard> cards = creditCardRepository.findAllByUser(userSession.getUser());
             model.addAttribute("cards", cards);
         }
@@ -253,8 +251,8 @@ public class FlightController {
         model.addAttribute("user", userSession.getUser());
         return "displayPaymentPage.html";
     }
-  
-  @PostMapping("/processMemberPayment")
+
+    @PostMapping("/processMemberPayment")
     public String processMemberPayment(Model model, HttpServletResponse response) throws IOException {
         User user = userSession.getUser();
         Reservation reservation = new Reservation();
@@ -280,7 +278,7 @@ public class FlightController {
 
     @PostMapping("/processGuestPayment")
     public void processGuestPayment(String cardholder_name, String card_number, String card_type, int expiration_month,
-                            int expiration_year, String security_code, Model model,  HttpServletResponse response) throws IOException {
+                                    int expiration_year, String security_code, Model model, HttpServletResponse response) throws IOException {
 
         Reservation reservation = new Reservation();
 
@@ -314,7 +312,7 @@ public class FlightController {
     public String displayReservationId(Model model) {
         List<Reservation> guestReservationId = new ArrayList<>();
         List<Guest> guestList = guestRepository.findAll();
-        System.out.println(guestList.get(1).getPassengers().size() );
+        System.out.println(guestList.get(1).getPassengers().size());
 
         List<Reservation> reservationList = reservationRepository.findAll();
 

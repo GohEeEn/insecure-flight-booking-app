@@ -12,6 +12,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import ucd.comp40660.user.UserSession;
+import ucd.comp40660.user.model.Guest;
 import ucd.comp40660.user.model.User;
 
 import javax.servlet.http.HttpServletResponse;
@@ -107,13 +108,13 @@ public class ReservationController {
 
                 Date date = new Date();
                 Timestamp ts = new Timestamp(date.getTime());
-                Timestamp cancellable = new Timestamp(date.getTime() + (3600*1000*24));
+                Timestamp cancellable = new Timestamp(date.getTime() + (3600 * 1000 * 24));
 
                 for (Reservation reservation : reservations) {
                     Flight flight = flightRepository.findFlightByReservations(reservation);
                     upcoming_cancellable.addAll(flightRepository.findAllByReservationsAndArrivalDateTimeAfter(reservation, cancellable));
                     upcoming.addAll(flightRepository.findAllByReservationsAndArrivalDateTimeBetween(reservation, ts, cancellable));
-                    past.addAll(flightRepository.findAllByReservationsAndArrivalDateTimeBefore(reservation, ts ));
+                    past.addAll(flightRepository.findAllByReservationsAndArrivalDateTimeBefore(reservation, ts));
 
 
                     if (flight != null) {
@@ -121,7 +122,7 @@ public class ReservationController {
                     }
                 }
 
-                for(Reservation cancelled_reservation : cancelled_reservations){
+                for (Reservation cancelled_reservation : cancelled_reservations) {
                     cancelled_flights.add(flightRepository.findFlightByReservations(cancelled_reservation));
                 }
 
@@ -155,5 +156,31 @@ public class ReservationController {
         response.sendRedirect("/getUserReservations");
     }
 
+    @PostMapping("/getGuestReservations")
+    public String getGuestReservations(Model model, String inputEmail, String inputReservationID) throws ReservationNotFoundException {
+
+//        backend log messages
+        if (inputEmail != null && inputReservationID != null) {
+            log.info(String.format("getGuestReservations(): Email: " + inputEmail));
+            log.info(String.format("getGuestReservations(): Reservation ID: " + inputReservationID));
+        }
+
+//        find the reservation via email and reservation id
+        Reservation reservation = reservationRepository.findAllByEmailAndId(inputEmail, Long.parseLong(inputReservationID));
+
+//        find the flight via the reservation object
+        Flight flight = flightRepository.findFlightByReservations(reservation);
+
+        if (flight != null) {
+            log.info(String.format("getGuestReservations(): Flight info: '%s'", flight));
+
+            model.addAttribute("flightGuest", flight);
+        } else {
+            model.addAttribute("error", "Flight not found");
+            return "index.html";
+        }
+
+        return "viewFlightsGuest.html";
+    }
 
 }
