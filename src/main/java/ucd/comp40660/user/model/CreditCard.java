@@ -6,6 +6,13 @@ import javax.validation.constraints.*;
 import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Data;
+import lombok.ToString;
+import org.hibernate.annotations.LazyCollection;
+import org.hibernate.annotations.LazyCollectionOption;
+import ucd.comp40660.reservation.model.Reservation;
+
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity
 @Table(name="credit_cards", uniqueConstraints = {@UniqueConstraint(columnNames = {"card_number"})})
@@ -36,11 +43,20 @@ public class CreditCard {
 
     @ManyToOne
     @JsonIgnore
+    @ToString.Exclude
     private User user;
 
-    @OneToOne
+//    @OneToOne
+//    @JsonIgnore
+//    @ToString.Exclude
+//    private Guest guest;
+
+    @OneToMany(mappedBy = "credit_card")
+    @LazyCollection(LazyCollectionOption.FALSE)
     @JsonIgnore
-    private Guest guest;
+    @ToString.Exclude
+    private List<Reservation> reservations = new ArrayList<>();
+
 
     public CreditCard() { super(); }
 
@@ -51,6 +67,12 @@ public class CreditCard {
         this.expiration_month = expiration_month;
         this.expiration_year = expiration_year;
         this.security_code = security_code;
+    }
+
+    public String maskedCardDetails(){
+        String maskedDetails = "Ends in ";
+        maskedDetails = card_number.substring(card_number.length()-4);
+        return maskedDetails;
     }
 
 }
