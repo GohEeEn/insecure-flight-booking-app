@@ -1,14 +1,13 @@
 package ucd.comp40660.flight.model;
 
-import javax.persistence.*;
-import javax.validation.constraints.NotBlank;
-
 import lombok.Data;
 import ucd.comp40660.reservation.model.Reservation;
 
+import javax.persistence.*;
+import javax.validation.constraints.NotBlank;
 import java.sql.Timestamp;
-import java.util.Date;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 @Entity
@@ -52,10 +51,10 @@ public class Flight {
         this.destination= destination;
         this.departure_date_time= departureDateTime;
         this.arrivalDateTime = arrivalDateTime;
-        this.cancelLimitTime = setCancelTime(departureDateTime);
+        this.cancelLimitTime = setCancelTime();
     }
 
-    public Timestamp setCancelTime(Date departureDateTime){
+    public Timestamp setCancelTime(){
         Timestamp ct = new Timestamp(0);
         ct.setTime(this.departure_date_time.getTime() - (3600 * 1000 * 24));
         return ct;

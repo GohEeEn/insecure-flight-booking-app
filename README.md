@@ -43,11 +43,21 @@ This is the Flight Reservation Web Application repository for UCD BSc Computer S
     server.port=<open_port>
     ```
 
-### Introduction to this web application
+## Introduction to this web application
 
-#### Guest
+### Guest
 
-#### Member
+Homepage is the first page you will always see when you open this application with `localhost:<server.port>`
+
+![Homepage frontend for guest](img/Guest_1_Homepage.png)
+
+1. Header of the navigation bar, also the link to homepage
+2. Reservation retrieval form for any `guest` with their email address & reservation id
+3. Club member registration link
+4. Member login link
+5. Flight search as a guest
+
+### Member
 
 1. Register an Account by clicking the `Register` link in the upper right-hand corner.
 2. Input the required details and click `Register` at the bottom of the form.

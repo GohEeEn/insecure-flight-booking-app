@@ -9,16 +9,13 @@
 	<body>
 		<nav th:replace="fragments/header :: navigation-bar"></nav>
 
-		<div class="container" style="margin-bottom: : 0px">
-			<div class="row">
-				<div class="col-6">
-					<h4>Payment Method</h4>
-				</div>
-			</div>
+		<div class="container">
 
-			<div th:if="${user != null && cards.size() > 0 }">
-				<form action="/processMemberPayment" method="post">
-					<table>
+			<h4>Payment Method</h4>
+
+			<div class="container">
+				<form th:if="${user != null && cards.size() > 0}" action="/processMemberPayment" method="post" >
+					<table class="table table-hover table-fixed">
 						<thead>
 							<tr>
 								<th>Select</th>
@@ -47,7 +44,7 @@
 			</div>
 
 			<div th:if="${user != null}">
-        		<a href="/registerCard" class="btn btn-outline-primary">Add New Card</a>
+				<a href="/registerCard" class="btn btn-outline-primary">Add New Card</a>
 			</div>
 
 			<div th:if="${user == null}">
