@@ -49,6 +49,16 @@ This is the Flight Reservation Web Application repository for UCD BSc Computer S
 
 #### Member
 
+1. Register an Account by clicking the `Register` link in the upper right-hand corner.
+2. Input the required details and click `Register` at the bottom of the form.
+3. Upon returning to the login page, you can login as the created Member via the `Login` button in the upper-right hand side of the page.
+4. Clicking on the Member icon that has nor replaced the Register/Login icons, a dropdown menu will give you a choice of viewing reservations, your profile or logging out.
+5. Click on Profile to see your personal details and find links to edit user details/password, view stored credit cards or delete the Member.
+6. By default, credit cards are required to book a flight. Select `View Credit cards`, then `Add New Card` to create one. If you do not you will be propmpted to do so during the boooking process.
+7. From the home page, select a Fight to book. An example might be From Sofia to Dublin on the 19th of March.
+8. After completing a booking it will be available to view in `Reservations` in the Member drop-down menu in the upper-right hand side.
+9. If more than 24 hours away, an option to cancel will be available.
+
 ### Authors (Team inSecurity)
 
 - [Ee En Goh](https://github.com/GohEeEn)
