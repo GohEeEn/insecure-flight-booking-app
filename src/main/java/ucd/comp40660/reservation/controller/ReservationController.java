@@ -134,7 +134,6 @@ public class ReservationController {
                 model.addAttribute("past", past);
                 model.addAttribute("cancelled_flights", cancelled_flights);
                 model.addAttribute("upcoming_cancellable", upcoming_cancellable);
-                model.addAttribute("user", user);
                 log.info(String.format("Added flights to front end as \'flightsUser\'"));
                 log.info("Cancelled Flights: " + cancelled_flights);
 
@@ -142,6 +141,7 @@ public class ReservationController {
 //                throw new ReservationNotFoundException();
                 model.addAttribute("error", "No reservations found");
             }
+            model.addAttribute("user", user);
             return "viewFlightsUser.html";
 
         }
@@ -200,6 +200,7 @@ public class ReservationController {
             return "viewFlightsGuest.html";
         } else {
 //            if no reservation found with the provided details, keep user on the same page
+            model.addAttribute("error", "No such reservation found.");
             return "index.html";
         }
     }
