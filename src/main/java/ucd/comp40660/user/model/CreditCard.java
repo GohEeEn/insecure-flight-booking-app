@@ -1,9 +1,5 @@
 package ucd.comp40660.user.model;
 
-import javax.persistence.*;
-import javax.validation.constraints.*;
-
-import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Data;
 import lombok.ToString;
@@ -11,6 +7,8 @@ import org.hibernate.annotations.LazyCollection;
 import org.hibernate.annotations.LazyCollectionOption;
 import ucd.comp40660.reservation.model.Reservation;
 
+import javax.persistence.*;
+import javax.validation.constraints.NotBlank;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -45,11 +43,6 @@ public class CreditCard {
     @JsonIgnore
     @ToString.Exclude
     private User user;
-
-//    @OneToOne
-//    @JsonIgnore
-//    @ToString.Exclude
-//    private Guest guest;
 
     @OneToMany(mappedBy = "credit_card")
     @LazyCollection(LazyCollectionOption.FALSE)
