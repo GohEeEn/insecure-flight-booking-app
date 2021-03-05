@@ -31,9 +31,9 @@
                     </tr>
                 </tbody>
 
-                <div th:if="${user != null && cards.size() == 0}">
+                <caption th:if="${user != null && cards.size() == 0}">
                     <h3 class="text-center">No Credit Card found</h3>
-                </div>
+                </caption>
             </table>
 
             <a href="/registerCard" class="btn btn-primary">Add New Card</a>

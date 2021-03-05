@@ -2,7 +2,7 @@
 
 <html lang="en" xmlns:th="http://www.thymeleaf.org">
 	<head>
-		<title>Home</title>
+		<title>Reservation Done</title>
 
 		<div th:replace="fragments/header :: header-data"></div>
 	</head>
@@ -11,9 +11,8 @@
 	<nav th:replace="fragments/header :: navigation-bar"></nav>
 
 		<div class="container">
-			<div class="row">
-				<h5>Thank For Booking with Secure Airways</h5>
-			</div>
+
+			<h3>Thank For Booking with Secure Airways</h3>
 
 			<table th:if="${user != null}" class="table">
 				<thead>
@@ -39,6 +38,10 @@
 			</table>
 
 			<table th:if="${user == null}" class="table">
+				<caption style="color: red">
+					Note : Remember this reservation id and your registered email address to access it in future
+				</caption>
+
 				<thead>
 					<tr>
 						<th>#</th>
@@ -47,15 +50,15 @@
 				</thead>
 				<tbody>
 					<tr th:each="guestReservationId : ${guestReservationIds}">
-						<td class="counterCell"></td>
-						<td th:text="${guestReservationId.id} "></td>
+						<td></td>
+						<td th:text="${guestReservationId.id}"></td>
 					</tr>
 				</tbody>
 			</table>
 
 			<div class="row">
 				<form action="/home" class="inline" method="post">
-					<button type="submit" class="btn btn-primary btn-lg">Return to Home Page</button>
+					<button type="submit" class="btn btn-primary btn-lg">Home</button>
 				</form>
 			</div>
 		</div>
