@@ -258,6 +258,7 @@ public class FlightController {
 
         User user = userSession.getUser();
         Reservation reservation = new Reservation();
+//        if(!user.getReservations().contains())
         user.getReservations().add(reservation);
         userRepository.flush();
         reservation.setUser(user);
@@ -265,18 +266,25 @@ public class FlightController {
 
       //TODO Create flight object via tempflightreference and flightrepo
         Flight flight = flightRepository.findFlightByFlightID(temporaryFlightReference);
-        reservation.setFlight(flight);
-        flight.getReservations().add(reservation);
-        flightRepository.saveAndFlush(flight);
-        reservationRepository.saveAndFlush(reservation);
-        reservation.setCredit_card(card);
+        if(reservationRepository.existsByUserAndFlight(user, flight)){
+            model.addAttribute("user", user);
+            model.addAttribute("error", "Flight already booked by Member, new booking cancelled.\n");
+            return "index.html";
+        }
+        else{
+            reservation.setFlight(flight);
+            flight.getReservations().add(reservation);
+            flightRepository.saveAndFlush(flight);
+            reservationRepository.saveAndFlush(reservation);
+            reservation.setCredit_card(card);
 
-      model.addAttribute("user", user);
-        model.addAttribute("reservation", reservation);
-        model.addAttribute("flight", flight);
-        //TODO add Flight object to model for display @ displayReservation.html
+            model.addAttribute("user", user);
+            model.addAttribute("reservation", reservation);
+            model.addAttribute("flight", flight);
+            //TODO add Flight object to model for display @ displayReservation.html
 
-        return "displayReservation.html";
+            return "displayReservation.html";
+        }
 
     }
 

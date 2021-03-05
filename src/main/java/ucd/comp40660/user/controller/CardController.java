@@ -57,7 +57,7 @@ public class CardController {
             return "login.html";
         }
 
-        newCard = creditCardRepository.save(newCard);
+        newCard = creditCardRepository.saveAndFlush(newCard);
         return "viewProfile.html";
     }
 
