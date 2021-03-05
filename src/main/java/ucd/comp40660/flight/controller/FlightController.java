@@ -256,27 +256,34 @@ public class FlightController {
   @PostMapping("/processMemberPayment")
     public String processMemberPayment(Model model, HttpServletResponse response, CreditCard card) throws IOException {
 
-        User user = userSession.getUser();
-        Reservation reservation = new Reservation();
-        user.getReservations().add(reservation);
-        userRepository.flush();
-        reservation.setUser(user);
+      User user = userSession.getUser();
+      Reservation reservation = new Reservation();
+//        if(!user.getReservations().contains())
+      user.getReservations().add(reservation);
+      userRepository.flush();
+      reservation.setUser(user);
 
 
-        Flight flight = flightRepository.findFlightByFlightID(temporaryFlightReference);
-        reservation.setFlight(flight);
-        flight.getReservations().add(reservation);
-        flightRepository.saveAndFlush(flight);
-        reservationRepository.saveAndFlush(reservation);
-        reservation.setCredit_card(card);
+      Flight flight = flightRepository.findFlightByFlightID(temporaryFlightReference);
+      if (reservationRepository.existsByUserAndFlight(user, flight)) {
+          model.addAttribute("user", user);
+          model.addAttribute("error", "Flight already booked by Member, new booking cancelled.\n");
+          return "index.html";
+      } else {
+          reservation.setFlight(flight);
+          flight.getReservations().add(reservation);
+          flightRepository.saveAndFlush(flight);
+          reservationRepository.saveAndFlush(reservation);
+          reservation.setCredit_card(card);
 
-        model.addAttribute("user", user);
-        model.addAttribute("reservation", reservation);
-        model.addAttribute("flight", flight);
+          model.addAttribute("user", user);
+          model.addAttribute("reservation", reservation);
+          model.addAttribute("flight", flight);
 
-        return "displayReservation.html";
+          return "displayReservation.html";
 
-    }
+      }
+  }
 
 
     @PostMapping("/processGuestPayment")

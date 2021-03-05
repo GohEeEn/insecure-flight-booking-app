@@ -118,3 +118,18 @@ footer{
 footer#page-footer {
     background-color: rgba(0,0,0,.03);
 }
+
+.footer_fix {
+  position: fixed;
+  left: 0;
+  bottom: 0;
+  width: 100%;
+}
+
+/*.form-group{
+    margin-bottom: 14px;
+}*/
+
+.reduceformspace{
+    margin-bottom: 5px;
+}

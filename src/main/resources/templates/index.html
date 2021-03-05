@@ -120,6 +120,14 @@
 					</form>
 				</div>
 			</div>
+			<div class="container">
+                    <span th:if="error != null">
+                      <div class="row">
+                          <p class="error" th:text="${error}"></p>
+                      </div>
+                    </span>
+			</div>
+
 		</div>
 
 		<div th:replace="fragments/footer :: footer"></div>
