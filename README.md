@@ -81,7 +81,7 @@ Homepage is the first page you will always see when you open this application wi
 
 #### General Reservation Workflow
 
-![Reservation workflow of this application](img/Reservation_Workflow.png)
+![Reservation workflow of this application](img/Reservation_Workflow.PNG)
 
 #### Authors (Team inSecurity)
 
