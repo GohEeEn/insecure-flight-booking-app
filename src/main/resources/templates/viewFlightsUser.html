@@ -23,33 +23,33 @@
 <body>
 <nav th:replace="fragments/header :: navigation-bar"></nav>
 
-<div class="container">
-    <div class="row">
-        <div class="col-lg-12 align-self-center">
-            <h2>All Flights</h2>
-            <table class="table table-hover table-fixed">
-                <thead>
-                <tr>
-                    <th>#</th>
-                    <th>Departure</th>
-                    <th>Destination</th>
-                    <th>Outbound Time</th>
-                    <th>Arrival Time</th>
-                </tr>
-                </thead>
-                <tbody>
-                <tr th:each="flight: ${flightsUser}">
-                    <td class="counterCell"></td>
-                    <td th:text="${flight?.source} "></td>
-                    <td th:text="${flight?.destination} "></td>
-                    <td th:text="${flight?.departure_date_time} "></td>
-                    <td th:text="${flight?.arrivalDateTime} "></td>
-                </tr>
-                </tbody>
-            </table>
-        </div>
-    </div>
-</div>
+<!--<div class="container">-->
+<!--    <div class="row">-->
+<!--        <div class="col-lg-12 align-self-center">-->
+<!--            <h2>All Flights</h2>-->
+<!--            <table class="table table-hover table-fixed">-->
+<!--                <thead>-->
+<!--                <tr>-->
+<!--                    <th>#</th>-->
+<!--                    <th>Departure</th>-->
+<!--                    <th>Destination</th>-->
+<!--                    <th>Outbound Time</th>-->
+<!--                    <th>Arrival Time</th>-->
+<!--                </tr>-->
+<!--                </thead>-->
+<!--                <tbody>-->
+<!--                <tr th:each="flight: ${flightsUser}">-->
+<!--                    <td class="counterCell"></td>-->
+<!--                    <td th:text="${flight?.source} "></td>-->
+<!--                    <td th:text="${flight?.destination} "></td>-->
+<!--                    <td th:text="${flight?.departure_date_time} "></td>-->
+<!--                    <td th:text="${flight?.arrivalDateTime} "></td>-->
+<!--                </tr>-->
+<!--                </tbody>-->
+<!--            </table>-->
+<!--        </div>-->
+<!--    </div>-->
+<!--</div>-->
 
 <div class="container">
     <div class="row">
@@ -63,6 +63,7 @@
                     <th>Destination</th>
                     <th>Outbound Time</th>
                     <th>Arrival Time</th>
+                    <th>Action</th>
                 </tr>
                 </thead>
                 <tbody>
@@ -73,28 +74,6 @@
                     <td th:text="${flight?.departure_date_time} "></td>
                     <td th:text="${flight?.arrivalDateTime} "></td>
                 </tr>
-                </tbody>
-            </table>
-        </div>
-    </div>
-</div>
-
-<div class="container">
-    <div class="row">
-        <div class="col-lg-12 align-self-center">
-            <h2>Cancellable Flights</h2>
-            <table class="table table-hover table-fixed">
-                <thead>
-                <tr>
-                    <th>#</th>
-                    <th>Departure</th>
-                    <th>Destination</th>
-                    <th>Outbound Time</th>
-                    <th>Arrival Time</th>
-                    <th>Action</th>
-                </tr>
-                </thead>
-                <tbody>
                 <tr th:each="flight: ${upcoming_cancellable}">
                     <td class="counterCell"></td>
                     <td th:text="${flight?.source} "></td>
@@ -105,12 +84,44 @@
                         <a th:href="@{/reservations/cancel/{id}(id = ${flight.getFlightID})}" class="btn btn-danger">Cancel</a>
                     </td>
 
-                </tr>
                 </tbody>
             </table>
         </div>
     </div>
 </div>
+
+<!--<div class="container">-->
+<!--    <div class="row">-->
+<!--        <div class="col-lg-12 align-self-center">-->
+<!--            <h2>Cancellable Flights</h2>-->
+<!--            <table class="table table-hover table-fixed">-->
+<!--                <thead>-->
+<!--                <tr>-->
+<!--                    <th>#</th>-->
+<!--                    <th>Departure</th>-->
+<!--                    <th>Destination</th>-->
+<!--                    <th>Outbound Time</th>-->
+<!--                    <th>Arrival Time</th>-->
+<!--                    <th>Action</th>-->
+<!--                </tr>-->
+<!--                </thead>-->
+<!--                <tbody>-->
+<!--                <tr th:each="flight: ${upcoming_cancellable}">-->
+<!--                    <td class="counterCell"></td>-->
+<!--                    <td th:text="${flight?.source} "></td>-->
+<!--                    <td th:text="${flight?.destination} "></td>-->
+<!--                    <td th:text="${flight?.departure_date_time} "></td>-->
+<!--                    <td th:text="${flight?.arrivalDateTime} "></td>-->
+<!--                    <td>-->
+<!--                        <a th:href="@{/reservations/cancel/{id}(id = ${flight.getFlightID})}" class="btn btn-danger">Cancel</a>-->
+<!--                    </td>-->
+
+<!--                </tr>-->
+<!--                </tbody>-->
+<!--            </table>-->
+<!--        </div>-->
+<!--    </div>-->
+<!--</div>-->
 
 
 <div class="container">

@@ -25,6 +25,7 @@ import java.util.Date;
 import java.util.List;
 
 import lombok.extern.log4j.Log4j2;
+import ucd.comp40660.user.repository.UserRepository;
 
 @Log4j2
 @Controller
@@ -35,6 +36,9 @@ public class ReservationController {
 
     @Autowired
     FlightRepository flightRepository;
+
+    @Autowired
+    UserRepository userRepository;
 
     //  use it to implement the get user/member reservations and display it
     @Autowired
@@ -91,14 +95,12 @@ public class ReservationController {
             log.info(String.format("UserSession user info: " + user.toString()));
 
 //            add current user to the model
-            model.addAttribute("user", user);
 
 //            find all reservations associated with a user
             List<Reservation> reservations = reservationRepository.findAllByUserAndCancelledIsFalse(user);
             List<Reservation> cancelled_reservations = reservationRepository.findAllByUserAndCancelledIsTrue(user);
-//            reservations.removeAll(cancelled_reservations);
 
-            if (reservations.size() > 0) {
+            if (reservations.size() > 0 || cancelled_reservations.size() > 0) {
 //            loop through each reservation and find the flights associated
                 List<Flight> flights = new ArrayList<>();
                 List<Flight> upcoming = new ArrayList<>();
@@ -132,6 +134,7 @@ public class ReservationController {
                 model.addAttribute("past", past);
                 model.addAttribute("cancelled_flights", cancelled_flights);
                 model.addAttribute("upcoming_cancellable", upcoming_cancellable);
+                model.addAttribute("user", user);
                 log.info(String.format("Added flights to front end as \'flightsUser\'"));
                 log.info("Cancelled Flights: " + cancelled_flights);
 
@@ -139,9 +142,14 @@ public class ReservationController {
 //                throw new ReservationNotFoundException();
                 model.addAttribute("error", "No reservations found");
             }
+            return "viewFlightsUser.html";
+
+        }
+        else{
+            model.addAttribute("error", "No Member logged in");
+            return "index.html";
         }
 
-        return "viewFlightsUser.html";
 
     }
 
@@ -152,6 +160,8 @@ public class ReservationController {
         Reservation reservation = reservationRepository.findByUserAndFlight(user, flight);
         reservation.setCancelled(true);
         reservationRepository.saveAndFlush(reservation);
+        userRepository.saveAndFlush(user);
+        flightRepository.saveAndFlush(flight);
         model.addAttribute("user", user);
         response.sendRedirect("/getUserReservations");
     }
