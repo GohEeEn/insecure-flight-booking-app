@@ -1,30 +1,27 @@
 package ucd.comp40660.reservation.controller;
 
 
-import org.springframework.stereotype.Controller;
-import org.springframework.ui.Model;
-import ucd.comp40660.flight.model.Flight;
-import ucd.comp40660.flight.repository.FlightRepository;
-import ucd.comp40660.reservation.repository.ReservationRepository;
-import ucd.comp40660.reservation.model.Reservation;
-import ucd.comp40660.reservation.exception.ReservationNotFoundException;
+import lombok.extern.log4j.Log4j2;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
+import ucd.comp40660.flight.model.Flight;
+import ucd.comp40660.flight.repository.FlightRepository;
+import ucd.comp40660.reservation.exception.ReservationNotFoundException;
+import ucd.comp40660.reservation.model.Reservation;
+import ucd.comp40660.reservation.repository.ReservationRepository;
 import ucd.comp40660.user.UserSession;
-import ucd.comp40660.user.model.Guest;
 import ucd.comp40660.user.model.User;
 
 import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
 import java.io.IOException;
 import java.sql.Timestamp;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
-
-import lombok.extern.log4j.Log4j2;
 
 @Log4j2
 @Controller
@@ -65,9 +62,7 @@ public class ReservationController {
         reservation.setEmail(reservationDetails.getEmail());
         reservation.setFlight_reference(reservationDetails.getFlight_reference());
 
-        Reservation reservationUpdated = reservationRepository.save(reservation);
-
-        return reservationUpdated;
+        return reservationRepository.save(reservation);
     }
 
     //    Delete a reservation record
@@ -87,19 +82,18 @@ public class ReservationController {
         if (userSession.getUser() != null) {
             User user = userSession.getUser();
 
-//            backend log messages
+            // backend log messages
             log.info(String.format("UserSession user info: " + user.toString()));
 
-//            add current user to the model
+            // add current user to the model
             model.addAttribute("user", user);
 
-//            find all reservations associated with a user
+            // find all reservations associated with a user
             List<Reservation> reservations = reservationRepository.findAllByUserAndCancelledIsFalse(user);
             List<Reservation> cancelled_reservations = reservationRepository.findAllByUserAndCancelledIsTrue(user);
-//            reservations.removeAll(cancelled_reservations);
 
+            // loop through each reservation and find the flights associated
             if (reservations.size() > 0) {
-//            loop through each reservation and find the flights associated
                 List<Flight> flights = new ArrayList<>();
                 List<Flight> upcoming = new ArrayList<>();
                 List<Flight> past = new ArrayList<>();
@@ -116,7 +110,6 @@ public class ReservationController {
                     upcoming.addAll(flightRepository.findAllByReservationsAndArrivalDateTimeBetween(reservation, ts, cancellable));
                     past.addAll(flightRepository.findAllByReservationsAndArrivalDateTimeBefore(reservation, ts));
 
-
                     if (flight != null) {
                         flights.add(flight);
                     }
@@ -126,23 +119,21 @@ public class ReservationController {
                     cancelled_flights.add(flightRepository.findFlightByReservations(cancelled_reservation));
                 }
 
-//            add the flights to the model, so thymeleaf can display them
+                // add the flights to the model, so thymeleaf can display them
                 model.addAttribute("flightsUser", flights);
                 model.addAttribute("upcoming", upcoming);
                 model.addAttribute("past", past);
                 model.addAttribute("cancelled_flights", cancelled_flights);
                 model.addAttribute("upcoming_cancellable", upcoming_cancellable);
-                log.info(String.format("Added flights to front end as \'flightsUser\'"));
+                log.info("Added flights to front end as 'flightsUser'");
                 log.info("Cancelled Flights: " + cancelled_flights);
 
             } else { // throw an error if there are no reservations
-//                throw new ReservationNotFoundException();
                 model.addAttribute("error", "No reservations found");
             }
         }
 
         return "viewFlightsUser.html";
-
     }
 
     @GetMapping("/reservations/cancel/{id}")
@@ -161,8 +152,8 @@ public class ReservationController {
 
 //        backend log messages
         if (inputEmail != null && inputReservationID != null) {
-            log.info(String.format("getGuestReservations(): Email: " + inputEmail));
-            log.info(String.format("getGuestReservations(): Reservation ID: " + inputReservationID));
+            log.info("getGuestReservations(): Email: " + inputEmail);
+            log.info("getGuestReservations(): Reservation ID: " + inputReservationID);
         }
 
         Long id;
@@ -173,23 +164,23 @@ public class ReservationController {
             return "index.html";
         }
 
-//        find the reservation via email and reservation id
+        // find the reservation via email and reservation id
         Reservation reservation = reservationRepository.findOneByEmailAndId(inputEmail, id);
 
         if (reservation != null) {
             log.info(String.format("getGuestReservations(): Reservation info: '%s'", reservation));
 
-            //        find the flight via the reservation object
+            // find the flight via the reservation object
             Flight flight = flightRepository.findFlightByReservations(reservation);
 
             log.info(String.format("getGuestReservations(): Flight info: '%s'", flight));
 
-//            add flight to the model
+            // add flight to the model
             model.addAttribute("flightGuest", flight);
 
             return "viewFlightsGuest.html";
         } else {
-//            if no reservation found with the provided details, keep user on the same page
+            // if no reservation found with the provided details, keep user on the same page
             return "index.html";
         }
     }

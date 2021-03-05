@@ -1,15 +1,15 @@
 package ucd.comp40660.flight.controller;
 
+import lombok.extern.log4j.Log4j2;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.*;
 import ucd.comp40660.flight.exception.FlightNotFoundException;
 import ucd.comp40660.flight.model.Flight;
 import ucd.comp40660.flight.model.FlightSearch;
 import ucd.comp40660.flight.repository.FlightRepository;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
-
 import ucd.comp40660.reservation.model.Reservation;
 import ucd.comp40660.reservation.repository.ReservationRepository;
 import ucd.comp40660.user.UserSession;
@@ -19,7 +19,8 @@ import ucd.comp40660.user.model.Passenger;
 import ucd.comp40660.user.model.User;
 import ucd.comp40660.user.repository.CreditCardRepository;
 import ucd.comp40660.user.repository.GuestRepository;
-
+import ucd.comp40660.user.repository.PassengerRepository;
+import ucd.comp40660.user.repository.UserRepository;
 
 import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
@@ -27,11 +28,6 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.List;
-
-import ucd.comp40660.user.repository.PassengerRepository;
-
-import lombok.extern.log4j.Log4j2;
-import ucd.comp40660.user.repository.UserRepository;
 
 
 @Log4j2
@@ -98,9 +94,7 @@ public class FlightController {
         flight.setArrivalDateTime(flightDetails.getArrivalDateTime());
         flight.setDeparture_date_time(flightDetails.getDeparture_date_time());
 
-        Flight updatedFlight = flightRepository.save(flight);
-
-        return updatedFlight;
+        return flightRepository.save(flight);
     }
 
     //    Delete a flight record
@@ -127,14 +121,13 @@ public class FlightController {
         flightSearch.setOutboundDate(outboundDate);
         model.addAttribute("user", userSession.getUser());
 
-
         response.sendRedirect("/flightSearchResults");
     }
 
     @GetMapping("/flightSearchResults")
     public String flightSearchResults(Model model) {
         List<Flight> flightList = flightCheck();
-//        flightList = flightRepository.findAll();
+
         model.addAttribute("displayedFlights", flightList);
         model.addAttribute("user", userSession.getUser());
 
@@ -211,7 +204,6 @@ public class FlightController {
             passengerRepository.saveAndFlush(passenger);
             passenger.setGuest(guest);
 
-            System.out.println("size: " + guest.getPassengers().size());
         } else {
             user.getPassengers().add(passenger);
             userRepository.saveAndFlush(user);
@@ -226,8 +218,8 @@ public class FlightController {
     }
 
     @PostMapping("/processGuestPersonalDetails")
-    public String processGuestPersonalDetails(String name, String surname, String email, String phoneNumber, String address,
-                                              Model model, HttpServletResponse response) throws IOException {
+    public String processGuestPersonalDetails(String name, String surname, String email, String phoneNumber,
+                                              String address, Model model) {
 
         guest.setName(name);
         guest.setSurname(surname);
@@ -252,9 +244,8 @@ public class FlightController {
         return "displayPaymentPage.html";
     }
 
-  
-  @PostMapping("/processMemberPayment")
-    public String processMemberPayment(Model model, HttpServletResponse response, CreditCard card) throws IOException {
+    @PostMapping("/processMemberPayment")
+    public String processMemberPayment(Model model, CreditCard card) {
 
         User user = userSession.getUser();
         Reservation reservation = new Reservation();
@@ -262,8 +253,6 @@ public class FlightController {
         userRepository.flush();
         reservation.setUser(user);
 
-
-      //TODO Create flight object via tempflightreference and flightrepo
         Flight flight = flightRepository.findFlightByFlightID(temporaryFlightReference);
         reservation.setFlight(flight);
         flight.getReservations().add(reservation);
@@ -271,35 +260,29 @@ public class FlightController {
         reservationRepository.saveAndFlush(reservation);
         reservation.setCredit_card(card);
 
-      model.addAttribute("user", user);
+        model.addAttribute("user", user);
         model.addAttribute("reservation", reservation);
         model.addAttribute("flight", flight);
-        //TODO add Flight object to model for display @ displayReservation.html
 
         return "displayReservation.html";
-
     }
 
 
     @PostMapping("/processGuestPayment")
     public void processGuestPayment(String cardholder_name, String card_number, String card_type, int expiration_month,
-                                    int expiration_year, String security_code, Model model, HttpServletResponse response) throws IOException {
+                                    int expiration_year, String security_code, HttpServletResponse response) throws IOException {
 
         Reservation reservation = new Reservation();
 
         CreditCard card = new CreditCard(cardholder_name, card_number, card_type, expiration_month, expiration_year, security_code);
         creditCardRepository.saveAndFlush(card);
 
-//        guest.setCredit_card(card);
         guestRepository.save(guest);
         reservation.setCredit_card(card);
 
-//        card.setGuest(guest);
         card.getReservations().add(reservation);
 
         reservation.setEmail(guest.getEmail());
-
-
         reservation.setFlight_reference(temporaryFlightReference);//Should be made redundant with Flight object now used
         reservation.setFlight(flightRepository.findFlightByFlightID(temporaryFlightReference));
 
@@ -318,7 +301,7 @@ public class FlightController {
     public String displayReservationId(Model model) {
         List<Reservation> guestReservationId = new ArrayList<>();
         List<Guest> guestList = guestRepository.findAll();
-        System.out.println(guestList.get(1).getPassengers().size());
+        log.info(guestList.get(1).getPassengers().size());
 
         List<Reservation> reservationList = reservationRepository.findAll();
 
@@ -360,32 +343,26 @@ public class FlightController {
     @GetMapping("/getGuestReservations")
     public String getGuestReservations(Model model) {
 
-//        obtain flight and guest objects
         Flight flight = flightRepository.findFlightByFlightID(temporaryFlightReference);
         Guest guest = guestRepository.findTopByOrderByIdDesc();
 
-//        backend log messages
-        if (guest != null) {
-            log.info(String.format("getGuestReservations(): Guest info: " + guest.toString()));
-        } else {
-            log.info(String.format("getGuestReservations(): Guest is null"));
-        }
+        if (guest != null)
+            log.info("getGuestReservations(): Guest info: " + guest.toString());
+        else
+            log.info("getGuestReservations(): Guest is null");
 
-        if (flight != null) {
-            log.info(String.format("getGuestReservations(): Flight info: " + flight.toString()));
-        } else {
-            log.info(String.format("getGuestReservations(): Flight is null"));
-        }
+        if (flight != null)
+            log.info("getGuestReservations(): Flight info: " + flight.toString());
+        else
+            log.info("getGuestReservations(): Flight is null");
 
-//        pass flight and guest objects to Thymeleaf frontend
         if (flight != null) {
             model.addAttribute("guest", guest);
             model.addAttribute("flightGuest", flight);
-            return "viewFlightsGuest.html";
         } else {
             model.addAttribute("error", "Flight is null");
-            return "viewFlightsGuest.html";
         }
-    }
 
+        return "viewFlightsGuest.html";
+    }
 }
