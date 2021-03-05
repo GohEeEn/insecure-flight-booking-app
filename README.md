@@ -26,7 +26,7 @@ This is the Flight Reservation Web Application repository for UCD BSc Computer S
 
     ```properties
     # schema_name=`application` in this example
-    spring.datasource.url=jdbc:mysql://localhost:3306/<schema_name>
+    spring.datasource.url=jdbc:mysql://localhost:3306/<schema_name>?createDatabaseIfNotExist=true
     spring.datasource.username=<your_user_name>
     spring.datasource.password=<your_user_password>
     ```
@@ -36,14 +36,18 @@ This is the Flight Reservation Web Application repository for UCD BSc Computer S
 3. Open a terminal on the root directory of this project (ie. where this doc is stored)
 4. Run the command `mvn clean install` to run tests and build the project
 5. Run the command `mvn spring-boot:run` to run the Spring Boot application
-6. Go to `http://localhost:8080` to open the web application (setting can be done in `application.properties`)
+6. Go to `http://localhost:<server.port>` to open the web application (setting can be done in `application.properties`)
 
     ```properties
     # 8080 by default
     server.port=<open_port>
     ```
 
-7. The home page be like :
+### Introduction to this web application
+
+#### Guest
+
+#### Member
 
 ### Authors (Team inSecurity)
 
