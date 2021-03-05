@@ -61,13 +61,13 @@
 			<span th:if="${user == null}">
 				<div style="margin-bottom: 0px">
 				<form action="/processGuestPayment" method="post" >
-					<div class="form-group reduceformspace">
+					<div class="form-group">
 						<label for="cardholder_name">CARDHOLDER NAME</label>
 						<input type="text" class="form-control" id="cardholder_name" name="cardholder_name" required="required">
 					</div>
 					<div class="row">
 						<div class="col">
-							<div class="form-group reduceformspace">
+							<div class="form-group">
 								<label for="card_type">CREDIT/DEBIT CARD</label>
 								<select class="form-control" id="card_type" name="card_type" required>
 									<option value="">Choose ...</option>
@@ -78,31 +78,31 @@
 						</div>
 					</div>
 
-					<div class="form-group reduceformspace">
+					<div class="form-group">
 						<label for="card_number">CARD NUMBER</label>
 						<input type="text" class="form-control" id="card_number" name="card_number" required>
 					</div>
 
-					<div class="form-row" >
-						<div class="form-group reduceformspace col-md-6" >
+					<div class="form-row">
+						<div class="form-group col-md-6" >
 							<label for="expiration_month">EXPIRES</label>
 							<input type="number" class="form-control" id="expiration_month" placeholder="Month" name="expiration_month" min="1" max="12" required>
 						</div>
-						<div class="form-group reduceformspace col-md-6">
-							<label for="expiration_year" style="color: white">.</label>
+						<div class="form-group col-md-6">
+							<label for="expiration_year" class="dotsyle">.</label>
 							<input type="number" class="form-control" id="expiration_year" placeholder="Year" name="expiration_year" min="2021" max="2050" required>
 						</div>
 					</div>
 					<!-- <br> -->
 					<div class="form-row" >
-						<div class="form-group reduceformspace col-md-6" >
+						<div class="form-group col-md-6" >
 							<label for="security_code">SECURITY CODE</label>
 							<input type="text" class="form-control" id="security_code" name="security_code" required>
 						</div>
-						<div class="form-group reduceformspace col-md-6">
+						<div class="form-group col-md-6">
 						</div>
 					</div>
-					<div class="form-group reduceformspace">
+					<div class="form-group">
 						<div class="form-check">
 							<input class="form-check-input" type="checkbox" id="gridCheck">
 							<label class="form-check-label" for="gridCheck">

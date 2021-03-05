@@ -1,9 +1,19 @@
 @import url('https://fonts.googleapis.com/css?family=Roboto+Mono&display=swap');
 
-body, html{ 
+/*body, html{ 
     height:100%; 
     padding:0; 
     margin:0;  
+}*/
+
+html {
+    position: relative;
+    min-height: 100%;
+}
+
+body {
+    margin: 0 0 100px;
+    padding-bottom: 2.5rem;
 }
 
 * {
@@ -120,16 +130,12 @@ footer#page-footer {
 }
 
 .footer_fix {
-  position: fixed;
+  position: absolute;
   left: 0;
   bottom: 0;
   width: 100%;
 }
 
-/*.form-group{
-    margin-bottom: 14px;
-}*/
-
-.reduceformspace{
-    margin-bottom: 5px;
+.dotsyle {
+    color: white;
 }
