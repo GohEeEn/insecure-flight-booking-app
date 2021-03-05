@@ -1,13 +1,13 @@
 package ucd.comp40660.user.model;
 
-import javax.persistence.*;
-import javax.validation.constraints.*;
-
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Data;
 import lombok.ToString;
 import ucd.comp40660.reservation.model.Reservation;
 
+import javax.persistence.*;
+import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotNull;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -36,12 +36,6 @@ public class Guest {
 
     @NotBlank
     private String address;
-
-//    @OneToOne(cascade = CascadeType.ALL)
-//    @ToString.Exclude
-//    @JsonIgnore
-//    private CreditCard credit_card = new CreditCard();
-
 
     @OneToMany(mappedBy = "guest", orphanRemoval = true, cascade = CascadeType.ALL)
     @ToString.Exclude

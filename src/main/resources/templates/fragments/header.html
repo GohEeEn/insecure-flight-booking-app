@@ -1,11 +1,3 @@
-<!--  
-    Source code for :
-    (header-data)
-    - General CSS reference - Both local and remote
-    (public-navbar)
-    - Navbar designed for public
--->
-
 <!DOCTYPE html>
 <html lang="en" xmlns:th="http://www.thymeleaf.org">
 
@@ -68,43 +60,36 @@
             -->
 
             <!-- Guest user -->
-            <span th:if="${user==null}">
-                        <li class="nav-item list-inline-item">
-                            <a class="nav-link" href="/register">
-                                <i class="fa fa-user-plus" aria-hidden="true"></i>
-                                &nbsp;Register
-                            </a>
-                        </li>
-            
-                        <li class="nav-item list-inline-item">
-                            <a class="nav-link active" href="/login">
-                                <i class="fa fa-sign-in" aria-hidden="true"></i>
-                                &nbsp;Login
-                            </a>
-                        </li>
+            <div th:if="${user==null}">
+                <li class="nav-item list-inline-item">
+                    <a class="nav-link" href="/register">
+                        <i class="fa fa-user-plus" aria-hidden="true"></i>
+                        &nbsp;Register
+                    </a>
+                </li>
 
-                        <li class="nav-item list-inline-item">
-                            <a class="nav-link active" href="/getGuestReservations">
-                                <i class="fa fa-sign-in" aria-hidden="true"></i>
-                                Reservations
-                            </a>
-                        </li>
-                    </span>
+                <li class="nav-item list-inline-item">
+                    <a class="nav-link active" href="/login">
+                        <i class="fa fa-sign-in" aria-hidden="true"></i>
+                        &nbsp;Login
+                    </a>
+                </li>
+            </div>
 
             <!-- Not a guest -->
-            <span th:unless="${user==null}">
+            <div th:unless="${user==null}">
 
-                        <li class="nav-item dropdown list-inline-item">
-                            <a class="nav-link dropdown-toggle"
-                               href="#" id="member-drop-link" data-toggle="dropdown"
-                               role="button" aria-haspopup="true" aria-expanded="false"
-                            ><i class="fa fa-user" aria-hidden="true"></i>
-                                &nbsp; <span th:text="${user.getUsername()}"></span>
-                            </a>
+                <li class="nav-item dropdown list-inline-item">
+                    <a class="nav-link dropdown-toggle"
+                       href="#" id="member-drop-link" data-toggle="dropdown"
+                       role="button" aria-haspopup="true" aria-expanded="false"
+                    ><i class="fa fa-user" aria-hidden="true"></i>
+                        &nbsp; <span th:text="${user.getUsername()}"></span>
+                    </a>
 
-                            <!-- Member user -->
-                            <div th:if="${user.getRole() == 'member'}" class="dropdown-menu"
-                                 aria-labelledby="member-drop-link">
+                    <!-- Member user -->
+                    <div th:if="${user.getRole() == 'member'}" class="dropdown-menu"
+                         aria-labelledby="member-drop-link">
 
                                 <h6 class="dropdown-header">
                                     &nbsp;Reservations
@@ -120,49 +105,49 @@
 <!--                                        &nbsp;History-->
 <!--                                </a>-->
 
-                                <div class="dropdown-divider"></div>
+                        <div class="dropdown-divider"></div>
 
-                                <h6 class="dropdown-header">
-                                    &nbsp;Setting
-                                </h6>
+                        <h6 class="dropdown-header">
+                            &nbsp;Setting
+                        </h6>
 
-                                <a class="dropdown-item" href="/viewProfile">
-                                    <i class="fa fa-user-circle" aria-hidden="true"></i>
-                                        &nbsp;Profile
-                                </a>
+                        <a class="dropdown-item" href="/viewProfile">
+                            <i class="fa fa-user-circle" aria-hidden="true"></i>
+                                &nbsp;Profile
+                        </a>
 
-                                <a class="dropdown-item" href="/logout">
-                                    <i class="fa fa-sign-out" aria-hidden="true"></i>
-                                        &nbsp;Log Out
-                                </a>
-                            </div>
+                        <a class="dropdown-item" href="/logout">
+                            <i class="fa fa-sign-out" aria-hidden="true"></i>
+                                &nbsp;Log Out
+                        </a>
+                    </div>
 
-                            <!-- Admin user -->
-                            <div th:if="${user.getRole() == 'admin'}" class="dropdown-menu"
-                                 aria-labelledby="member-drop-link">
-    
-                                <h6 class="dropdown-header">
-                                    &nbsp;Manage
-                                </h6>
-    
-                                <a class="dropdown-item" href="#">
-                                    <i class="fa fa-users" aria-hidden="true"></i>
-                                        &nbsp;Members
-                                </a>
-    
-                                <div class="dropdown-divider"></div>
-    
-                                <h6 class="dropdown-header">
-                                    &nbsp;Setting
-                                </h6>
-    
-                                <a class="dropdown-item" href="/logout">
-                                    <i class="fa fa-sign-out" aria-hidden="true"></i>
-                                        &nbsp;Log Out
-                                </a>
-                            </div>
-                        </li>
-                    </span>
+                    <!-- Admin user -->
+                    <div th:if="${user.getRole() == 'admin'}" class="dropdown-menu"
+                         aria-labelledby="member-drop-link">
+
+                        <h6 class="dropdown-header">
+                            &nbsp;Manage
+                        </h6>
+
+                        <a class="dropdown-item" href="#">
+                            <i class="fa fa-users" aria-hidden="true"></i>
+                                &nbsp;Members
+                        </a>
+
+                        <div class="dropdown-divider"></div>
+
+                        <h6 class="dropdown-header">
+                            &nbsp;Setting
+                        </h6>
+
+                        <a class="dropdown-item" href="/logout">
+                            <i class="fa fa-sign-out" aria-hidden="true"></i>
+                                &nbsp;Log Out
+                        </a>
+                    </div>
+                </li>
+            </div>
         </ul>
     </div>
 </nav>

@@ -7,7 +7,6 @@
 		<div th:replace="fragments/header :: header-data"></div>
 	</head>
 	<body>
-
 		<nav th:replace="fragments/header :: navigation-bar"></nav>
 
 		<div class="container" style="margin-bottom: : 0px">
@@ -17,57 +16,51 @@
 				</div>
 			</div>
 
-
-		<div>
-			<span th:if="${user != null && cards.size() > 0 }">
+			<div th:if="${user != null && cards.size() > 0 }">
 				<form action="/processMemberPayment" method="post">
 					<table>
 						<thead>
-						<tr>
-						<th></th>
-						<th>Credit Card</th>
-						<th>Name</th>
-						<th>Expiration Date</th>
-						</tr>
+							<tr>
+								<th>Select</th>
+								<th>Credit Card</th>
+								<th>Name</th>
+								<th>Expiration Date</th>
+							</tr>
 						</thead>
 						<tbody>
-						<tr th:each="card : ${cards}">
-							<td>
-								<label>
-									<input type="radio" id="card" name="card_choice" required>
-								</label>
-								<!--								<label for="${card}">""</label>-->
-							</td>
-							<td><span th:text="${card.card_number}" ></span></td>
-							<td><span th:text="${card.cardholder_name}" ></span></td>
-							<td><span th:text="${card.expiration_year}" ></span></td>
-
-						</tr>
+							<tr th:each="card : ${cards}">
+								<td><label for="card"></label><input type="radio" id="card" name="card_choice" required></td>
+								<td><span th:text="${card.card_number}" ></span></td>
+								<td><span th:text="${card.cardholder_name}" ></span></td>
+								<td><span th:text="${card.expiration_year}" ></span></td>
+							</tr>
 						</tbody>
 					</table>
 
-					<button type="submit" class="btn btn-primary">Select Payment Option</button>
-
+					<button type="submit" class="btn btn-primary">Select</button>
 				</form>
-			</span>
+			</div>
 
-			<span th:if="${user != null && cards.size() == 0}"}>
-				<h3>No stored payment methods detected. Please add a Payment Method and restart the booking process.</h3>
-			</span>
-			<span th:if="${user != null}">
-        		<a href="/registerCard" class="btn btn-secondary">Add New Card</a>
-			</span>
+			<div th:if="${user != null && cards.size() == 0}">
+				<h3 class="text-center">No stored payment methods detected.<br/>
+					Please add a Payment Method and restart the booking process.</h3>
+			</div>
 
-			<span th:if="${user == null}">
-				<div style="margin-bottom: 0px">
+			<div th:if="${user != null}">
+        		<a href="/registerCard" class="btn btn-outline-primary">Add New Card</a>
+			</div>
+
+			<div th:if="${user == null}">
 				<form action="/processGuestPayment" method="post" >
-					<div class="form-group reduceformspace">
+
+					<div class="form-group">
 						<label for="cardholder_name">CARDHOLDER NAME</label>
-						<input type="text" class="form-control" id="cardholder_name" name="cardholder_name" required="required">
+						<input type="text" class="form-control" id="cardholder_name" name="cardholder_name" required>
 					</div>
+
 					<div class="row">
 						<div class="col">
-							<div class="form-group reduceformspace">
+							<div class="form-group">
 								<label for="card_type">CREDIT/DEBIT CARD</label>
 								<select class="form-control" id="card_type" name="card_type" required>
 									<option value="">Choose ...</option>
@@ -78,31 +71,34 @@
 						</div>
 					</div>
 
-					<div class="form-group reduceformspace">
+					<div class="form-group">
 						<label for="card_number">CARD NUMBER</label>
 						<input type="text" class="form-control" id="card_number" name="card_number" required>
 					</div>
 
-					<div class="form-row" >
-						<div class="form-group reduceformspace col-md-6" >
+					<div class="form-row">
+						<div class="form-group col-md-6" >
 							<label for="expiration_month">EXPIRES</label>
-							<input type="number" class="form-control" id="expiration_month" placeholder="Month" name="expiration_month" min="1" max="12" required>
+							<input type="number" class="form-control" id="expiration_month"
+								   placeholder="Month" name="expiration_month" min="1" max="12" required>
 						</div>
-						<div class="form-group reduceformspace col-md-6">
-							<label for="expiration_year" style="color: white">.</label>
-							<input type="number" class="form-control" id="expiration_year" placeholder="Year" name="expiration_year" min="2021" max="2050" required>
+						<div class="form-group col-md-6">
+							<label for="expiration_year" class="dotsyle">.</label>
+							<input type="number" class="form-control" id="expiration_year"
+								   placeholder="Year" name="expiration_year" min="2021" max="2050" required>
 						</div>
 					</div>
-					<!-- <br> -->
+
 					<div class="form-row" >
-						<div class="form-group reduceformspace col-md-6" >
+						<div class="form-group col-md-6" >
 							<label for="security_code">SECURITY CODE</label>
 							<input type="text" class="form-control" id="security_code" name="security_code" required>
 						</div>
-						<div class="form-group reduceformspace col-md-6">
+						<div class="form-group col-md-6">
 						</div>
 					</div>
-					<div class="form-group reduceformspace">
+
+					<div class="form-group">
 						<div class="form-check">
 							<input class="form-check-input" type="checkbox" id="gridCheck">
 							<label class="form-check-label" for="gridCheck">
@@ -112,7 +108,6 @@
 					</div>
 					<button type="submit" class="btn btn-primary">Add to Account</button>
 				</form>
-			</div>
 			</div>
 		</div>
 
