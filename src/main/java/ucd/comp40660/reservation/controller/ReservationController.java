@@ -22,6 +22,9 @@ import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import lombok.extern.log4j.Log4j2;
+import ucd.comp40660.user.repository.UserRepository;
+
 
 @Log4j2
 @Controller
@@ -32,6 +35,9 @@ public class ReservationController {
 
     @Autowired
     FlightRepository flightRepository;
+
+    @Autowired
+    UserRepository userRepository;
 
     //  use it to implement the get user/member reservations and display it
     @Autowired
@@ -85,15 +91,19 @@ public class ReservationController {
             // backend log messages
             log.info(String.format("UserSession user info: " + user.toString()));
 
+
             // add current user to the model
             model.addAttribute("user", user);
+
 
             // find all reservations associated with a user
             List<Reservation> reservations = reservationRepository.findAllByUserAndCancelledIsFalse(user);
             List<Reservation> cancelled_reservations = reservationRepository.findAllByUserAndCancelledIsTrue(user);
 
-            // loop through each reservation and find the flights associated
-            if (reservations.size() > 0) {
+
+            if (reservations.size() > 0 || cancelled_reservations.size() > 0) {
+//            loop through each reservation and find the flights associated
+
                 List<Flight> flights = new ArrayList<>();
                 List<Flight> upcoming = new ArrayList<>();
                 List<Flight> past = new ArrayList<>();
@@ -101,14 +111,14 @@ public class ReservationController {
                 List<Flight> cancelled_flights = new ArrayList<>();
 
                 Date date = new Date();
-                Timestamp ts = new Timestamp(date.getTime());
+                Timestamp now = new Timestamp(date.getTime());
                 Timestamp cancellable = new Timestamp(date.getTime() + (3600 * 1000 * 24));
 
                 for (Reservation reservation : reservations) {
                     Flight flight = flightRepository.findFlightByReservations(reservation);
                     upcoming_cancellable.addAll(flightRepository.findAllByReservationsAndArrivalDateTimeAfter(reservation, cancellable));
-                    upcoming.addAll(flightRepository.findAllByReservationsAndArrivalDateTimeBetween(reservation, ts, cancellable));
-                    past.addAll(flightRepository.findAllByReservationsAndArrivalDateTimeBefore(reservation, ts));
+                    upcoming.addAll(flightRepository.findAllByReservationsAndArrivalDateTimeBetween(reservation, now, cancellable));
+                    past.addAll(flightRepository.findAllByReservationsAndArrivalDateTimeBefore(reservation, now));
 
                     if (flight != null) {
                         flights.add(flight);
@@ -131,9 +141,16 @@ public class ReservationController {
             } else { // throw an error if there are no reservations
                 model.addAttribute("error", "No reservations found");
             }
+            model.addAttribute("user", user);
+            return "viewFlightsUser.html";
+
+        }
+        else{
+            model.addAttribute("error", "No Member logged in");
+            return "index.html";
         }
 
-        return "viewFlightsUser.html";
+
     }
 
     @GetMapping("/reservations/cancel/{id}")
@@ -143,6 +160,8 @@ public class ReservationController {
         Reservation reservation = reservationRepository.findByUserAndFlight(user, flight);
         reservation.setCancelled(true);
         reservationRepository.saveAndFlush(reservation);
+        userRepository.saveAndFlush(user);
+        flightRepository.saveAndFlush(flight);
         model.addAttribute("user", user);
         response.sendRedirect("/getUserReservations");
     }
@@ -180,7 +199,10 @@ public class ReservationController {
 
             return "viewFlightsGuest.html";
         } else {
-            // if no reservation found with the provided details, keep user on the same page
+
+//            if no reservation found with the provided details, keep user on the same page
+            model.addAttribute("error", "No such reservation found.");
+          
             return "index.html";
         }
     }
