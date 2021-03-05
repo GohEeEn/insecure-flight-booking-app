@@ -1,9 +1,19 @@
 @import url('https://fonts.googleapis.com/css?family=Roboto+Mono&display=swap');
 
-body, html{ 
+/*body, html{ 
     height:100%; 
     padding:0; 
     margin:0;  
+}*/
+
+html {
+    position: relative;
+    min-height: 100%;
+}
+
+body {
+    margin: 0 0 100px;
+    padding-bottom: 2.5rem;
 }
 
 * {
@@ -117,4 +127,15 @@ footer{
 
 footer#page-footer {
     background-color: rgba(0,0,0,.03);
+}
+
+.footer_fix {
+  position: absolute;
+  left: 0;
+  bottom: 0;
+  width: 100%;
+}
+
+.dotsyle {
+    color: white;
 }
