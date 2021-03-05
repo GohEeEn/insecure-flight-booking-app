@@ -45,6 +45,14 @@
 					</div>
 				</div>
 			</div>
+			<div class="container">
+                    <span th:if="error != null">
+                      <div class="row">
+                          <p class="error" th:text="${error}"></p>
+                      </div>
+                    </span>
+			</div>
+
 		</div>
 		<div class="col-4">
 			<h4>Choose Flights</h4>

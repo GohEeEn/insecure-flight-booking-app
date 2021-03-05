@@ -2,7 +2,7 @@
 ALTER TABLE library.flights MODIFY flightID bigint NOT NULL AUTO_INCREMENT;
 
 INSERT INTO flights(source, destination, departure_date_time, arrival_date_time) VALUES
-('Sofia, Bulgaria', 'Dublin, Ireland', '2021-03-05 20:30:00', '2021-03-05 00:30:00'),
+('Sofia, Bulgaria', 'Dublin, Ireland', '2021-03-05 20:30:00', '2021-03-06 00:30:00'),
 ('Stockholm, Sweden', 'Dublin, Ireland', '2021-03-06 11:30:00', '2021-03-06 13:30:00'),
 ('Oslo, Norway', 'Dublin, Ireland', '2021-03-07 08:00:00', '2021-03-05 10:30:00'),
 ('Rio de Janeiro, Brazil', 'Dublin, Ireland', '2021-03-05 20:30:00', '2021-03-05 00:30:00'),
