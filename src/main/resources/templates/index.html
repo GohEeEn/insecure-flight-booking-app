@@ -1,122 +1,167 @@
 <!DOCTYPE html>
 
 <html lang="en" xmlns:th="http://www.thymeleaf.org">
-	<head>
-		<title>Home</title>
+<head>
+	<title>Home</title>
 
-		<div th:replace="fragments/header :: header-data"></div>
-	</head>
+	<div th:replace="fragments/header :: header-data"></div>
+</head>
 
-	<body>
+<body>
 
-		<nav th:replace="fragments/header :: navigation-bar"></nav>
+<nav th:replace="fragments/header :: navigation-bar"></nav>
 
-		<div class="container">
-			<div class="row">
-				<div class="col-8">
-					<div class="row">
-						<form class="form-inline" action="/getGuestReservations" method="post">
-						  	<div class="form-group mb-2">
-						      <label for="ReservationText">Retrieve Reservation</label>
-						    </div>
-						    <div class="form-group mx-sm-3 mb-2">
-						      <label class="sr-only" for="inputEmail">Email</label>
-						      <input type="text" class="form-control" id="inputEmail" name="inputEmail" placeholder="Enter Email Address">
-						    </div>
-						    <div class="form-group mx-sm-3 mb-2">
-						      <label class="sr-only" for="inputReservationID">Reservation ID</label>
-						      <input type="text" class="form-control" id="inputReservationID" name="inputReservationID" placeholder="Enter Reservation ID">
-						    </div>
-						    <div >
-						      <button type="submit" class="btn btn-primary mb-2">Submit</button>
-						    </div>
-						</form>
+<div class="container">
+	<div class="row">
+		<div class="col-8">
+			<div class="row pl-3" th:if="${user == null}">
+				<form class="form-inline" action="/getGuestReservations" method="post">
+					<div class="form-group mb-2">
+						<label>Retrieve Reservation</label>
 					</div>
-					<div id="carouselHomePage" class="carousel slide" data-ride="carousel">
-					  <div class="carousel-inner">
-					    <div class="carousel-item active">
-					      <img class="d-block w-100" src="picfolder/aircraftontarmac.jpg" alt="aircraft on tarmac">
-					    </div>
-<!-- 					    <div class="carousel-item active">
-					      <img class="d-block w-100" src="picfolder/airhostess.jpg" alt="three air hostess">
-					    </div> -->
-					    <div class="carousel-item">
-					      <img class="d-block w-100" src="picfolder/flightpassenger.jpg" alt="interior of flight cabin">
-					    </div>
-					    <div class="carousel-item">
-					      <img class="d-block w-100" src="picfolder/businessclass.jpg" alt="empty business class cabin">
-					    </div>
-					  </div>
+					<div class="form-group mx-sm-3 mb-2">
+						<label class="sr-only" for="inputEmail">Email</label>
+						<input type="text" class="form-control" id="inputEmail" name="inputEmail" placeholder="Enter Email Address">
 					</div>
-				</div>
-				<div class="col-4">
-					<h4>Choose Flights</h4>
-					<form action="/processFlightSearch" method="post" >
-						<div class="row">
-							<div class="col">
-								<div class="form-group">
-									<label for="from">From</label>
-									<select class="form-control" id="from" name="departure" required>
-										<option value="">Departure City</option>
-										<option value="Sofia, Bulgaria">Sofia, Bulgaria</option>
-										<option value="Dublin, Ireland">Dublin, Ireland</option>
-										<option value="Stockholm, Sweden">Stockholm, Sweden</option>
-										<option value="Oslo, Norway">Oslo, Norway</option>
-										<option value="Rio de Janeiro, Brazil">Rio de Janeiro, Brazil</option>
-										<option value="Manila, Philippines">Manila, Philippines</option>
-										<option value="Seoul, South Korea">Seoul, South Korea</option>
-										<option value="Tokyo, Japan">Tokyo, Japan</option>
-										<option value="Bucharest, Romania">Bucharest, Romania</option>
-										<option value="Pyongyang, North Korea">Pyongyang, North Korea</option>
-									</select>
-								</div>
-							</div>
-						</div>
-						<div class="row">
-							<div class="col">
-								<div class="form-group">
-									<label for="to">To</label>
-									<select class="form-control" id="to" name="destinationInput" required>
-										<option value="">Destination City</option>
-										<option value="Sofia, Bulgaria">Sofia, Bulgaria</option>
-										<option value="Dublin, Ireland">Dublin, Ireland</option>
-										<option value="Stockholm, Sweden">Stockholm, Sweden</option>
-										<option value="Oslo, Norway">Oslo, Norway</option>
-										<option value="Rio de Janeiro, Brazil">Rio de Janeiro, Brazil</option>
-										<option value="Manila, Philippines">Manila, Philippines</option>
-										<option value="Seoul, South Korea">Seoul, South Korea</option>
-										<option value="Tokyo, Japan">Tokyo, Japan</option>
-										<option value="Bucharest, Romania">Bucharest, Romania</option>
-										<option value="Pyongyang, North Korea">Pyongyang, North Korea</option>
-									</select>
-								</div>
-							</div>
-						</div>
-
-						<div class="row">
-							<div class="col">
-							<label for="passengersNumber">Passengers</label>
-							<input id="passengersNumber" type="number" class="form-control"
-								   placeholder="Number of Travellers" name="passengers" min="1" max="10" required>
-							</div>
-						</div>
-
-					<div class="row">
-						<div class="col">
-							<div class="form-group">
-								<label for="outboundDate">Date</label>
-								<input type="date" id="outboundDate" name="outboundDate" min="2020-11-28" max="2021-12-31" required>
-							</div>
-						</div>
+					<div class="form-group mx-sm-3 mb-2">
+						<label class="sr-only" for="inputReservationID">Reservation ID</label>
+						<input type="text" class="form-control" id="inputReservationID" name="inputReservationID"
+							   placeholder="Enter Reservation ID">
 					</div>
+					<button type="submit" class="btn btn-outline-primary mb-2">Find</button>
+				</form>
+			</div>
 
-					<button type="submit" class="btn btn-primary">Submit</button>
-					</form>
+			<div id="carouselHomePage" class="carousel slide" data-ride="carousel">
+				<div class="carousel-inner">
+					<div class="carousel-item active">
+						<img class="d-block w-100" src="picfolder/aircraftontarmac.jpg" alt="aircraft on tarmac">
+					</div>
+					<div class="carousel-item">
+						<img class="d-block w-100" src="picfolder/flightpassenger.jpg" alt="interior of flight cabin">
+					</div>
+					<div class="carousel-item">
+						<img class="d-block w-100" src="picfolder/businessclass.jpg" alt="empty business class cabin">
+					</div>
 				</div>
 			</div>
 		</div>
+		<div class="col-4">
+			<h4>Choose Flights</h4>
+			<form action="/processFlightSearch" method="post" >
+<!--				<div class="row">-->
+<!--					<div class="col">-->
+<!--						<div class="form-group">-->
+<!--							<label for="from">From</label>-->
+<!--							<select class="form-control" id="from" name="departure" required>-->
+<!--								<option value="">Departure City</option>-->
+<!--								<option value="Sofia, Bulgaria">Sofia, Bulgaria</option>-->
+<!--								<option value="Dublin, Ireland">Dublin, Ireland</option>-->
+<!--								<option value="Stockholm, Sweden">Stockholm, Sweden</option>-->
+<!--								<option value="Oslo, Norway">Oslo, Norway</option>-->
+<!--								<option value="Rio de Janeiro, Brazil">Rio de Janeiro, Brazil</option>-->
+<!--								<option value="Manila, Philippines">Manila, Philippines</option>-->
+<!--								<option value="Seoul, South Korea">Seoul, South Korea</option>-->
+<!--								<option value="Tokyo, Japan">Tokyo, Japan</option>-->
+<!--								<option value="Bucharest, Romania">Bucharest, Romania</option>-->
+<!--								<option value="Pyongyang, North Korea">Pyongyang, North Korea</option>-->
+<!--							</select>-->
+<!--						</div>-->
+<!--					</div>-->
+<!--				</div>-->
 
-		<div th:replace="fragments/footer :: footer"></div>
+				<div class="form-group">
+					<label for="from">From</label>
+					<select class="form-control" id="from" name="departure" required>
+						<option value="">Departure City</option>
+						<option value="Sofia, Bulgaria">Sofia, Bulgaria</option>
+						<option value="Dublin, Ireland">Dublin, Ireland</option>
+						<option value="Stockholm, Sweden">Stockholm, Sweden</option>
+						<option value="Oslo, Norway">Oslo, Norway</option>
+						<option value="Rio de Janeiro, Brazil">Rio de Janeiro, Brazil</option>
+						<option value="Manila, Philippines">Manila, Philippines</option>
+						<option value="Seoul, South Korea">Seoul, South Korea</option>
+						<option value="Tokyo, Japan">Tokyo, Japan</option>
+						<option value="Bucharest, Romania">Bucharest, Romania</option>
+						<option value="Pyongyang, North Korea">Pyongyang, North Korea</option>
+					</select>
+				</div>
 
-	</body>
+<!--				<div class="row">-->
+<!--					<div class="col">-->
+<!--						<div class="form-group">-->
+<!--							<label for="to">To</label>-->
+<!--							<select class="form-control" id="to" name="destinationInput" required>-->
+<!--								<option value="">Destination City</option>-->
+<!--								<option value="Sofia, Bulgaria">Sofia, Bulgaria</option>-->
+<!--								<option value="Dublin, Ireland">Dublin, Ireland</option>-->
+<!--								<option value="Stockholm, Sweden">Stockholm, Sweden</option>-->
+<!--								<option value="Oslo, Norway">Oslo, Norway</option>-->
+<!--								<option value="Rio de Janeiro, Brazil">Rio de Janeiro, Brazil</option>-->
+<!--								<option value="Manila, Philippines">Manila, Philippines</option>-->
+<!--								<option value="Seoul, South Korea">Seoul, South Korea</option>-->
+<!--								<option value="Tokyo, Japan">Tokyo, Japan</option>-->
+<!--								<option value="Bucharest, Romania">Bucharest, Romania</option>-->
+<!--								<option value="Pyongyang, North Korea">Pyongyang, North Korea</option>-->
+<!--							</select>-->
+<!--						</div>-->
+<!--					</div>-->
+<!--				</div>-->
+
+				<div class="form-group">
+					<label for="to">To</label>
+					<select class="form-control" id="to" name="destinationInput" required>
+						<option value="">Destination City</option>
+						<option value="Sofia, Bulgaria">Sofia, Bulgaria</option>
+						<option value="Dublin, Ireland">Dublin, Ireland</option>
+						<option value="Stockholm, Sweden">Stockholm, Sweden</option>
+						<option value="Oslo, Norway">Oslo, Norway</option>
+						<option value="Rio de Janeiro, Brazil">Rio de Janeiro, Brazil</option>
+						<option value="Manila, Philippines">Manila, Philippines</option>
+						<option value="Seoul, South Korea">Seoul, South Korea</option>
+						<option value="Tokyo, Japan">Tokyo, Japan</option>
+						<option value="Bucharest, Romania">Bucharest, Romania</option>
+						<option value="Pyongyang, North Korea">Pyongyang, North Korea</option>
+					</select>
+				</div>
+
+<!--				<div class="row">-->
+<!--					<div class="col">-->
+<!--						<label for="passengersNumber">Passengers</label>-->
+<!--						<input id="passengersNumber" type="number" class="form-control"-->
+<!--							   placeholder="Number of Travellers" name="passengers" min="1" max="10" required>-->
+<!--					</div>-->
+<!--				</div>-->
+
+				<div class="form-group">
+					<label for="passengersNumber">Passengers</label>
+					<input id="passengersNumber" type="number" class="form-control"
+						   placeholder="Number of Travellers" name="passengers" min="1" max="10" required>
+				</div>
+
+<!--				<div class="row">-->
+<!--					<div class="col">-->
+<!--						<div class="form-group">-->
+<!--							<label for="outboundDate">Date</label>-->
+<!--							<input class="form-control" type="date" id="outboundDate"-->
+<!--								   name="outboundDate" min="2020-11-28" max="2021-12-31" required>-->
+<!--						</div>-->
+<!--					</div>-->
+<!--				</div>-->
+
+				<div class="form-group">
+					<label for="outboundDate">Date</label>
+					<input class="form-control" type="date" id="outboundDate"
+						   name="outboundDate" min="2020-11-28" max="2021-12-31" required>
+				</div>
+
+				<button type="submit" class="btn btn-primary">Submit</button>
+			</form>
+		</div>
+	</div>
+</div>
+
+<div th:replace="fragments/footer :: footer"></div>
+
+</body>
 </html>
