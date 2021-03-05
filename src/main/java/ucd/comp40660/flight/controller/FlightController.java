@@ -263,7 +263,6 @@ public class FlightController {
         reservation.setUser(user);
 
 
-      //TODO Create flight object via tempflightreference and flightrepo
         Flight flight = flightRepository.findFlightByFlightID(temporaryFlightReference);
         reservation.setFlight(flight);
         flight.getReservations().add(reservation);
@@ -271,10 +270,9 @@ public class FlightController {
         reservationRepository.saveAndFlush(reservation);
         reservation.setCredit_card(card);
 
-      model.addAttribute("user", user);
+        model.addAttribute("user", user);
         model.addAttribute("reservation", reservation);
         model.addAttribute("flight", flight);
-        //TODO add Flight object to model for display @ displayReservation.html
 
         return "displayReservation.html";
 
