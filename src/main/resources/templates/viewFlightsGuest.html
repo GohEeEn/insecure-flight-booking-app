@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Flight Result</title>
+
+    <style type="text/css">
+
+        table {
+            counter-reset: tableCount;
+        }
+
+        .counterCell:before {
+            content: counter(tableCount);
+            counter-increment: tableCount;
+        }
+
+    </style>
+
+    <div th:replace="fragments/header :: header-data"></div>
+</head>
+
+<body>
+<nav th:replace="fragments/header :: navigation-bar"></nav>
+
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-lg-12 align-self-center">
+            <table class="table table-hover table-fixed">
+                <thead>
+                <tr>
+                    <th>#</th>
+                    <th>Departure</th>
+                    <th>Destination</th>
+                    <th>Outbound Time</th>
+                    <th>Arrival Time</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr>
+                    <td class="counterCell"></td>
+                    <td th:text="${flightGuest?.source}"></td>
+                    <td th:text="${flightGuest?.destination}"></td>
+                    <td th:text="${flightGuest?.departure_date_time}"></td>
+                    <td th:text="${flightGuest?.arrivalDateTime}"></td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<div th:replace="fragments/footer :: footer"></div>
+</body>
+</html>

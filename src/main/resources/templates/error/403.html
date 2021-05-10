@@ -1,0 +1,38 @@
+<!DOCTYPE HTML>
+
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+
+    <head>
+        <meta charset="utf-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <title>BAFlight : Forbidden Page</title>
+        <meta name="description" content="">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        
+        <div th:replace="fragments/header :: header-data"></div>
+        <link href="/css/error.css" rel="stylesheet">
+    </head>
+
+    <body>
+
+        <div id="error-content" class="container text-center align-middle">
+
+            <h1>403</h1>
+
+            <div class="container ">
+                <p><em>HTTP 403 Forbidden</em></p>
+                <p>Access Denied</p>
+                <p>You Do Not Have The Permission To Access This Page</p>
+
+                <div class="mt-5">
+                    <p>: Return to :</p>
+                    <a href="/" class="btn btn-light">Home</a> 
+                    <a href="javascript:history.back()" class="btn btn-primary">Back</a> 
+                </div>
+            </div>
+        </div>
+
+    </body>
+
+</html>
+

@@ -1,12 +1,21 @@
 package ucd.comp40660.user.model;
 
-import javax.persistence.*;
-import javax.validation.constraints.*;
-
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Data;
+import lombok.ToString;
+import org.hibernate.annotations.LazyCollection;
+import org.hibernate.annotations.LazyCollectionOption;
+import ucd.comp40660.reservation.model.Reservation;
+
+import javax.persistence.*;
+import javax.validation.constraints.Email;
+import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotNull;
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity
-@Table(name = "users", uniqueConstraints={@UniqueConstraint(columnNames = {"username", "email", "phone"})})
+@Table(name = "users", uniqueConstraints = {@UniqueConstraint(columnNames = {"username", "email", "phone"})})
 @Data
 public class User {
 
@@ -23,18 +32,18 @@ public class User {
     @NotBlank(message = "Role improperly initialised.")
     private String role;
 
-    @Column(unique=true)
+    @Column(unique = true)
     @NotBlank(message = "Username field must not be empty.")
     private String username;
 
     @NotBlank(message = "Password field must not be empty.")
     private String password;
 
-    @Column(unique=true)
+    @Column(unique = true)
     @NotNull(message = "Password Duplicate field must not be empty.")
     private String phone;
 
-    @Column(unique=true)
+    @Column(unique = true)
     @Email(message = "Valid e-mail address required.")
     @NotBlank(message = "E-mail field must not be empty.")
     private String email;
@@ -42,32 +51,29 @@ public class User {
     @NotBlank(message = "Address field must not be empty.")
     private String address;
 
-    @NotBlank(message = "Credit Card Details field must not be empty.")
-    private String credit_card_details;
+    @OneToMany(mappedBy = "user")
+    @LazyCollection(LazyCollectionOption.FALSE)
+    @JsonIgnore
+    @ToString.Exclude
+    private List<CreditCard> credit_cards = new ArrayList<>();
 
-//    @NotBlank(message = "Reservation History improperly initialised(blank).")
-    private String reservation_history;
+    @OneToMany(mappedBy = "user")
+    @LazyCollection(LazyCollectionOption.FALSE)
+    @JsonIgnore
+    @ToString.Exclude
+    private List<Reservation> reservations = new ArrayList<>();
 
-//    @NotBlank(message = "Upcoming Reservations improperly initialised(blank).")
-    private String upcoming_reservations;
+    @Column
+    @OneToMany(mappedBy = "user", fetch = FetchType.EAGER, orphanRemoval = true, cascade = CascadeType.ALL)
+    @ToString.Exclude
+    private List<Passenger> passengers = new ArrayList<>();
 
 
     public User() {
         super();
     }
 
-//    public User(Long registrationID, String name, Long phone, String email, String address, String credit_card_details, String reservation_history, String upcoming_reservations) {
-//        this.registrationID = registrationID;
-//        this.name = name;
-//        this.phone = phone;
-//        this.email = email;
-//        this.address = address;
-//        this.credit_card_details = credit_card_details;
-//        this.reservation_history = reservation_history;
-//        this.upcoming_reservations = upcoming_reservations;
-//    }
-
-    public User(String name, String surname, String username, String role, String phone, String email, String address, String credit_card_details, String password, String reservation_history, String upcoming_reservations) {
+    public User(String name, String surname, String username, String role, String phone, String email, String address, String password, List<Reservation> reservations) {
         this.name = name;
         this.surname = surname;
         this.username = username;
@@ -75,10 +81,8 @@ public class User {
         this.phone = phone;
         this.email = email;
         this.address = address;
-        this.credit_card_details = credit_card_details;
         this.password = password;
-        this.reservation_history = reservation_history;
-        this.upcoming_reservations = upcoming_reservations;
+        this.reservations = reservations;
     }
 }
 

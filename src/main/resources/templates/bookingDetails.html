@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+	<head>
+		<title>Home</title>
+
+		<div th:replace="fragments/header :: header-data"></div>
+	</head>
+
+	<body>
+
+		<nav th:replace="fragments/header :: navigation-bar"></nav>
+
+
+		<div class="container">
+			<div class="row">
+				<div class="col-8">
+					<h4>Enter Personal Details</h4>
+					<form action="/processGuestPersonalDetails" method="post">
+						 <div class="form-row">
+						    <div class="form-group col-md-6">
+						      <label for="firstName">FirstName</label>
+						      <input type="text" class="form-control" id="firstName" placeholder="name" name="name" required>
+						    </div>
+						    <div class="form-group col-md-6">
+						      <label for="lastName">LastName</label>
+						      <input type="text" class="form-control" id="lastName" placeholder="surname" name="surname" required>
+						    </div>
+						 </div>
+						 <div class="form-group">
+						    <label for="inputAddress">Address</label>
+						    <input type="text" class="form-control" id="inputAddress" placeholder="1234 Main St" name="address" required>
+						 </div>
+						 <div class="form-row">
+						    <div class="form-group col-md-6">
+						      <label for="inputEmail">Email</label>
+						      <input type="email" class="form-control" id="inputEmail" placeholder="email@example.com" name="email" required>
+						    </div>
+						    <div class="form-group col-md-6">
+						      <label for="inputPhoneNumber">Phone Number</label>
+						      <input type="tel" class="form-control" id="inputPhoneNumber" placeholder="123-456-7890" name="phoneNumber" pattern="[0-9]{3}-[0-9]{3}-[0-9]{4}" required>
+						      <small>Format:123-456-7890</small>
+						    </div>
+						 </div>
+<!-- 						 <div class="form-group">
+						    <label for="inputAddress">Address</label>
+						    <input type="text" class="form-control" id="inputAddress" placeholder="1234 Main St" name="address" required>
+						 </div> -->
+						 <div class="form-group">
+						    <div class="form-check">
+						      <input class="form-check-input" type="checkbox" id="gridCheck">
+						      <label class="form-check-label" for="gridCheck">
+						        Use address for billing
+						      </label>
+						    </div>
+						 </div>
+						 <button type="submit" class="btn btn-primary">Continue to Payment</button>
+					</form>
+				</div>
+				<div class="col-4">
+<!-- 					<h4>Choose Flights</h4>
+					<form action="/processFlightSearch" method="post" >
+
+
+
+					<button type="submit" class="btn btn-primary">Submit</button>
+					</form> -->
+				</div>
+			</div>
+		</div>
+
+		<div th:replace="fragments/footer :: footer"></div>
+
+	</body>
+</html>
