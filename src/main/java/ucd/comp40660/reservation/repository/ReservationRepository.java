@@ -13,14 +13,14 @@ import java.util.Optional;
 @Repository
 public interface ReservationRepository extends JpaRepository<Reservation, Long> {
     Optional<Reservation> findByEmail(String email);
-    public List<Reservation> findAllByUser(User user);
-    public Reservation findOneByGuest(Guest guest);
-    public Reservation findByFlight(Flight flight);
-    public Reservation findByUserAndFlight(User user, Flight flight);
-    public List <Reservation> findAllByUserAndCancelledIsTrue(User user);
-    public List <Reservation> findAllByUserAndCancelledIsFalse(User user);
-    public Reservation findByUserAndFlightAndCancelledIsTrue(User user, Flight flight);
-    public Reservation findOneByEmailAndId(String email, Long id);
+    List<Reservation> findAllByUser(User user);
+    Reservation findOneByGuest(Guest guest);
+    Reservation findByFlight(Flight flight);
+    Reservation findByUserAndFlight(User user, Flight flight);
+    List <Reservation> findAllByUserAndCancelledIsTrue(User user);
+    List <Reservation> findAllByUserAndCancelledIsFalse(User user);
+    Reservation findByUserAndFlightAndCancelledIsTrue(User user, Flight flight);
+    Reservation findOneByEmailAndId(String email, Long id);
 
     boolean existsByUserAndFlight(User user, Flight flight);
 //    public findFirstByUser(User user);

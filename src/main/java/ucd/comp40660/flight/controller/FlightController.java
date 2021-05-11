@@ -358,12 +358,12 @@ public class FlightController {
         Guest guest = guestRepository.findTopByOrderByIdDesc();
 
         if (guest != null)
-            log.info("getGuestReservations(): Guest info: " + guest.toString());
+            log.info("getGuestReservations(): Guest info: " + guest);
         else
             log.info("getGuestReservations(): Guest is null");
 
         if (flight != null)
-            log.info("getGuestReservations(): Flight info: " + flight.toString());
+            log.info("getGuestReservations(): Flight info: " + flight);
         else
             log.info("getGuestReservations(): Flight is null");
 

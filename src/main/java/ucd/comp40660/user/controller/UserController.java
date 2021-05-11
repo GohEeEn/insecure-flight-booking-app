@@ -16,6 +16,8 @@ import ucd.comp40660.user.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.ui.Model;
+import org.springframework.security.access.prepost.PreAuthorize;
+
 
 
 import javax.servlet.http.HttpServletResponse;
@@ -59,11 +61,12 @@ public class UserController {
 
     //    Get a single registration by id
 //    the id can be changed to any other attribute
-    @GetMapping("/users/{id}")
+    @PreAuthorize("#username == authentication.name or hasAuthority('ADMIN')")
+    @GetMapping("/users/{username}")
     @ResponseBody
-    public User getRegistrationById(@PathVariable(value = "id") Long registrationId) throws UserNotFoundException {
-        return userRepository.findById(registrationId)
-                .orElseThrow(() -> new UserNotFoundException(registrationId));
+    public User getRegistrationByUsername(@PathVariable(value = "username") String username) throws UserNotFoundException {
+        return userRepository.findByUsername(username)
+                .orElseThrow(() -> new UserNotFoundException(username));
     }
 
     //    update registration details

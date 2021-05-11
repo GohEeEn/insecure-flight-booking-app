@@ -12,7 +12,9 @@ import javax.validation.constraints.Email;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 @Entity
 @Table(name = "users", uniqueConstraints = {@UniqueConstraint(columnNames = {"username", "email", "phone"})})
@@ -67,6 +69,21 @@ public class User {
     @OneToMany(mappedBy = "user", fetch = FetchType.EAGER, orphanRemoval = true, cascade = CascadeType.ALL)
     @ToString.Exclude
     private List<Passenger> passengers = new ArrayList<>();
+
+    @ManyToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
+    @JoinTable(name="user_roles",
+            joinColumns = @JoinColumn(name="user_id", referencedColumnName="registrationID"),
+            inverseJoinColumns = @JoinColumn(name="role_id", referencedColumnName="id")
+    )
+    private Set<Role> roles = new HashSet<>();
+
+    public Set<Role> getRoles() {
+        return this.roles;
+    }
+
+    public void setRoles(Set<Role> roles) {
+        this.roles = roles;
+    }
 
 
     public User() {

@@ -61,10 +61,16 @@ INSERT INTO reservations(email, flight_flightid, cancelled) VALUES
 ALTER TABLE application.users MODIFY registrationID bigint NOT NULL AUTO_INCREMENT;
 
 INSERT INTO users(name, surname, username, password, role, phone, email, address) VALUES
-('slav', 'denisov', 'Slav', 'Slav1234', 'member', '0830881242', 'slav@ucdconnect.ie', '10 beach bay, smithfield'),
-('ola', 'akintola', 'Ola', 'Ola1234', 'member', '0830881243', 'ola@ucdconnect.ie', '13 gunners bay , automaticfield'),
-('vincent', 'goh', 'Vincent', 'Vincent1234', 'member', '0830881244', 'vincent@ucdconnect.ie', '69 miami bay area, awesomefield'),
-('sean', 'mcloughlin', 'Sean', 'Sean1234', 'member', '0830881245', 'sean@ucdconnect.ie', '27 day dreams, bringfield');
+('slav', 'denisov', 'Slav', 'Slav1234', 'MEMBER', '0830881242', 'slav@ucdconnect.ie', '10 beach bay, smithfield'),
+('ola', 'akintola', 'Ola', 'Ola1234', 'MEMBER', '0830881243', 'ola@ucdconnect.ie', '13 gunners bay , automaticfield'),
+('vincent', 'goh', 'Vincent', 'Vincent1234', 'MEMBER', '0830881244', 'vincent@ucdconnect.ie', '69 miami bay area, awesomefield'),
+('sean', 'mcloughlin', 'Sean', 'Sean1234', 'MEMBER', '0830881245', 'sean@ucdconnect.ie', '27 day dreams, bringfield'),
+('admin', 'admin', 'admin', 'Admin1234', 'ADMIN', '9999999999', 'admin@ba.com', 'BA HQ, London');
+
+ALTER TABLE  application.roles;
+
+INSERT INTO roles(id, name) VALUES
+(1, 'GUEST'), (2, 'MEMBER'), (3, 'ADMIN');
 
 ALTER TABLE application.guests MODIFY id bigint NOT NULL AUTO_INCREMENT;
 
