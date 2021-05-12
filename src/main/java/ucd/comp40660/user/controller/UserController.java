@@ -1,10 +1,12 @@
 package ucd.comp40660.user.controller;
 
+import org.springframework.validation.BindingResult;
 import ucd.comp40660.flight.model.Flight;
 import ucd.comp40660.flight.repository.FlightRepository;
 import ucd.comp40660.reservation.exception.ReservationNotFoundException;
 import ucd.comp40660.reservation.model.Reservation;
 import ucd.comp40660.reservation.repository.ReservationRepository;
+import ucd.comp40660.service.UserService;
 import ucd.comp40660.user.UserSession;
 import org.springframework.stereotype.Controller;
 import ucd.comp40660.user.exception.CreditCardNotFoundException;
@@ -17,7 +19,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.ui.Model;
 import org.springframework.security.access.prepost.PreAuthorize;
-
+import ucd.comp40660.validator.UserValidator;
 
 
 import javax.servlet.http.HttpServletResponse;
@@ -46,6 +48,12 @@ public class UserController {
     @Autowired
     FlightRepository flightRepository;
 
+    @Autowired
+    UserValidator userValidator;
+
+    @Autowired
+    UserService userService;
+
     @GetMapping("/")
     public String index(Model model) {
         model.addAttribute("user", userSession.getUser());
@@ -65,8 +73,7 @@ public class UserController {
     @GetMapping("/users/{username}")
     @ResponseBody
     public User getRegistrationByUsername(@PathVariable(value = "username") String username) throws UserNotFoundException {
-        return userRepository.findByUsername(username)
-                .orElseThrow(() -> new UserNotFoundException(username));
+        return userRepository.findByUsername(username);
     }
 
     //    update registration details
@@ -109,40 +116,57 @@ public class UserController {
         return "register.html";
     }
 
-    @PostMapping("/register")
-    public String createUser(String name, String surname, String username, String phone, String address, String email,
-                             String password, String passwordDuplicate, Model model) throws SQLIntegrityConstraintViolationException, IOException {
 
-        if (userRepository.existsByUsername(username)) {
-            System.out.println("\n\nDUPLICATE USERNAME DETECTED\n\n");
-            model.addAttribute("error", "Username already exists.");
+    @PostMapping("/register")
+    public String register(Model model, @ModelAttribute("userForm") User userForm, BindingResult bindingResult){
+        userValidator.validate(userForm, bindingResult);
+
+        if(bindingResult.hasErrors()){
+            model.addAttribute("error", bindingResult.getAllErrors().toString());
             return "register.html";
-        } else if (userRepository.existsByEmail(email)) {
-            model.addAttribute("error", "E-mail address already in use.");
-            return "register.html";
-        } else if (userRepository.existsByPhone(phone)) {
-            model.addAttribute("error", "Phone number already in use.");
-            return "register.html";
-        } else {
-            if (password.equals(passwordDuplicate)) {
-                User user = new User();
-                user.setName(name);
-                user.setSurname(surname);
-                user.setUsername(username);
-                user.setPhone(phone);
-                user.setAddress(address);
-                user.setEmail(email);
-                user.setRole("member");
-                user.setPassword(password);
-                userRepository.save(user);
-                userSession.setUser(user);
-                return "index.html";
-            } else {
-                userSession.setLoginFailed(true);
-                return "register.html";
-            }
         }
+
+        userService.save(userForm);
+
+        return "index.html";
     }
+
+
+
+//    @PostMapping("/register")
+//    public String createUser(String name, String surname, String username, String phone, String address, String email,
+//                             String password, String passwordDuplicate, Model model) throws SQLIntegrityConstraintViolationException, IOException {
+//
+//        if (userRepository.existsByUsername(username)) {
+//            System.out.println("\n\nDUPLICATE USERNAME DETECTED\n\n");
+//            model.addAttribute("error", "Username already exists.");
+//            return "register.html";
+//        } else if (userRepository.existsByEmail(email)) {
+//            model.addAttribute("error", "E-mail address already in use.");
+//            return "register.html";
+//        } else if (userRepository.existsByPhone(phone)) {
+//            model.addAttribute("error", "Phone number already in use.");
+//            return "register.html";
+//        } else {
+//            if (password.equals(passwordDuplicate)) {
+//                User user = new User();
+//                user.setName(name);
+//                user.setSurname(surname);
+//                user.setUsername(username);
+//                user.setPhone(phone);
+//                user.setAddress(address);
+//                user.setEmail(email);
+//                user.setRole("MEMBER");
+//                user.setPassword(password);
+//                userRepository.save(user);
+//                userSession.setUser(user);
+//                return "index.html";
+//            } else {
+//                userSession.setLoginFailed(true);
+//                return "register.html";
+//            }
+//        }
+//    }
 
     @GetMapping("/viewProfile")
     public String viewProfile(Model model) {

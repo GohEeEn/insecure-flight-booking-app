@@ -42,7 +42,7 @@ public class AuthenticationController{
 
     @PostMapping("/login")
     public void doLogin(String username, String password, HttpServletResponse response) throws Exception{
-        Optional<User> user = userRepository.findAllByUsernameAndPassword(username, password);
+        Optional<User> user = Optional.ofNullable(userRepository.findAllByUsernameAndPassword(username, password));
         if(user.isPresent()){
             userSession.setUser(user.get());
             response.sendRedirect("/");

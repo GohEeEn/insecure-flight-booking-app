@@ -53,6 +53,9 @@ public class User {
     @NotBlank(message = "Address field must not be empty.")
     private String address;
 
+    @Transient
+    private String passwordConfirm;
+
     @OneToMany(mappedBy = "user")
     @LazyCollection(LazyCollectionOption.FALSE)
     @JsonIgnore
@@ -85,6 +88,13 @@ public class User {
         this.roles = roles;
     }
 
+    public String getPasswordConfirm() {
+        return passwordConfirm;
+    }
+
+    public void setPasswordConfirm(String passwordConfirm) {
+        this.passwordConfirm = passwordConfirm;
+    }
 
     public User() {
         super();
