@@ -46,6 +46,8 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter{
         auth.authenticationProvider(authenticationProvider());
     }
 
+
+
     @Bean
     public DaoAuthenticationProvider authenticationProvider(){
         DaoAuthenticationProvider authProvider = new DaoAuthenticationProvider();
@@ -64,7 +66,8 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter{
 
         http.cors().and().csrf().disable()
                 .authorizeRequests()
-                .antMatchers("/error","/resources/**", "/login","/registration", "/forgotpassword", "/confirm-reset").permitAll()
+                .antMatchers("/error","/resources/**", "/login","/registration", "/forgotpassword", "/confirm-reset", "/")
+                .permitAll()
                 .antMatchers("/user").access("hasAnyAuthority('ADMIN','USER')")
                 .antMatchers("/admin").access("hasAuthority('ADMIN')")
                 .anyRequest().authenticated()
