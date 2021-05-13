@@ -1,17 +1,12 @@
 package ucd.comp40660;
 
-import ucd.comp40660.service.UserDetailsServiceImplementation;
-import ucd.comp40660.filter.JWTAuthenticationFilter;
-import ucd.comp40660.filter.JWTAuthorisationFilter;
-import static ucd.comp40660.filter.SecurityConstants.COOKIE_NAME;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
-import org.springframework.security.config.annotation.authentication.builders.*;
+import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
@@ -22,8 +17,11 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
+import ucd.comp40660.service.UserDetailsServiceImplementation;
 
 import java.util.Arrays;
+
+import static ucd.comp40660.filter.SecurityConstants.COOKIE_NAME;
 
 @Configuration
 @EnableWebSecurity
@@ -46,8 +44,6 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter{
         auth.authenticationProvider(authenticationProvider());
     }
 
-
-
     @Bean
     public DaoAuthenticationProvider authenticationProvider(){
         DaoAuthenticationProvider authProvider = new DaoAuthenticationProvider();
@@ -64,39 +60,34 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter{
     @Override
     protected void configure(HttpSecurity http) throws Exception{
 
+        // Enable Cross Origin RequestS (cors) and disable Spring Boot CSRF protection
+        // CSRF protection is automatically enabled by Spring Security to create a stateful session, while we are using stateless session here
+        // thus it has to be disabled here
         http.cors().and().csrf().disable()
+//                .requiresChannel().anyRequest().requiresSecure()  // Require HTTPS Requests
+//                .and()
                 .authorizeRequests()
-                .antMatchers("/error","/resources/**", "/login","/register", "/forgotpassword", "/confirm-reset", "/")
-                .permitAll()
+                .antMatchers("/error","/resources/**", "/login","/register", "/forgotpassword", "/confirm-reset","/").permitAll()
                 .antMatchers("/user").access("hasAnyAuthority('ADMIN','USER')")
                 .antMatchers("/admin").access("hasAuthority('ADMIN')")
-                .anyRequest().authenticated()
+                .anyRequest().authenticated()   // Authenticate all requests, with exception URL regexes mentioned above
                 .and()
                 .formLogin()
                 .defaultSuccessUrl("/", true)
                 //.successHandler(authenticationSuccessHandler)
-                .loginPage("/login")
+                .loginPage("/login")            // Specify URL for login
                 .permitAll()
                 .and()
                 .logout()
-                .logoutUrl("/logout")
-                .deleteCookies(COOKIE_NAME)
+                .logoutUrl("/logout")           // Specify URL for logout
+                .deleteCookies(COOKIE_NAME)     // Delete the cookie containing the JWT after logout
                 .permitAll()
                 .and()
-                .addFilter(new JWTAuthenticationFilter(authenticationManager()))
-                .addFilter(new JWTAuthorisationFilter(authenticationManager()))
-                // this disables session creation on Spring Security
+                // Filtering by intercepting incoming requests and execute predefined methods
+//                .addFilter(new JWTAuthenticationFilter(authenticationManager()))    // filter support authentication
+//                .addFilter(new JWTAuthorisationFilter(authenticationManager()))     // filter support authorization
+                // Enforce stateless sessions : this disables session creation 0on Spring Security
                 .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS);
-
-    /*.csrf().disable()
-                .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS)
-                .and()
-                .authorizeRequests()
-                .anyRequest().authenticated()
-                .and()
-
-                //.and()
-                */
     }
 
     @Bean
