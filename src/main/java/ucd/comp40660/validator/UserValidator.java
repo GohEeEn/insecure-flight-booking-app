@@ -44,7 +44,7 @@ private final String PASSWORD_REGEX = "([A-Za-z]*).{2,32}";
 
         //ValidationUtils.rejectIfEmptyOrWhitespace(errors, "username", "NotEmpty");
 
-        if ((user.getUsername().length() < 6 || user.getUsername().length() > 32) ||
+        if ((user.getUsername().length() < 4 || user.getUsername().length() > 32) ||
                 (!isUserValid(user.getUsername())) ||
                 (userService.findByEmail(user.getEmail())!=null) ||
                 (userService.findByUsername(user.getUsername()) != null) ||

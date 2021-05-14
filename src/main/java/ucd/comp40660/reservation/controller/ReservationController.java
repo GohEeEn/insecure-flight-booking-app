@@ -15,9 +15,11 @@ import ucd.comp40660.reservation.repository.ReservationRepository;
 import ucd.comp40660.user.UserSession;
 import ucd.comp40660.user.model.User;
 
+import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
 import java.io.IOException;
+import java.security.Principal;
 import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.Date;
@@ -84,9 +86,17 @@ public class ReservationController {
     }
 
     @GetMapping("/getUserReservations")
-    public String getUserReservations(Model model) throws ReservationNotFoundException {
-        if (userSession.getUser() != null) {
-            User user = userSession.getUser();
+    public String getUserReservations(Model model, HttpServletRequest req) throws ReservationNotFoundException {
+        User user = null;
+
+        Principal userDetails = req.getUserPrincipal();
+        if (userDetails != null) {
+            user = userRepository.findByUsername(userDetails.getName());
+            model.addAttribute("user", user);
+        }
+
+        if (user != null) {
+//            User user = userSession.getUser();
 
             // backend log messages
             log.info(String.format("UserSession user info: " + user.toString()));
@@ -154,9 +164,17 @@ public class ReservationController {
     }
 
     @GetMapping("/reservations/cancel/{id}")
-    public void cancelReservation(@PathVariable(value = "id") Long flightID, Model model, HttpServletResponse response) throws ReservationNotFoundException, IOException {
+    public void cancelReservation(@PathVariable(value = "id") Long flightID, Model model, HttpServletResponse response, HttpServletRequest req) throws ReservationNotFoundException, IOException {
+        User user = null;
+
+        Principal userDetails = req.getUserPrincipal();
+        if (userDetails != null) {
+            user = userRepository.findByUsername(userDetails.getName());
+            model.addAttribute("user", user);
+        }
+
         Flight flight = flightRepository.findFlightByFlightID(flightID);
-        User user = userSession.getUser();
+//        User user = userSession.getUser();
         Reservation reservation = reservationRepository.findByUserAndFlight(user, flight);
         reservation.setCancelled(true);
         reservationRepository.saveAndFlush(reservation);

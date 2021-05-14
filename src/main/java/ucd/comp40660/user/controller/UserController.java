@@ -22,9 +22,11 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import ucd.comp40660.validator.UserValidator;
 
 
+import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
 import java.io.IOException;
+import java.security.Principal;
 import java.sql.SQLIntegrityConstraintViolationException;
 import java.util.ArrayList;
 import java.util.List;
@@ -55,8 +57,13 @@ public class UserController {
     UserService userService;
 
     @GetMapping("/")
-    public String index(Model model) {
-        model.addAttribute("user", userSession.getUser());
+    public String index(Model model, HttpServletRequest req) {
+        Principal userDetails = req.getUserPrincipal();
+        if (userDetails != null) {
+            User user = userRepository.findByUsername(userDetails.getName());
+            model.addAttribute("user", user);
+        }
+
         return "index.html";
     }
 
@@ -72,13 +79,17 @@ public class UserController {
     @PreAuthorize("#username == authentication.name or hasAuthority('ADMIN')")
     @GetMapping("/users/{username}")
     @ResponseBody
-    public User getRegistrationByUsername(@PathVariable(value = "username") String username) throws UserNotFoundException {
+    public User getRegistrationByUsername(@PathVariable(value = "username") String username, HttpServletRequest req) throws UserNotFoundException {
+//        Principal userDetails = req.getUserPrincipal();
         return userRepository.findByUsername(username);
+
+//        return userRepository.findByUsername(username);
     }
 
     //    update registration details
     @PutMapping("/users/{id}")
     public User updateRegistration(@PathVariable(value = "id") Long registrationId, @Valid @RequestBody User userDetails) throws UserNotFoundException {
+
         User user = userRepository.findById(registrationId)
                 .orElseThrow(() -> new UserNotFoundException(registrationId));
 
@@ -94,9 +105,13 @@ public class UserController {
 
     //    Delete a registration record
     @GetMapping("/delete/{id}")
-    public String deleteRegistration(@PathVariable(value = "id") Long registrationID) throws UserNotFoundException {
-        User user = userRepository.findById(registrationID)
-                .orElseThrow(() -> new UserNotFoundException(registrationID));
+    public String deleteRegistration(@PathVariable(value = "id") Long registrationID, HttpServletRequest req) throws UserNotFoundException {
+        Principal userDetails = req.getUserPrincipal();
+        User user = userRepository.findByUsername(userDetails.getName());
+
+//        User user = userRepository.findById(registrationID)
+//                .orElseThrow(() -> new UserNotFoundException(registrationID));
+
 
         userRepository.delete(user);
         userSession.setUser(null);
@@ -130,6 +145,33 @@ public class UserController {
 
         return "index.html";
     }
+
+    @GetMapping("/adminRegister")
+    public String adminRegister(Model model, HttpServletResponse response) throws Exception {
+        if (userSession.isLoginFailed()) {
+            model.addAttribute("error", "Unable to create account, passwords do not match");
+            userSession.setLoginFailed(false);
+        }
+        if (userSession.getUser() != null) {
+            response.sendRedirect("/logout");
+        }
+        return "adminRegister.html";
+    }
+
+    @PostMapping("/adminRegister")
+    public String adminRegister(Model model, @ModelAttribute("userForm") User userForm, BindingResult bindingResult){
+        userValidator.validate(userForm, bindingResult);
+
+        if(bindingResult.hasErrors()){
+            model.addAttribute("error", bindingResult.getAllErrors().toString());
+            return "adminRegister.html";
+        }
+
+        userService.adminSave(userForm);
+
+        return "index.html";
+    }
+
 
 
 
@@ -169,8 +211,11 @@ public class UserController {
 //    }
 
     @GetMapping("/viewProfile")
-    public String viewProfile(Model model) {
-        model.addAttribute("user", userSession.getUser());
+    public String viewProfile(Model model, HttpServletRequest req) {
+        Principal userDetails = req.getUserPrincipal();
+        User user = userRepository.findByUsername(userDetails.getName());
+
+        model.addAttribute("user", user);
         return "viewProfile.html";
     }
 

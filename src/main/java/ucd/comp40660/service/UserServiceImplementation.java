@@ -30,12 +30,27 @@ public class UserServiceImplementation implements UserService {
     @Override
     public void save(User user) {
         user.setPassword(bCryptPasswordEncoder.encode(user.getPassword()));
-        Role userRole = roleRepository.findByName("USER");
+        Role userRole = roleRepository.findByName("MEMBER");
         Set<Role> roleSet = new HashSet<Role>();
         roleSet.add(userRole);
         user.setRoles(roleSet);
         userRepository.save(user);
     }
+
+    @Override
+    public void adminSave(User user) {
+        user.setPassword(bCryptPasswordEncoder.encode(user.getPassword()));
+        Role userRole = roleRepository.findByName("ADMIN");
+        System.out.println("\n\nROLE FOUND: ");
+        System.out.println(userRole.getName());
+        System.out.println(userRole.getId());
+        Set<Role> roleSet = new HashSet<Role>();
+        roleSet.add(userRole);
+        user.setRoles(roleSet);
+        userRepository.save(user);
+    }
+
+
 
     @Override
     public User findByUsername(String username) {

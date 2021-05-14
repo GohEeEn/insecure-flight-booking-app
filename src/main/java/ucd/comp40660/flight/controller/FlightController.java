@@ -12,6 +12,7 @@ import ucd.comp40660.flight.model.FlightSearch;
 import ucd.comp40660.flight.repository.FlightRepository;
 import ucd.comp40660.reservation.model.Reservation;
 import ucd.comp40660.reservation.repository.ReservationRepository;
+import ucd.comp40660.service.UserService;
 import ucd.comp40660.user.UserSession;
 import ucd.comp40660.user.model.CreditCard;
 import ucd.comp40660.user.model.Guest;
@@ -21,11 +22,14 @@ import ucd.comp40660.user.repository.CreditCardRepository;
 import ucd.comp40660.user.repository.GuestRepository;
 import ucd.comp40660.user.repository.PassengerRepository;
 import ucd.comp40660.user.repository.UserRepository;
+import ucd.comp40660.validator.UserValidator;
 
+import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.security.Principal;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -57,6 +61,13 @@ public class FlightController {
 
     @Autowired
     private UserSession userSession;
+
+    @Autowired
+    UserValidator userValidator;
+
+    @Autowired
+    UserService userService;
+
 
 
     Long temporaryFlightReference;
@@ -170,16 +181,24 @@ public class FlightController {
     }
 
     @GetMapping("/displayBookingPage")
-    public String guestBooking(Model model) {
+    public String guestBooking(Model model, HttpServletRequest req) {
 
-        model.addAttribute("user", userSession.getUser());
+        User user = null;
+
+        Principal userDetails = req.getUserPrincipal();
+        if (userDetails != null) {
+            user = userRepository.findByUsername(userDetails.getName());
+            model.addAttribute("user", user);
+        }
+
+//        model.addAttribute("user", userSession.getUser());
 
         if (numberOfPassengers > 1) {
             return "passengerDetails.html";
-        } else if (userSession.getUser() == null) {
+        } else if (user == null) {
             return "bookingDetails.html";
         } else {
-            model.addAttribute("cards", userSession.getUser().getCredit_cards());
+            model.addAttribute("cards", user.getCredit_cards());
             return "displayPaymentPage.html";
         }
     }
@@ -233,22 +252,37 @@ public class FlightController {
     }
 
     @GetMapping("/displayPaymentPage")
-    public String displayPaymentPage(Model model) {
+    public String displayPaymentPage(Model model, HttpServletRequest req) {
 
-        if (userSession.getUser() != null) {
-            List<CreditCard> cards = creditCardRepository.findAllByUser(userSession.getUser());
+        User user = null;
+
+        Principal userDetails = req.getUserPrincipal();
+        if (userDetails != null) {
+            user = userRepository.findByUsername(userDetails.getName());
+            model.addAttribute("user", user);
+        }
+
+        if (user != null) {
+            List<CreditCard> cards = creditCardRepository.findAllByUser(user);
             model.addAttribute("cards", cards);
         }
 
-        model.addAttribute("user", userSession.getUser());
+        model.addAttribute("user", user);
         return "displayPaymentPage.html";
     }
 
     @PostMapping("/processMemberPayment")
-    public String processMemberPayment(Model model, CreditCard card) {
+    public String processMemberPayment(Model model, CreditCard card, HttpServletRequest req) {
 
+        User user = null;
 
-      User user = userSession.getUser();
+        Principal userDetails = req.getUserPrincipal();
+        if (userDetails != null) {
+            user = userRepository.findByUsername(userDetails.getName());
+            model.addAttribute("user", user);
+        }
+
+//      User user = userSession.getUser();
       Reservation reservation = new Reservation();
 //        if(!user.getReservations().contains())
       user.getReservations().add(reservation);

@@ -65,11 +65,11 @@ public class JWTAuthenticationFilter  extends UsernamePasswordAuthenticationFilt
                 .withSubject(((ACUserDetails) auth.getPrincipal()).getUsername())
                 .withExpiresAt(new Date(System.currentTimeMillis() + EXPIRATION_TIME))
                 .sign(HMAC512(SECRET.getBytes()));
-        //res.addHeader(HEADER_STRING, TOKEN_PREFIX + token);
+        response.addHeader(HEADER_STRING, TOKEN_PREFIX + token);
 
         addCookie(token, response);
 
-        new DefaultRedirectStrategy().sendRedirect(request, response, "/");
+        //new DefaultRedirectStrategy().sendRedirect(request, response, "/");
 
         //authenticationSuccessHandler.onAuthenticationSuccess(request, response, getAuthentication(token));
         //getAuthentication(token).

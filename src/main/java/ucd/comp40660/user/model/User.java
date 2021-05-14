@@ -31,8 +31,8 @@ public class User {
     @NotBlank(message = "Surname field must not be empty.")
     private String surname;
 
-    @NotBlank(message = "Role improperly initialised.")
-    private String role;
+//    @NotBlank(message = "Role improperly initialised.")
+//    private String role;
 
     @Column(unique = true)
     @NotBlank(message = "Username field must not be empty.")
@@ -73,7 +73,9 @@ public class User {
     @ToString.Exclude
     private List<Passenger> passengers = new ArrayList<>();
 
-    @ManyToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
+    @ManyToMany(fetch = FetchType.EAGER)
+    @JsonIgnore
+    @ToString.Exclude
     @JoinTable(name="user_roles",
             joinColumns = @JoinColumn(name="user_id", referencedColumnName="registrationID"),
             inverseJoinColumns = @JoinColumn(name="role_id", referencedColumnName="id")
@@ -100,11 +102,11 @@ public class User {
         super();
     }
 
-    public User(String name, String surname, String username, String role, String phone, String email, String address, String password, List<Reservation> reservations) {
+    public User(String name, String surname, String username, String phone, String email, String address, String password, List<Reservation> reservations) {
         this.name = name;
         this.surname = surname;
         this.username = username;
-        this.role = role;
+//        this.role = role;
         this.phone = phone;
         this.email = email;
         this.address = address;

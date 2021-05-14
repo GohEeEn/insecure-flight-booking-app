@@ -9,6 +9,8 @@ public interface UserService {
 
     void save(User user);
 
+    void adminSave(User user);
+
     User findByUsername(String username);
 
     User findByEmail(String email);
