@@ -41,6 +41,9 @@ public class UserServiceImplementation implements UserService {
     public void adminSave(User user) {
         user.setPassword(bCryptPasswordEncoder.encode(user.getPassword()));
         Role userRole = roleRepository.findByName("ADMIN");
+        System.out.println("\n\nROLE FOUND: ");
+        System.out.println(userRole.getName());
+        System.out.println(userRole.getId());
         Set<Role> roleSet = new HashSet<Role>();
         roleSet.add(userRole);
         user.setRoles(roleSet);

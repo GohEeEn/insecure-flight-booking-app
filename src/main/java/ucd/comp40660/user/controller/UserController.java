@@ -58,8 +58,12 @@ public class UserController {
 
     @GetMapping("/")
     public String index(Model model, HttpServletRequest req) {
-        Principal user = req.getUserPrincipal();
-        model.addAttribute("user", userRepository.findByUsername(user.getName()));
+        Principal userDetails = req.getUserPrincipal();
+        if (userDetails != null) {
+            User user = userRepository.findByUsername(userDetails.getName());
+            model.addAttribute("user", user);
+        }
+
         return "index.html";
     }
 
@@ -76,8 +80,8 @@ public class UserController {
     @GetMapping("/users/{username}")
     @ResponseBody
     public User getRegistrationByUsername(@PathVariable(value = "username") String username, HttpServletRequest req) throws UserNotFoundException {
-        Principal userDetails = req.getUserPrincipal();
-        return userRepository.findByUsername(userDetails.getName());
+//        Principal userDetails = req.getUserPrincipal();
+        return userRepository.findByUsername(username);
 
 //        return userRepository.findByUsername(username);
     }

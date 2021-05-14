@@ -74,6 +74,8 @@ public class User {
     private List<Passenger> passengers = new ArrayList<>();
 
     @ManyToMany(fetch = FetchType.EAGER)
+    @JsonIgnore
+    @ToString.Exclude
     @JoinTable(name="user_roles",
             joinColumns = @JoinColumn(name="user_id", referencedColumnName="registrationID"),
             inverseJoinColumns = @JoinColumn(name="role_id", referencedColumnName="id")
