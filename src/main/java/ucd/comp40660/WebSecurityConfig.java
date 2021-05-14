@@ -66,10 +66,11 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter{
 
         http.cors().and().csrf().disable()
                 .authorizeRequests()
-                .antMatchers("/error", "/resources/**", "/login","/register", "/forgotpassword", "/confirm-reset", "/", "/adminRegister")
+                .antMatchers("/error", "/resources/**", "/login","/register", "/forgotpassword", "/confirm-reset", "/")
                 .permitAll()
                 .antMatchers("/user").access("hasAnyAuthority('ADMIN','USER')")
                 .antMatchers("/admin").access("hasAuthority('ADMIN')")
+                .antMatchers("/adminRegister").access("hasAuthority('ADMIN')")
                 .anyRequest().authenticated()
                 .and()
                 .formLogin()
