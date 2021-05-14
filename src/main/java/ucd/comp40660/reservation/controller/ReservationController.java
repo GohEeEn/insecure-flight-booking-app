@@ -106,7 +106,7 @@ public class ReservationController {
 
         Principal userDetails = req.getUserPrincipal();
         if (userDetails != null) {
-            user = userRepository.findByUsername(userDetails.getName());
+            user = userRepository.findByUsername(username);
             model.addAttribute("user", user);
         }
 
@@ -118,7 +118,7 @@ public class ReservationController {
 
 
             // add current user to the model
-            model.addAttribute("user", user);
+//            model.addAttribute("user", user);
 
 
             // find all reservations associated with a user
@@ -166,7 +166,7 @@ public class ReservationController {
             } else { // throw an error if there are no reservations
                 model.addAttribute("error", "No reservations found");
             }
-            model.addAttribute("user", user);
+            model.addAttribute("user", userRepository.findByUsername(userDetails.getName()));
             return "viewFlightsUser.html";
 
         }
