@@ -1,5 +1,6 @@
 package ucd.comp40660;
 
+import com.ulisesbocchio.jasyptspringboot.annotation.EnableEncryptableProperties;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Bean;
@@ -25,6 +26,7 @@ import static ucd.comp40660.filter.SecurityConstants.COOKIE_NAME;
 
 @Configuration
 @EnableWebSecurity
+@EnableEncryptableProperties
 @EnableGlobalMethodSecurity(securedEnabled = true, prePostEnabled = true)
 public class WebSecurityConfig extends WebSecurityConfigurerAdapter{
     @Qualifier("userDetailsServiceImplementation")

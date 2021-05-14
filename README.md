@@ -36,7 +36,7 @@ This is the Flight Reservation Web Application repository for UCD BSc Computer S
    - Encryption of sensitive properties inside file application.properties is enabled with [Jasypt](http://www.jasypt.org)
    - To generate the encoded credential value, go to maven library path ` ~/.m2/repository/org/jasypt/jasypt/1.9.0` on terminal (CLI)
    - Use the following commmand to run the JAR program to generate the encoded value
-     ```java
+     ```
       java -cp jasypt-1.9.0.jar org.jasypt.intf.cli.JasyptPBEStringEncryptionCLI input="value" password=<key> algorithm=PBEWithMD5AndDES
      ```
       - __input__ - The value in string to be encoded
