@@ -82,8 +82,6 @@ public class UserController {
     public User getRegistrationByUsername(@PathVariable(value = "username") String username, HttpServletRequest req) throws UserNotFoundException {
 //        Principal userDetails = req.getUserPrincipal();
         return userRepository.findByUsername(username);
-
-//        return userRepository.findByUsername(username);
     }
 
     //    update registration details

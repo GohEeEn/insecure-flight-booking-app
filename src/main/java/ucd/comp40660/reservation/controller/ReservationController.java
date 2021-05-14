@@ -4,6 +4,7 @@ package ucd.comp40660.reservation.controller;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
@@ -12,6 +13,7 @@ import ucd.comp40660.flight.repository.FlightRepository;
 import ucd.comp40660.reservation.exception.ReservationNotFoundException;
 import ucd.comp40660.reservation.model.Reservation;
 import ucd.comp40660.reservation.repository.ReservationRepository;
+import ucd.comp40660.service.UserService;
 import ucd.comp40660.user.UserSession;
 import ucd.comp40660.user.model.User;
 
@@ -26,6 +28,7 @@ import java.util.Date;
 import java.util.List;
 import lombok.extern.log4j.Log4j2;
 import ucd.comp40660.user.repository.UserRepository;
+import ucd.comp40660.validator.UserValidator;
 
 
 @Log4j2
@@ -45,6 +48,13 @@ public class ReservationController {
     @Autowired
     private UserSession userSession;
 
+    @Autowired
+    UserValidator userValidator;
+
+    @Autowired
+    UserService userService;
+
+
     //    Get all reservations
     @GetMapping("/reservations")
     @ResponseBody
@@ -61,9 +71,11 @@ public class ReservationController {
     }
 
     //    Update the details of a reservation record
-    @PutMapping("/reservations/{id}")
+    @PreAuthorize("#username == authentication.name or hasAuthority('ADMIN')")
+    @PutMapping("/reservations/{username}/{id}")
     @ResponseBody
-    public Reservation updateReservation(@PathVariable(value = "id") Long reservationID, @Valid @RequestBody Reservation reservationDetails) throws ReservationNotFoundException {
+    public Reservation updateReservation(@PathVariable(value = "username") String username, @PathVariable(value = "id") Long reservationID,
+                                         @Valid @RequestBody Reservation reservationDetails) throws ReservationNotFoundException {
         Reservation reservation = reservationRepository.findById(reservationID)
                 .orElseThrow(() -> new ReservationNotFoundException(reservationID));
 
@@ -74,9 +86,11 @@ public class ReservationController {
     }
 
     //    Delete a reservation record
-    @DeleteMapping("/reservations/{id}")
+    @PreAuthorize("#username == authentication.name or hasAuthority('ADMIN')")
+    @DeleteMapping("/reservations/{username}/{id}")
     @ResponseBody
-    public ResponseEntity<?> deleteReservation(@PathVariable(value = "id") Long reservationID) throws ReservationNotFoundException {
+    public ResponseEntity<?> deleteReservation(@PathVariable(value = "username") String username, @PathVariable(value = "id") Long reservationID)
+            throws ReservationNotFoundException {
         Reservation reservation = reservationRepository.findById(reservationID)
                 .orElseThrow(() -> new ReservationNotFoundException(reservationID));
 
@@ -85,8 +99,9 @@ public class ReservationController {
         return ResponseEntity.ok().build();
     }
 
-    @GetMapping("/getUserReservations")
-    public String getUserReservations(Model model, HttpServletRequest req) throws ReservationNotFoundException {
+    @PreAuthorize("#username == authentication.name or hasAuthority('ADMIN')")
+    @GetMapping("/getUserReservations/{username}")
+    public String getUserReservations(@PathVariable(value = "username") String username, Model model, HttpServletRequest req) throws ReservationNotFoundException {
         User user = null;
 
         Principal userDetails = req.getUserPrincipal();
@@ -163,8 +178,10 @@ public class ReservationController {
 
     }
 
-    @GetMapping("/reservations/cancel/{id}")
-    public void cancelReservation(@PathVariable(value = "id") Long flightID, Model model, HttpServletResponse response, HttpServletRequest req) throws ReservationNotFoundException, IOException {
+    @PreAuthorize("#username == authentication.name or hasAuthority('ADMIN')")
+    @GetMapping("/reservations/cancel/{username}/{id}")
+    public void cancelReservation(@PathVariable(value = "username") String username, @PathVariable(value = "id") Long flightID,
+                                  Model model, HttpServletResponse response, HttpServletRequest req) throws ReservationNotFoundException, IOException {
         User user = null;
 
         Principal userDetails = req.getUserPrincipal();
