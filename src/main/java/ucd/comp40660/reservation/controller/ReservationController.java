@@ -107,14 +107,14 @@ public class ReservationController {
         Principal userDetails = req.getUserPrincipal();
         if (userDetails != null) {
             user = userRepository.findByUsername(username);
-            model.addAttribute("user", user);
+//            model.addAttribute("user", user);
         }
 
         if (user != null) {
 //            User user = userSession.getUser();
 
             // backend log messages
-            log.info(String.format("UserSession user info: " + user.toString()));
+            log.info(String.format("UserSession user info: " + user.toString() + "\n"));
 
 
             // add current user to the model
@@ -166,7 +166,7 @@ public class ReservationController {
             } else { // throw an error if there are no reservations
                 model.addAttribute("error", "No reservations found");
             }
-            model.addAttribute("user", userRepository.findByUsername(userDetails.getName()));
+            model.addAttribute("user", userRepository.findByUsername(username));
             return "viewFlightsUser.html";
 
         }
@@ -185,20 +185,22 @@ public class ReservationController {
         User user = null;
 
         Principal userDetails = req.getUserPrincipal();
-        if (userDetails != null) {
-            user = userRepository.findByUsername(userDetails.getName());
-            model.addAttribute("user", user);
-        }
+//        if (userDetails != null) {
+//            user = userRepository.findByUsername(username);
+//            model.addAttribute("user", user);
+//        }
+        user = userRepository.findByUsername(username);
 
         Flight flight = flightRepository.findFlightByFlightID(flightID);
+
 //        User user = userSession.getUser();
         Reservation reservation = reservationRepository.findByUserAndFlight(user, flight);
         reservation.setCancelled(true);
         reservationRepository.saveAndFlush(reservation);
         userRepository.saveAndFlush(user);
         flightRepository.saveAndFlush(flight);
-        model.addAttribute("user", user);
-        response.sendRedirect("/getUserReservations");
+        model.addAttribute("user", userRepository.findByUsername(userDetails.getName()));
+        response.sendRedirect("/getUserReservations/" + username);
     }
 
     @PostMapping("/getGuestReservations")

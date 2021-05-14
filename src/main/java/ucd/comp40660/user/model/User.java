@@ -98,6 +98,10 @@ public class User {
         this.passwordConfirm = passwordConfirm;
     }
 
+    public String getUsername(){
+        return this.username;
+    }
+
     public User() {
         super();
     }
