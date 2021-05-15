@@ -68,10 +68,20 @@ public class UserController {
     }
 
     //    Get all registrations
+    @PreAuthorize("hasAuthority('ADMIN')")
     @GetMapping("/users")
-    @ResponseBody
-    public List<User> getAllUsers() {
-        return userRepository.findAll();
+    public String getAllUsers(Model model, HttpServletRequest req) {
+        Principal userDetails = req.getUserPrincipal();
+        if (userDetails != null) {
+            User user = userRepository.findByUsername(userDetails.getName());
+            model.addAttribute("user", user);
+        }
+
+
+        List<User> users = userRepository.findAll();
+        model.addAttribute("users", users);
+
+        return "adminViewUsers.html";
     }
 
     //    Get a single registration by id
