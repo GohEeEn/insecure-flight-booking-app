@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<html lang="en" xmlns:th="http://www.thymeleaf.org" xmlns="http://www.w3.org/1999/html">
     <head>
         <title>Registration</title>
         
@@ -33,7 +33,11 @@
                 <div class="form-group">
                     <label for="password">Password</label>
                     <input id="password" class="form-control" type="password" name="password" placeholder="Password" onkeyup="CheckPasswordStrength(this.value);" required/>
-                    <span id="password_strength"></span>
+                </div>
+
+                <div class="custom-control custom-checkbox mb-3">
+                    <input type="checkbox" onclick="showPassword()" class="custom-control-input" id="viewPwd">
+                    <label class="custom-control-label" for="viewPwd">Show <span id="password_strength"></span> Password</label>
                 </div>
 
                 <div class="form-group">
