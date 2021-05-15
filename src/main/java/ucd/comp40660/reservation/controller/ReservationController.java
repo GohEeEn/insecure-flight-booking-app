@@ -103,23 +103,21 @@ public class ReservationController {
     @GetMapping("/getUserReservations/{username}")
     public String getUserReservations(@PathVariable(value = "username") String username, Model model, HttpServletRequest req) throws ReservationNotFoundException {
         User user = null;
+        User sessionUser = null;
 
         Principal userDetails = req.getUserPrincipal();
         if (userDetails != null) {
-            user = userRepository.findByUsername(username);
-//            model.addAttribute("user", user);
+            sessionUser = userRepository.findByUsername(userDetails.getName());
+//          model.addAttribute("user", user);
         }
+
+        user = userRepository.findByUsername(username);
 
         if (user != null) {
 //            User user = userSession.getUser();
 
             // backend log messages
             log.info(String.format("UserSession user info: " + user.toString() + "\n"));
-
-
-            // add current user to the model
-//            model.addAttribute("user", user);
-
 
             // find all reservations associated with a user
             List<Reservation> reservations = reservationRepository.findAllByUserAndCancelledIsFalse(user);
@@ -166,7 +164,8 @@ public class ReservationController {
             } else { // throw an error if there are no reservations
                 model.addAttribute("error", "No reservations found");
             }
-            model.addAttribute("user", userRepository.findByUsername(username));
+            model.addAttribute("user", user);
+            model.addAttribute("sessionUser", sessionUser);
             return "viewFlightsUser.html";
 
         }

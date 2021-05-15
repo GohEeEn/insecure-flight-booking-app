@@ -102,6 +102,10 @@ public class User {
         return this.username;
     }
 
+    public List<CreditCard> getCredit_cards(){
+        return this.credit_cards;
+    }
+
     public User() {
         super();
     }

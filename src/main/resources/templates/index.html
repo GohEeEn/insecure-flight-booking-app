@@ -14,7 +14,7 @@
 <div class="container">
 	<div class="row">
 		<div class="col-8">
-			<div class="row pl-3" th:if="${user == null}">
+			<div class="row pl-3" th:if="${sessionUser == null}">
 				<form class="form-inline" action="/getGuestReservations" method="post">
 					<div class="form-group mb-2">
 						<label>Retrieve Reservation</label>
@@ -57,59 +57,121 @@
 
 		<div class="col-4">
 			<h4>Choose Flights</h4>
-			<form action="/processFlightSearch" method="post" >
+			<div th:each="entry: ${sessionUser.getRoles()}">
+				<div th:if="${entry.name} == 'MEMBER'">
+					<form action="/processFlightSearch" method="post" >
 
-				<div class="form-group">
-					<label for="from">From</label>
-					<select class="form-control" id="from" name="departure" required>
-						<option value="">Departure City</option>
-						<option value="Sofia, Bulgaria">Sofia, Bulgaria</option>
-						<option value="Dublin, Ireland">Dublin, Ireland</option>
-						<option value="Stockholm, Sweden">Stockholm, Sweden</option>
-						<option value="Oslo, Norway">Oslo, Norway</option>
-						<option value="Rio de Janeiro, Brazil">Rio de Janeiro, Brazil</option>
-						<option value="Manila, Philippines">Manila, Philippines</option>
-						<option value="Seoul, South Korea">Seoul, South Korea</option>
-						<option value="Tokyo, Japan">Tokyo, Japan</option>
-						<option value="Bucharest, Romania">Bucharest, Romania</option>
-						<option value="Pyongyang, North Korea">Pyongyang, North Korea</option>
-					</select>
+						<div class="form-group">
+							<label for="from">From</label>
+							<select class="form-control" id="from" name="departure" required>
+								<option value="">Departure City</option>
+								<option value="Sofia, Bulgaria">Sofia, Bulgaria</option>
+								<option value="Dublin, Ireland">Dublin, Ireland</option>
+								<option value="Stockholm, Sweden">Stockholm, Sweden</option>
+								<option value="Oslo, Norway">Oslo, Norway</option>
+								<option value="Rio de Janeiro, Brazil">Rio de Janeiro, Brazil</option>
+								<option value="Manila, Philippines">Manila, Philippines</option>
+								<option value="Seoul, South Korea">Seoul, South Korea</option>
+								<option value="Tokyo, Japan">Tokyo, Japan</option>
+								<option value="Bucharest, Romania">Bucharest, Romania</option>
+								<option value="Pyongyang, North Korea">Pyongyang, North Korea</option>
+							</select>
+						</div>
+
+						<div class="form-group">
+							<label for="to">To</label>
+							<select class="form-control" id="to" name="destinationInput" required>
+								<option value="">Destination City</option>
+								<option value="Sofia, Bulgaria">Sofia, Bulgaria</option>
+								<option value="Dublin, Ireland">Dublin, Ireland</option>
+								<option value="Stockholm, Sweden">Stockholm, Sweden</option>
+								<option value="Oslo, Norway">Oslo, Norway</option>
+								<option value="Rio de Janeiro, Brazil">Rio de Janeiro, Brazil</option>
+								<option value="Manila, Philippines">Manila, Philippines</option>
+								<option value="Seoul, South Korea">Seoul, South Korea</option>
+								<option value="Tokyo, Japan">Tokyo, Japan</option>
+								<option value="Bucharest, Romania">Bucharest, Romania</option>
+								<option value="Pyongyang, North Korea">Pyongyang, North Korea</option>
+							</select>
+						</div>
+
+						<div class="form-group">
+							<label for="passengersNumber">Passengers</label>
+							<input id="passengersNumber" type="number" class="form-control"
+								   placeholder="Number of Travellers" name="passengers" min="1" max="10" required>
+						</div>
+
+						<div class="form-group">
+							<label for="outboundDate">Date</label>
+							<input class="form-control" type="date" id="outboundDate"
+								   name="outboundDate" min="2020-11-28" max="2021-12-31" required>
+						</div>
+
+						<button type="submit" class="btn btn-primary">Submit</button>
+					</form>
 				</div>
+				<div th:if="${entry.name} == 'ADMIN'">
+					<form action="/adminProcessFlightSearch" method="post" >
 
-				<div class="form-group">
-					<label for="to">To</label>
-					<select class="form-control" id="to" name="destinationInput" required>
-						<option value="">Destination City</option>
-						<option value="Sofia, Bulgaria">Sofia, Bulgaria</option>
-						<option value="Dublin, Ireland">Dublin, Ireland</option>
-						<option value="Stockholm, Sweden">Stockholm, Sweden</option>
-						<option value="Oslo, Norway">Oslo, Norway</option>
-						<option value="Rio de Janeiro, Brazil">Rio de Janeiro, Brazil</option>
-						<option value="Manila, Philippines">Manila, Philippines</option>
-						<option value="Seoul, South Korea">Seoul, South Korea</option>
-						<option value="Tokyo, Japan">Tokyo, Japan</option>
-						<option value="Bucharest, Romania">Bucharest, Romania</option>
-						<option value="Pyongyang, North Korea">Pyongyang, North Korea</option>
-					</select>
+						<div class="form-group">
+							<label for="from">From</label>
+							<select class="form-control" id="from" name="departure" required>
+								<option value="">Departure City</option>
+								<option value="Sofia, Bulgaria">Sofia, Bulgaria</option>
+								<option value="Dublin, Ireland">Dublin, Ireland</option>
+								<option value="Stockholm, Sweden">Stockholm, Sweden</option>
+								<option value="Oslo, Norway">Oslo, Norway</option>
+								<option value="Rio de Janeiro, Brazil">Rio de Janeiro, Brazil</option>
+								<option value="Manila, Philippines">Manila, Philippines</option>
+								<option value="Seoul, South Korea">Seoul, South Korea</option>
+								<option value="Tokyo, Japan">Tokyo, Japan</option>
+								<option value="Bucharest, Romania">Bucharest, Romania</option>
+								<option value="Pyongyang, North Korea">Pyongyang, North Korea</option>
+							</select>
+						</div>
+
+						<div class="form-group">
+							<label for="to">To</label>
+							<select class="form-control" id="to" name="destinationInput" required>
+								<option value="">Destination City</option>
+								<option value="Sofia, Bulgaria">Sofia, Bulgaria</option>
+								<option value="Dublin, Ireland">Dublin, Ireland</option>
+								<option value="Stockholm, Sweden">Stockholm, Sweden</option>
+								<option value="Oslo, Norway">Oslo, Norway</option>
+								<option value="Rio de Janeiro, Brazil">Rio de Janeiro, Brazil</option>
+								<option value="Manila, Philippines">Manila, Philippines</option>
+								<option value="Seoul, South Korea">Seoul, South Korea</option>
+								<option value="Tokyo, Japan">Tokyo, Japan</option>
+								<option value="Bucharest, Romania">Bucharest, Romania</option>
+								<option value="Pyongyang, North Korea">Pyongyang, North Korea</option>
+							</select>
+						</div>
+
+						<div class="form-group">
+							<label for="passengersNumber">Passengers</label>
+							<input id="passengersNumber" type="number" class="form-control"
+								   placeholder="Number of Travellers" name="passengers" min="1" max="10" required>
+						</div>
+
+						<div class="form-group">
+							<label for="outboundDate">Date</label>
+							<input class="form-control" type="date" id="outboundDate"
+								   name="outboundDate" min="2020-11-28" max="2021-12-31" required>
+						</div>
+
+						<div class="form-group">
+							<label for="username">Username of Bookee</label>
+							<input type="text" name="username"
+								   id="username" class="form-control"
+							required>
+						</div>
+
+						<button type="submit" class="btn btn-primary">Submit</button>
+					</form>
+
 				</div>
-
-				<div class="form-group">
-					<label for="passengersNumber">Passengers</label>
-					<input id="passengersNumber" type="number" class="form-control"
-						   placeholder="Number of Travellers" name="passengers" min="1" max="10" required>
-				</div>
-
-				<div class="form-group">
-					<label for="outboundDate">Date</label>
-					<input class="form-control" type="date" id="outboundDate"
-						   name="outboundDate" min="2020-11-28" max="2021-12-31" required>
-				</div>
-
-				<button type="submit" class="btn btn-primary">Submit</button>
-			</form>
+			</div>
 		</div>
-	</div>
-</div>
 
 <div th:replace="fragments/footer :: footer"></div>
 

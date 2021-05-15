@@ -3,6 +3,7 @@ package ucd.comp40660.flight.controller;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
@@ -135,9 +136,44 @@ public class FlightController {
         response.sendRedirect("/flightSearchResults");
     }
 
+    @PreAuthorize("hasAuthority('ADMIN')")
+    @PostMapping("/adminProcessFlightSearch")
+    public void adminProcessFlightSearch(String departure, String destinationInput, int passengers, String outboundDate, String username,
+                                    Model model, HttpServletResponse response, HttpServletRequest req) throws IOException {
+        User sessionUser = null;
+
+        Principal userDetails = req.getUserPrincipal();
+        if (userDetails != null) {
+            sessionUser = userRepository.findByUsername(userDetails.getName());
+            model.addAttribute("sessionUser", sessionUser);
+        }
+
+
+        numberOfPassengers = passengers;
+        flightSearch.setDeparture(departure);
+        flightSearch.setDestinationInput(destinationInput);
+        flightSearch.setPassengers(passengers);
+        flightSearch.setOutboundDate(outboundDate);
+
+        userSession.setUser(userRepository.findByUsername(username));
+        model.addAttribute("user", userRepository.findByUsername(username));
+
+        response.sendRedirect("/flightSearchResults");
+    }
+
+
     @GetMapping("/flightSearchResults")
-    public String flightSearchResults(Model model) {
+    public String flightSearchResults(Model model, HttpServletRequest req) {
         List<Flight> flightList = flightCheck();
+
+        User sessionUser = null;
+
+        Principal userDetails = req.getUserPrincipal();
+        if (userDetails != null) {
+            sessionUser = userRepository.findByUsername(userDetails.getName());
+            model.addAttribute("sessionUser", sessionUser);
+        }
+
 
         model.addAttribute("displayedFlights", flightList);
         model.addAttribute("user", userSession.getUser());
@@ -146,7 +182,17 @@ public class FlightController {
     }
 
     @PostMapping("/selectFlight")
-    public void selectFlight(String flightIndexSelected, Model model, HttpServletResponse response) throws IOException {
+    public void selectFlight(String flightIndexSelected, Model model, HttpServletResponse response, HttpServletRequest req) throws IOException {
+
+        User sessionUser = null;
+        User user = userSession.getUser();
+
+        Principal userDetails = req.getUserPrincipal();
+        if (userDetails != null) {
+            sessionUser = userRepository.findByUsername(userDetails.getName());
+            model.addAttribute("sessionUser", sessionUser);
+        }
+
         boolean isNumber = flightIndexSelected.chars().allMatch(Character::isDigit);
         if (!isNumber) {
             PrintWriter out = response.getWriter();
@@ -173,25 +219,31 @@ public class FlightController {
                         temporaryFlightReference = aFlight.getFlightID();
                     }
                 }
-                model.addAttribute("user", userSession.getUser());
+                model.addAttribute("user", user);
 
                 response.sendRedirect("/displayBookingPage");
             }
         }
     }
 
+
+
     @GetMapping("/displayBookingPage")
     public String guestBooking(Model model, HttpServletRequest req) {
 
-        User user = null;
+        User sessionUser = null;
 
         Principal userDetails = req.getUserPrincipal();
         if (userDetails != null) {
-            user = userRepository.findByUsername(userDetails.getName());
-            model.addAttribute("user", user);
+            sessionUser = userRepository.findByUsername(userDetails.getName());
+            model.addAttribute("sessionUser", sessionUser);
         }
 
 //        model.addAttribute("user", userSession.getUser());
+
+        User user = userSession.getUser();
+        model.addAttribute("user", user);
+
 
         if (numberOfPassengers > 1) {
             return "passengerDetails.html";
@@ -199,6 +251,7 @@ public class FlightController {
             return "bookingDetails.html";
         } else {
             model.addAttribute("cards", user.getCredit_cards());
+            System.out.println("CCs: " + user.getCredit_cards().toString());
             return "displayPaymentPage.html";
         }
     }
@@ -274,13 +327,16 @@ public class FlightController {
     @PostMapping("/processMemberPayment")
     public String processMemberPayment(Model model, CreditCard card, HttpServletRequest req) {
 
+        User sessionUser = null;
         User user = null;
 
         Principal userDetails = req.getUserPrincipal();
         if (userDetails != null) {
-            user = userRepository.findByUsername(userDetails.getName());
-            model.addAttribute("user", user);
+            sessionUser = userRepository.findByUsername(userDetails.getName());
+            model.addAttribute("sessionUser", sessionUser);
         }
+
+        user = userSession.getUser();
 
 //      User user = userSession.getUser();
       Reservation reservation = new Reservation();
