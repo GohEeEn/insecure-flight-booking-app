@@ -17,7 +17,7 @@ import org.springframework.ui.Model;
 
 
 @Controller
-public class AuthenticationController{
+public class AuthenticationController {
 
     @Autowired
     private UserSession userSession;
@@ -26,11 +26,11 @@ public class AuthenticationController{
     private UserRepository userRepository;
 
     @GetMapping("/login")
-    public String login(Model model){
-        if(userSession.isLoginFailed()){
-            model.addAttribute("error", "Username and Password combination incorrect.");
-            userSession.setLoginFailed(false);
-        }
+    public String login(Model model) {
+//        if(userSession.isLoginFailed()){
+//            model.addAttribute("error", "Username and Password combination incorrect.");
+//            userSession.setLoginFailed(false);
+//        }
         return "login.html";
     }
 
@@ -41,16 +41,18 @@ public class AuthenticationController{
     }
 
     @PostMapping("/login")
-    public void doLogin(String username, String password, HttpServletResponse response) throws Exception{
-        Optional<User> user = Optional.ofNullable(userRepository.findAllByUsernameAndPassword(username, password));
-        if(user.isPresent()){
-            userSession.setUser(user.get());
-            response.sendRedirect("/");
-        }
-        else {
-            userSession.setLoginFailed(true);
-            response.sendRedirect("/login");
-        }
-    }
+    public String doLogin(String username, String password, HttpServletResponse response) throws Exception {
+//        Optional<User> user = Optional.ofNullable(userRepository.findAllByUsernameAndPassword(username, password));
+//        if(user.isPresent()){
+//            userSession.setUser(user.get());
+//            response.sendRedirect("/");
+//        }
+//        else {
+//            userSession.setLoginFailed(true);
+//            response.sendRedirect("/login");
+//        }
+//    }
+        return "index.html";
 
+    }
 }

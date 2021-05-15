@@ -69,7 +69,7 @@ public class JWTAuthenticationFilter  extends UsernamePasswordAuthenticationFilt
 
         addCookie(token, response);
 
-        //new DefaultRedirectStrategy().sendRedirect(request, response, "/");
+        new DefaultRedirectStrategy().sendRedirect(request, response, "/");
 
         //authenticationSuccessHandler.onAuthenticationSuccess(request, response, getAuthentication(token));
         //getAuthentication(token).
