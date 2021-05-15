@@ -1,34 +1,25 @@
 package ucd.comp40660.user.controller;
 
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
-import ucd.comp40660.flight.model.Flight;
+import org.springframework.web.bind.annotation.*;
 import ucd.comp40660.flight.repository.FlightRepository;
-import ucd.comp40660.reservation.exception.ReservationNotFoundException;
-import ucd.comp40660.reservation.model.Reservation;
 import ucd.comp40660.reservation.repository.ReservationRepository;
 import ucd.comp40660.service.UserService;
 import ucd.comp40660.user.UserSession;
-import org.springframework.stereotype.Controller;
-import ucd.comp40660.user.exception.CreditCardNotFoundException;
 import ucd.comp40660.user.exception.UserNotFoundException;
-import ucd.comp40660.user.model.CreditCard;
 import ucd.comp40660.user.model.User;
 import ucd.comp40660.user.repository.CreditCardRepository;
 import ucd.comp40660.user.repository.UserRepository;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.*;
-import org.springframework.ui.Model;
-import org.springframework.security.access.prepost.PreAuthorize;
 import ucd.comp40660.validator.UserValidator;
-
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
-import java.io.IOException;
 import java.security.Principal;
-import java.sql.SQLIntegrityConstraintViolationException;
-import java.util.ArrayList;
 import java.util.List;
 
 
@@ -135,7 +126,7 @@ public class UserController {
         userValidator.validate(userForm, bindingResult);
 
         if(bindingResult.hasErrors()){
-            model.addAttribute("error", bindingResult.getAllErrors().toString());
+            model.addAttribute("error", bindingResult.getAllErrors().toString()); // TODO
             return "register.html";
         }
 
@@ -161,7 +152,7 @@ public class UserController {
         userValidator.validate(userForm, bindingResult);
 
         if(bindingResult.hasErrors()){
-            model.addAttribute("error", bindingResult.getAllErrors().toString());
+            model.addAttribute("error", bindingResult.getAllErrors().toString()); // TODO
             return "adminRegister.html";
         }
 
@@ -257,7 +248,16 @@ public class UserController {
                 user.setPhone(user.getPhone());
             }
             if (!(newUsername.isEmpty())) {
-                user.setUsername(newUsername);
+
+                if(!user.getUsername().equals(newUsername) && userService.findByUsername(newUsername) == null)
+                    user.setUsername(newUsername);
+                else {
+                    System.out.println("\n\nINVALID USERNAME <" + newUsername + "> \n\n");
+                    model.addAttribute("user", userSession.getUser());
+                    model.addAttribute("error", "\nInvalid Username, alterations denied.");
+                    return "editProfile.html";
+                }
+
             } else {
                 user.setUsername(user.getUsername());
             }
@@ -282,28 +282,30 @@ public class UserController {
         return "editPassword.html";
     }
 
-
     @PostMapping("/editPassword")
-    public String editPassword(String password, String newPassword, String newPasswordDuplicate, HttpServletResponse response, Model model)
-            throws Exception {
+    public String editPassword(String password, String newPassword, String newPasswordDuplicate, Model model, BindingResult bindingResult) {
 
         User user = userSession.getUser();
 
+        // Check if the given password matches the current password
         if (password.equals(user.getPassword())) {
 
-            if (newPassword.equals(newPasswordDuplicate) && (!(newPassword.isEmpty()))) {
-                user.setPassword(newPassword);
+            userValidator.validatePassword(newPassword, bindingResult);
+
+            if(bindingResult.hasErrors()) {
+                model.addAttribute("error", "\nInsufficient Password Strength, update denied.");
             } else {
-                model.addAttribute("error", "\nNew Password entries do not match, update denied.");
-                model.addAttribute("user", userSession.getUser());
+                if (newPassword.equals(newPasswordDuplicate) && (!(newPassword.isEmpty()))) {
+                    user.setPassword(newPassword);
+                    userRepository.save(user);
+                    model.addAttribute("user", userSession.getUser());
+                    return "viewProfile.html";
 
-                return "editPassword.html";
+                } else {
+                    model.addAttribute("error", "\nNew Password entries do not match, update denied.");
+                    model.addAttribute("user", userSession.getUser());
+                }
             }
-
-            userRepository.save(user);
-            model.addAttribute("user", userSession.getUser());
-
-            return "viewProfile.html";
 
         } else {
             System.out.println("\n\nPASSWORD FOUND TO BE INCORRECT\n\n");

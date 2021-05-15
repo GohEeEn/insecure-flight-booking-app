@@ -69,7 +69,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter{
 //                .requiresChannel().anyRequest().requiresSecure()  // Require HTTPS Requests
 //                .and()
                 .authorizeRequests()
-                .antMatchers("/error","/resources/**", "/login","/register", "/forgotpassword", "/confirm-reset","/").permitAll()
+                .antMatchers("/error","/resources/**","/css/**","/js/**", "/login","/register","/").permitAll()
                 .antMatchers("/user").access("hasAnyAuthority('ADMIN','USER')")
                 .antMatchers("/admin", "/adminRegister").access("hasAuthority('ADMIN')")
                 .anyRequest().authenticated()   // Authenticate all requests, with exception URL regexes mentioned above

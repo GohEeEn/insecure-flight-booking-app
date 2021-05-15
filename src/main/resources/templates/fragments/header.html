@@ -5,7 +5,7 @@
     <div th:fragment="header-data">
 
         <meta charset="utf-8">
-        <meta name="viewport" content="width = device-width, intial-scale = 1">
+        <meta name="viewport" content="width = device-width, initial-scale = 1">
 
         <!-- Bootstrap Stylesheet -->
         <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css"
@@ -16,7 +16,7 @@
         <link href="https://stackpath.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css" rel="stylesheet">
 
         <!-- Self-defined Stylesheet -->
-        <link rel="stylesheet" th:href="@{/css/common.css}" href="../../static/css/common.css"/>
+        <link rel="stylesheet" th:href="@{/css/common.css}"/>
 
         <!-- JavaScript Libraries Import -->
         <script type="text/javascript" src="https://code.jquery.com/jquery-3.4.1.slim.min.js"
@@ -28,6 +28,8 @@
         <script type="text/javascript" src="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/js/bootstrap.min.js"
                 integrity="sha384-wfSDF2E50Y2D1uUdj0O3uMBJnjuUD4Ih7YwaYd1iqfktj0Uod8GCExl3Og8ifwB6"
                 crossorigin="anonymous"></script>
+
+        <script type="text/javascript" th:src="@{/js/password_validation.js}"></script>
     </div>
 </head>
 
