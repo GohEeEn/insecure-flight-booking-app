@@ -56,6 +56,7 @@ public class UserController {
     @Autowired
     UserService userService;
 
+
     @GetMapping("/")
     public String index(Model model, HttpServletRequest req) {
         Principal userDetails = req.getUserPrincipal();

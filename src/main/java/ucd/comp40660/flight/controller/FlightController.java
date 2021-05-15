@@ -15,10 +15,7 @@ import ucd.comp40660.reservation.model.Reservation;
 import ucd.comp40660.reservation.repository.ReservationRepository;
 import ucd.comp40660.service.UserService;
 import ucd.comp40660.user.UserSession;
-import ucd.comp40660.user.model.CreditCard;
-import ucd.comp40660.user.model.Guest;
-import ucd.comp40660.user.model.Passenger;
-import ucd.comp40660.user.model.User;
+import ucd.comp40660.user.model.*;
 import ucd.comp40660.user.repository.CreditCardRepository;
 import ucd.comp40660.user.repository.GuestRepository;
 import ucd.comp40660.user.repository.PassengerRepository;
@@ -32,6 +29,7 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.security.Principal;
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 
 
@@ -124,14 +122,23 @@ public class FlightController {
     @PostMapping("/processFlightSearch")
 
     public void processFlightSearch(String departure, String destinationInput, int passengers, String outboundDate,
-                                    Model model, HttpServletResponse response) throws IOException {
+                                    Model model, HttpServletResponse response, HttpServletRequest req) throws IOException {
+
+        User sessionUser = null;
+
+        Principal userDetails = req.getUserPrincipal();
+        if (userDetails != null) {
+            sessionUser = userRepository.findByUsername(userDetails.getName());
+            model.addAttribute("sessionUser", sessionUser);
+        }
+
 
         numberOfPassengers = passengers;
         flightSearch.setDeparture(departure);
         flightSearch.setDestinationInput(destinationInput);
         flightSearch.setPassengers(passengers);
         flightSearch.setOutboundDate(outboundDate);
-        model.addAttribute("user", userSession.getUser());
+        model.addAttribute("user", sessionUser);
 
         response.sendRedirect("/flightSearchResults");
     }
@@ -176,22 +183,41 @@ public class FlightController {
 
 
         model.addAttribute("displayedFlights", flightList);
-        model.addAttribute("user", userSession.getUser());
+
+        //Determine if booking as a Member/Guest, or as an admin.
+        User user = null;
+        if(isAdmin(sessionUser)){
+            user = userSession.getUser();
+        }
+        else{
+            user = sessionUser;
+        }
+        model.addAttribute("user", user);
 
         return "flightResults.html";
     }
+
 
     @PostMapping("/selectFlight")
     public void selectFlight(String flightIndexSelected, Model model, HttpServletResponse response, HttpServletRequest req) throws IOException {
 
         User sessionUser = null;
-        User user = userSession.getUser();
 
         Principal userDetails = req.getUserPrincipal();
         if (userDetails != null) {
             sessionUser = userRepository.findByUsername(userDetails.getName());
             model.addAttribute("sessionUser", sessionUser);
         }
+
+        User user = null;
+        if(isAdmin(sessionUser)){
+            user = userSession.getUser();
+        }
+        else{
+            user = sessionUser;
+        }
+        model.addAttribute("user", user);
+
 
         boolean isNumber = flightIndexSelected.chars().allMatch(Character::isDigit);
         if (!isNumber) {
@@ -219,7 +245,7 @@ public class FlightController {
                         temporaryFlightReference = aFlight.getFlightID();
                     }
                 }
-                model.addAttribute("user", user);
+//                model.addAttribute("user", user);
 
                 response.sendRedirect("/displayBookingPage");
             }
@@ -239,10 +265,17 @@ public class FlightController {
             model.addAttribute("sessionUser", sessionUser);
         }
 
-//        model.addAttribute("user", userSession.getUser());
-
-        User user = userSession.getUser();
+        User user = null;
+        if(isAdmin(sessionUser)){
+            user = userSession.getUser();
+        }
+        else{
+            user = sessionUser;
+        }
         model.addAttribute("user", user);
+
+
+//        model.addAttribute("user", userSession.getUser());
 
 
         if (numberOfPassengers > 1) {
@@ -251,7 +284,6 @@ public class FlightController {
             return "bookingDetails.html";
         } else {
             model.addAttribute("cards", user.getCredit_cards());
-            System.out.println("CCs: " + user.getCredit_cards().toString());
             return "displayPaymentPage.html";
         }
     }
@@ -328,7 +360,6 @@ public class FlightController {
     public String processMemberPayment(Model model, CreditCard card, HttpServletRequest req) {
 
         User sessionUser = null;
-        User user = null;
 
         Principal userDetails = req.getUserPrincipal();
         if (userDetails != null) {
@@ -336,7 +367,14 @@ public class FlightController {
             model.addAttribute("sessionUser", sessionUser);
         }
 
-        user = userSession.getUser();
+        User user = null;
+        if(isAdmin(sessionUser)){
+            user = userSession.getUser();
+        }
+        else{
+            user = sessionUser;
+        }
+        model.addAttribute("user", user);
 
 //      User user = userSession.getUser();
       Reservation reservation = new Reservation();
@@ -466,4 +504,16 @@ public class FlightController {
 
         return "viewFlightsGuest.html";
     }
+
+    private boolean isAdmin(User sessionUser) {
+        boolean isAdmin = false;
+        Iterator<Role> roleIterator = sessionUser.getRoles().iterator();
+        while(roleIterator.hasNext()){
+            if(roleIterator.next().getName().equals("ADMIN")){
+                isAdmin = true;
+            }
+        }
+        return isAdmin;
+    }
+
 }
