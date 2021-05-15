@@ -1,4 +1,5 @@
 package ucd.comp40660.user.controller;
+import org.springframework.security.access.prepost.PreAuthorize;
 import ucd.comp40660.user.UserSession;
 import org.springframework.stereotype.Controller;
 import ucd.comp40660.user.exception.CreditCardNotFoundException;
@@ -70,19 +71,18 @@ public class CardController {
         newCard = creditCardRepository.saveAndFlush(newCard);
         return "viewProfile.html";
     }
-
-    @GetMapping("/viewMemberCreditCards")
-    public String viewMemberCreditCards(Model model, HttpServletRequest req){
-        User user = null;
+    @PreAuthorize("#username == authentication.name")
+    @GetMapping("/viewCreditCards/{username}")
+    public String viewMemberCreditCards(@PathVariable(value = "username") String username, Model model, HttpServletRequest req){
+        User sessionUser = null;
 
         Principal userDetails = req.getUserPrincipal();
         if (userDetails != null) {
-            user = userRepository.findByUsername(userDetails.getName());
-            model.addAttribute("user", user);
+            sessionUser = userRepository.findByUsername(userDetails.getName());
+            model.addAttribute("sessionUser", sessionUser);
         }
 
-        model.addAttribute("user", user);
-        model.addAttribute("cards", creditCardRepository.findAllByUser(user));
+        model.addAttribute("cards", creditCardRepository.findAllByUser(sessionUser));
         return "viewCreditCards.html";
     }
 

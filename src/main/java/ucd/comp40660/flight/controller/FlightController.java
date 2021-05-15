@@ -289,7 +289,8 @@ public class FlightController {
     }
 
     @PostMapping("/processOtherPassengerDetails")
-    public void processOtherPassengerDetails(String name, String surname, String email, String phoneNumber, String address, HttpServletResponse response) throws IOException {
+    public void processOtherPassengerDetails(String name, String surname, String email, String phoneNumber, String address,
+                                             HttpServletResponse response, HttpServletRequest req) throws IOException {
 
         Passenger passenger = new Passenger();
 
@@ -299,7 +300,24 @@ public class FlightController {
         passenger.setAddress(address);
         passenger.setEmail(email);
 
-        User user = userSession.getUser();
+        User sessionUser = null;
+
+        Principal userDetails = req.getUserPrincipal();
+        if (userDetails != null) {
+            sessionUser = userRepository.findByUsername(userDetails.getName());
+//            model.addAttribute("sessionUser", sessionUser);
+        }
+
+        User user = null;
+        if(isAdmin(sessionUser)){
+            user = userSession.getUser();
+        }
+        else{
+            user = sessionUser;
+        }
+
+
+//        User user = userSession.getUser();
 
         if (user == null) {
             guest.getPassengers().add(passenger);
@@ -367,6 +385,7 @@ public class FlightController {
             model.addAttribute("sessionUser", sessionUser);
         }
 
+        //Determine if booking as admin
         User user = null;
         if(isAdmin(sessionUser)){
             user = userSession.getUser();
