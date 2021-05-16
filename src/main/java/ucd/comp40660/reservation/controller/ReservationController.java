@@ -4,6 +4,7 @@ package ucd.comp40660.reservation.controller;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
@@ -12,18 +13,22 @@ import ucd.comp40660.flight.repository.FlightRepository;
 import ucd.comp40660.reservation.exception.ReservationNotFoundException;
 import ucd.comp40660.reservation.model.Reservation;
 import ucd.comp40660.reservation.repository.ReservationRepository;
+import ucd.comp40660.service.UserService;
 import ucd.comp40660.user.UserSession;
 import ucd.comp40660.user.model.User;
 
+import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
 import java.io.IOException;
+import java.security.Principal;
 import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import lombok.extern.log4j.Log4j2;
 import ucd.comp40660.user.repository.UserRepository;
+import ucd.comp40660.validator.UserValidator;
 
 
 @Log4j2
@@ -43,6 +48,13 @@ public class ReservationController {
     @Autowired
     private UserSession userSession;
 
+    @Autowired
+    UserValidator userValidator;
+
+    @Autowired
+    UserService userService;
+
+
     //    Get all reservations
     @GetMapping("/reservations")
     @ResponseBody
@@ -59,9 +71,11 @@ public class ReservationController {
     }
 
     //    Update the details of a reservation record
-    @PutMapping("/reservations/{id}")
+    @PreAuthorize("#username == authentication.name or hasAuthority('ADMIN')")
+    @PutMapping("/reservations/{username}/{id}")
     @ResponseBody
-    public Reservation updateReservation(@PathVariable(value = "id") Long reservationID, @Valid @RequestBody Reservation reservationDetails) throws ReservationNotFoundException {
+    public Reservation updateReservation(@PathVariable(value = "username") String username, @PathVariable(value = "id") Long reservationID,
+                                         @Valid @RequestBody Reservation reservationDetails) throws ReservationNotFoundException {
         Reservation reservation = reservationRepository.findById(reservationID)
                 .orElseThrow(() -> new ReservationNotFoundException(reservationID));
 
@@ -72,9 +86,11 @@ public class ReservationController {
     }
 
     //    Delete a reservation record
-    @DeleteMapping("/reservations/{id}")
+    @PreAuthorize("#username == authentication.name or hasAuthority('ADMIN')")
+    @DeleteMapping("/reservations/{username}/{id}")
     @ResponseBody
-    public ResponseEntity<?> deleteReservation(@PathVariable(value = "id") Long reservationID) throws ReservationNotFoundException {
+    public ResponseEntity<?> deleteReservation(@PathVariable(value = "username") String username, @PathVariable(value = "id") Long reservationID)
+            throws ReservationNotFoundException {
         Reservation reservation = reservationRepository.findById(reservationID)
                 .orElseThrow(() -> new ReservationNotFoundException(reservationID));
 
@@ -83,18 +99,25 @@ public class ReservationController {
         return ResponseEntity.ok().build();
     }
 
-    @GetMapping("/getUserReservations")
-    public String getUserReservations(Model model) throws ReservationNotFoundException {
-        if (userSession.getUser() != null) {
-            User user = userSession.getUser();
+    @PreAuthorize("#username == authentication.name or hasAuthority('ADMIN')")
+    @GetMapping("/getUserReservations/{username}")
+    public String getUserReservations(@PathVariable(value = "username") String username, Model model, HttpServletRequest req) throws ReservationNotFoundException {
+        User user = null;
+        User sessionUser = null;
+
+        Principal userDetails = req.getUserPrincipal();
+        if (userDetails != null) {
+            sessionUser = userRepository.findByUsername(userDetails.getName());
+//          model.addAttribute("user", user);
+        }
+
+        user = userRepository.findByUsername(username);
+
+        if (user != null) {
+//            User user = userSession.getUser();
 
             // backend log messages
-            log.info(String.format("UserSession user info: " + user.toString()));
-
-
-            // add current user to the model
-            model.addAttribute("user", user);
-
+            log.info(String.format("UserSession user info: " + user.toString() + "\n"));
 
             // find all reservations associated with a user
             List<Reservation> reservations = reservationRepository.findAllByUserAndCancelledIsFalse(user);
@@ -142,6 +165,7 @@ public class ReservationController {
                 model.addAttribute("error", "No reservations found");
             }
             model.addAttribute("user", user);
+            model.addAttribute("sessionUser", sessionUser);
             return "viewFlightsUser.html";
 
         }
@@ -153,17 +177,29 @@ public class ReservationController {
 
     }
 
-    @GetMapping("/reservations/cancel/{id}")
-    public void cancelReservation(@PathVariable(value = "id") Long flightID, Model model, HttpServletResponse response) throws ReservationNotFoundException, IOException {
+    @PreAuthorize("#username == authentication.name or hasAuthority('ADMIN')")
+    @GetMapping("/reservations/cancel/{username}/{id}")
+    public void cancelReservation(@PathVariable(value = "username") String username, @PathVariable(value = "id") Long flightID,
+                                  Model model, HttpServletResponse response, HttpServletRequest req) throws ReservationNotFoundException, IOException {
+        User user = null;
+
+        Principal userDetails = req.getUserPrincipal();
+//        if (userDetails != null) {
+//            user = userRepository.findByUsername(username);
+//            model.addAttribute("user", user);
+//        }
+        user = userRepository.findByUsername(username);
+
         Flight flight = flightRepository.findFlightByFlightID(flightID);
-        User user = userSession.getUser();
+
+//        User user = userSession.getUser();
         Reservation reservation = reservationRepository.findByUserAndFlight(user, flight);
         reservation.setCancelled(true);
         reservationRepository.saveAndFlush(reservation);
         userRepository.saveAndFlush(user);
         flightRepository.saveAndFlush(flight);
-        model.addAttribute("user", user);
-        response.sendRedirect("/getUserReservations");
+        model.addAttribute("user", userRepository.findByUsername(userDetails.getName()));
+        response.sendRedirect("/getUserReservations/" + username);
     }
 
     @PostMapping("/getGuestReservations")

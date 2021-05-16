@@ -6,4 +6,9 @@ public class UserNotFoundException extends Exception {
     public UserNotFoundException(long registrationID) {
         super(String.format("Registration is not found with id '%s'", registrationID));
     }
+
+    public UserNotFoundException(String username){
+        super(String.format("Registration is not found with user name '%s'", username));
+
+    }
 }

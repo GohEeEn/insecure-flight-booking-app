@@ -12,7 +12,9 @@ import javax.validation.constraints.Email;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 @Entity
 @Table(name = "users", uniqueConstraints = {@UniqueConstraint(columnNames = {"username", "email", "phone"})})
@@ -29,8 +31,8 @@ public class User {
     @NotBlank(message = "Surname field must not be empty.")
     private String surname;
 
-    @NotBlank(message = "Role improperly initialised.")
-    private String role;
+//    @NotBlank(message = "Role improperly initialised.")
+//    private String role;
 
     @Column(unique = true)
     @NotBlank(message = "Username field must not be empty.")
@@ -51,6 +53,9 @@ public class User {
     @NotBlank(message = "Address field must not be empty.")
     private String address;
 
+    @Transient
+    private String passwordConfirm;
+
     @OneToMany(mappedBy = "user")
     @LazyCollection(LazyCollectionOption.FALSE)
     @JsonIgnore
@@ -68,16 +73,48 @@ public class User {
     @ToString.Exclude
     private List<Passenger> passengers = new ArrayList<>();
 
+    @ManyToMany(fetch = FetchType.EAGER)
+    @JsonIgnore
+    @ToString.Exclude
+    @JoinTable(name="user_roles",
+            joinColumns = @JoinColumn(name="user_id", referencedColumnName="registrationID"),
+            inverseJoinColumns = @JoinColumn(name="role_id", referencedColumnName="id")
+    )
+    private Set<Role> roles = new HashSet<>();
+
+    public Set<Role> getRoles() {
+        return this.roles;
+    }
+
+    public void setRoles(Set<Role> roles) {
+        this.roles = roles;
+    }
+
+    public String getPasswordConfirm() {
+        return passwordConfirm;
+    }
+
+    public void setPasswordConfirm(String passwordConfirm) {
+        this.passwordConfirm = passwordConfirm;
+    }
+
+    public String getUsername(){
+        return this.username;
+    }
+
+    public List<CreditCard> getCredit_cards(){
+        return this.credit_cards;
+    }
 
     public User() {
         super();
     }
 
-    public User(String name, String surname, String username, String role, String phone, String email, String address, String password, List<Reservation> reservations) {
+    public User(String name, String surname, String username, String phone, String email, String address, String password, List<Reservation> reservations) {
         this.name = name;
         this.surname = surname;
         this.username = username;
-        this.role = role;
+//        this.role = role;
         this.phone = phone;
         this.email = email;
         this.address = address;

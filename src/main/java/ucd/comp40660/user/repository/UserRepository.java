@@ -11,15 +11,17 @@ import java.util.Optional;
 @Repository
 public interface UserRepository extends JpaRepository<User, Long> {
 
-    Optional<User> findAllByUsernameAndPassword(String username, String password);
+    User findAllByUsernameAndPassword(String username, String password);
+//    List<User> findByUsername(String username);
+    User findByUsername(String username);
 
-    public List<User> findByUsername(String username);
+    User findByEmail(String email);
 
-    public boolean existsByUsername(String username);
+    boolean existsByUsername(String username);
 
-    public boolean existsByEmail(String email);
+    boolean existsByEmail(String email);
 
-    public boolean existsByPhone(String phone);
+    boolean existsByPhone(String phone);
 
 
 

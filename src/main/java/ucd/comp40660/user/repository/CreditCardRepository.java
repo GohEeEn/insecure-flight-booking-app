@@ -12,7 +12,7 @@ import java.util.Optional;
 @Repository
 public interface CreditCardRepository extends JpaRepository<CreditCard, Long> {
 
-    public List<CreditCard> findAllByUser(User user);
+    List<CreditCard> findAllByUser(User user);
 
 //    public CreditCard findOneByGuest(Guest guest);
 }
