@@ -1,7 +1,8 @@
 package ucd.comp40660.reservation.controller;
 
 
-import lombok.extern.log4j.Log4j2;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -26,15 +27,14 @@ import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
-import lombok.extern.log4j.Log4j2;
 import ucd.comp40660.user.repository.UserRepository;
 import ucd.comp40660.validator.UserValidator;
 
 
-@Log4j2
 @Controller
 public class ReservationController {
 
+    private static final Logger LOGGER = LoggerFactory.getLogger(ReservationController.class);
     @Autowired
     ReservationRepository reservationRepository;
 
@@ -117,7 +117,7 @@ public class ReservationController {
 //            User user = userSession.getUser();
 
             // backend log messages
-            log.info(String.format("UserSession user info: " + user.toString() + "\n"));
+            LOGGER.info(String.format("UserSession user info: " + user.toString() + "\n"));
 
             // find all reservations associated with a user
             List<Reservation> reservations = reservationRepository.findAllByUserAndCancelledIsFalse(user);
@@ -158,8 +158,8 @@ public class ReservationController {
                 model.addAttribute("past", past);
                 model.addAttribute("cancelled_flights", cancelled_flights);
                 model.addAttribute("upcoming_cancellable", upcoming_cancellable);
-                log.info("Added flights to front end as 'flightsUser'");
-                log.info("Cancelled Flights: " + cancelled_flights);
+                LOGGER.info("Added flights to front end as 'flightsUser'");
+                LOGGER.info("Cancelled Flights: " + cancelled_flights);
 
             } else { // throw an error if there are no reservations
                 model.addAttribute("error", "No reservations found");
@@ -207,8 +207,8 @@ public class ReservationController {
 
 //        backend log messages
         if (inputEmail != null && inputReservationID != null) {
-            log.info("getGuestReservations(): Email: " + inputEmail);
-            log.info("getGuestReservations(): Reservation ID: " + inputReservationID);
+            LOGGER.info("getGuestReservations(): Email: " + inputEmail);
+            LOGGER.info("getGuestReservations(): Reservation ID: " + inputReservationID);
         }
 
         Long id;
@@ -223,12 +223,12 @@ public class ReservationController {
         Reservation reservation = reservationRepository.findOneByEmailAndId(inputEmail, id);
 
         if (reservation != null) {
-            log.info(String.format("getGuestReservations(): Reservation info: '%s'", reservation));
+            LOGGER.info(String.format("getGuestReservations(): Reservation info: '%s'", reservation));
 
             // find the flight via the reservation object
             Flight flight = flightRepository.findFlightByReservations(reservation);
 
-            log.info(String.format("getGuestReservations(): Flight info: '%s'", flight));
+            LOGGER.info(String.format("getGuestReservations(): Flight info: '%s'", flight));
 
             // add flight to the model
             model.addAttribute("flightGuest", flight);

@@ -1,6 +1,7 @@
 package ucd.comp40660.flight.controller;
 
-import lombok.extern.log4j.Log4j2;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -33,12 +34,12 @@ import java.util.Iterator;
 import java.util.List;
 
 
-@Log4j2
 @Controller
 public class FlightController {
 
     private final FlightSearch flightSearch = new FlightSearch();
     private Guest guest = new Guest();
+    private static final Logger LOGGER = LoggerFactory.getLogger(FlightController.class);
 
     @Autowired
     ReservationRepository reservationRepository;
@@ -459,7 +460,7 @@ public class FlightController {
     public String displayReservationId(Model model) {
         List<Reservation> guestReservationId = new ArrayList<>();
         List<Guest> guestList = guestRepository.findAll();
-        log.info(guestList.get(1).getPassengers().size());
+        LOGGER.info("%s", guestList.get(1).getPassengers().size());
 
         List<Reservation> reservationList = reservationRepository.findAll();
 
@@ -505,14 +506,14 @@ public class FlightController {
         Guest guest = guestRepository.findTopByOrderByIdDesc();
 
         if (guest != null)
-            log.info("getGuestReservations(): Guest info: " + guest);
+            LOGGER.info("getGuestReservations(): Guest info: " + guest);
         else
-            log.info("getGuestReservations(): Guest is null");
+            LOGGER.info("getGuestReservations(): Guest is null");
 
         if (flight != null)
-            log.info("getGuestReservations(): Flight info: " + flight);
+            LOGGER.info("getGuestReservations(): Flight info: " + flight);
         else
-            log.info("getGuestReservations(): Flight is null");
+            LOGGER.info("getGuestReservations(): Flight is null");
 
         if (flight != null) {
             model.addAttribute("guest", guest);
