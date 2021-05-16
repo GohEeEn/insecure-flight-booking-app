@@ -4,6 +4,8 @@ import java.util.Optional;
 
 import javax.servlet.http.HttpServletResponse;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import ucd.comp40660.user.UserSession;
 import ucd.comp40660.user.repository.UserRepository;
 import ucd.comp40660.user.model.User;
@@ -15,9 +17,10 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 
 
-
 @Controller
 public class AuthenticationController {
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(AuthenticationController.class);
 
     @Autowired
     private UserSession userSession;
@@ -36,6 +39,7 @@ public class AuthenticationController {
 
     @GetMapping("/logout")
     public void logout(HttpServletResponse response) throws Exception {
+        LOGGER.info("%s", "User <" + userSession.getUser().getUsername() + "> logged out");
         userSession.setUser(null);
         response.sendRedirect("/");
     }

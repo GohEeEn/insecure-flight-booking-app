@@ -82,6 +82,7 @@ public class FlightController {
     @GetMapping("/flights")
     @ResponseBody
     public List<Flight> getAllFlights() {
+        LOGGER.info("%s", "Called getAllFlights() by user <" + userSession.getUser().getUsername() + ">");
         return flightRepository.findAll();
     }
 
@@ -89,6 +90,9 @@ public class FlightController {
     @GetMapping("/flights/{id}")
     @ResponseBody
     public Flight getFlightById(@PathVariable(value = "id") Long flightID) throws FlightNotFoundException {
+
+        LOGGER.info("%s", "Called getFlightById() with id = <" + flightID + "> by user <" + userSession.getUser().getUsername() + ">");
+
         return flightRepository.findById(flightID)
                 .orElseThrow(() -> new FlightNotFoundException(flightID));
     }
@@ -105,6 +109,8 @@ public class FlightController {
         flight.setArrivalDateTime(flightDetails.getArrivalDateTime());
         flight.setDeparture_date_time(flightDetails.getDeparture_date_time());
 
+        LOGGER.info("%s", "Called updateFlight() with id <" + flightID + "> by user <" + userSession.getUser().getUsername() + ">");
+
         return flightRepository.save(flight);
     }
 
@@ -116,6 +122,8 @@ public class FlightController {
                 .orElseThrow(() -> new FlightNotFoundException(flightID));
 
         flightRepository.delete(flight);
+
+        LOGGER.info("%s", "Called deleteFlight() with id <" + flightID + "> by user <" + userSession.getUser().getUsername() + ">");
 
         return ResponseEntity.ok().build();
     }
@@ -460,7 +468,7 @@ public class FlightController {
     public String displayReservationId(Model model) {
         List<Reservation> guestReservationId = new ArrayList<>();
         List<Guest> guestList = guestRepository.findAll();
-        LOGGER.info("%s", guestList.get(1).getPassengers().size());
+//        LOGGER.info("%s", guestList.get(1).getPassengers().size());
 
         List<Reservation> reservationList = reservationRepository.findAll();
 
@@ -518,6 +526,7 @@ public class FlightController {
         if (flight != null) {
             model.addAttribute("guest", guest);
             model.addAttribute("flightGuest", flight);
+            LOGGER.info("%s", "Called getGuestReservations(): by guest <" + guest + ">");
         } else {
             model.addAttribute("error", "Flight is null");
         }

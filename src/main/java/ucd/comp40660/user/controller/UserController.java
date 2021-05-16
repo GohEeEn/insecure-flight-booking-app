@@ -1,5 +1,7 @@
 package ucd.comp40660.user.controller;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.validation.BindingResult;
 import ucd.comp40660.flight.model.Flight;
 import ucd.comp40660.flight.repository.FlightRepository;
@@ -34,6 +36,8 @@ import java.util.List;
 
 @Controller
 public class UserController {
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(UserController.class);
 
     @Autowired
     private UserSession userSession;
@@ -73,11 +77,12 @@ public class UserController {
     @GetMapping("/users")
     public String getAllUsers(Model model, HttpServletRequest req) {
         Principal userDetails = req.getUserPrincipal();
+
         if (userDetails != null) {
             User sessionUser = userRepository.findByUsername(userDetails.getName());
             model.addAttribute("sessionUser", sessionUser);
+            LOGGER.info("%s", "List all users called by <" + sessionUser.getUsername() + ">");
         }
-
 
         List<User> users = userRepository.findAll();
         model.addAttribute("users", users);
@@ -92,6 +97,8 @@ public class UserController {
     @ResponseBody
     public User getRegistrationByUsername(@PathVariable(value = "username") String username, HttpServletRequest req) throws UserNotFoundException {
 //        Principal userDetails = req.getUserPrincipal();
+
+        LOGGER.info("%s", "Called get a registration by id <" + username + "> from <" + userSession.getUser().getUsername());
         return userRepository.findByUsername(username);
     }
 
@@ -109,6 +116,8 @@ public class UserController {
         user.setPhone(userDetails.getPhone());
         user.setSurname(user.getSurname());
 
+        LOGGER.info("%s", "Updated registration details for user <" + user.getUsername() + ">");
+
         return userRepository.save(user);
     }
 
@@ -123,9 +132,10 @@ public class UserController {
 //        User user = userRepository.findById(registrationID)
 //                .orElseThrow(() -> new UserNotFoundException(registrationID));
 
+        LOGGER.info("%s", "Deleted user registration for user <" + username + "> by admin <" + userSession.getUser().getUsername() + ">");
 
         userRepository.delete(user);
-        if(sessionUser.getUsername().equals(user.getUsername())) {
+        if (sessionUser.getUsername().equals(user.getUsername())) {
             userSession.setUser(null);
         }
 
@@ -146,10 +156,10 @@ public class UserController {
 
 
     @PostMapping("/register")
-    public String register(Model model, @ModelAttribute("userForm") User userForm, BindingResult bindingResult){
+    public String register(Model model, @ModelAttribute("userForm") User userForm, BindingResult bindingResult) {
         userValidator.validate(userForm, bindingResult);
 
-        if(bindingResult.hasErrors()){
+        if (bindingResult.hasErrors()) {
             model.addAttribute("error", bindingResult.getAllErrors().toString());
             return "register.html";
         }
@@ -172,20 +182,19 @@ public class UserController {
     }
 
     @PostMapping("/adminRegister")
-    public String adminRegister(Model model, @ModelAttribute("userForm") User userForm, BindingResult bindingResult){
+    public String adminRegister(Model model, @ModelAttribute("userForm") User userForm, BindingResult bindingResult) {
         userValidator.validate(userForm, bindingResult);
 
-        if(bindingResult.hasErrors()){
+        if (bindingResult.hasErrors()) {
             model.addAttribute("error", bindingResult.getAllErrors().toString());
             return "adminRegister.html";
         }
 
+        LOGGER.info("New admin registered with username <" + userForm.getUsername() + ">");
         userService.adminSave(userForm);
 
         return "index.html";
     }
-
-
 
 
 //    @PostMapping("/register")
@@ -243,6 +252,8 @@ public class UserController {
                               String newUsername, String password, Model model) throws Exception {
 
         User user = userSession.getUser();
+
+        LOGGER.info("%s", "Profile edited by user <" + user.getUsername() + ">");
 
         if (password.equals(user.getPassword())) {
 
@@ -317,6 +328,8 @@ public class UserController {
 
             userRepository.save(user);
             model.addAttribute("user", userSession.getUser());
+
+            LOGGER.info("%s", "Password changed by user <" + user.getUsername() + ">");
 
             return "viewProfile.html";
 
