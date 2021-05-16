@@ -47,22 +47,33 @@ public class UserController {
     @Autowired
     UserService userService;
 
+
     @GetMapping("/")
     public String index(Model model, HttpServletRequest req) {
         Principal userDetails = req.getUserPrincipal();
         if (userDetails != null) {
-            User user = userRepository.findByUsername(userDetails.getName());
-            model.addAttribute("user", user);
+            User sessionUser = userRepository.findByUsername(userDetails.getName());
+            model.addAttribute("sessionUser", sessionUser);
         }
 
         return "index.html";
     }
 
     //    Get all registrations
+    @PreAuthorize("hasAuthority('ADMIN')")
     @GetMapping("/users")
-    @ResponseBody
-    public List<User> getAllUsers() {
-        return userRepository.findAll();
+    public String getAllUsers(Model model, HttpServletRequest req) {
+        Principal userDetails = req.getUserPrincipal();
+        if (userDetails != null) {
+            User sessionUser = userRepository.findByUsername(userDetails.getName());
+            model.addAttribute("sessionUser", sessionUser);
+        }
+
+
+        List<User> users = userRepository.findAll();
+        model.addAttribute("users", users);
+
+        return "adminViewUsers.html";
     }
 
     //    Get a single registration by id
@@ -93,17 +104,21 @@ public class UserController {
     }
 
     //    Delete a registration record
-    @GetMapping("/delete/{id}")
-    public String deleteRegistration(@PathVariable(value = "id") Long registrationID, HttpServletRequest req) throws UserNotFoundException {
+    @PreAuthorize("#username == authentication.name or hasAuthority('ADMIN')")
+    @GetMapping("/delete/{username}")
+    public String deleteRegistration(@PathVariable(value = "username") String username, HttpServletRequest req) throws UserNotFoundException {
         Principal userDetails = req.getUserPrincipal();
-        User user = userRepository.findByUsername(userDetails.getName());
+        User sessionUser = userRepository.findByUsername(userDetails.getName());
+        User user = userRepository.findByUsername(username);
 
 //        User user = userRepository.findById(registrationID)
 //                .orElseThrow(() -> new UserNotFoundException(registrationID));
 
 
         userRepository.delete(user);
-        userSession.setUser(null);
+        if(sessionUser.getUsername().equals(user.getUsername())) {
+            userSession.setUser(null);
+        }
 
         return "index.html";
     }

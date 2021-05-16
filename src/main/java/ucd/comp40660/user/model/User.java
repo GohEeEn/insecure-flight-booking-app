@@ -98,6 +98,14 @@ public class User {
         this.passwordConfirm = passwordConfirm;
     }
 
+    public String getUsername(){
+        return this.username;
+    }
+
+    public List<CreditCard> getCredit_cards(){
+        return this.credit_cards;
+    }
+
     public User() {
         super();
     }

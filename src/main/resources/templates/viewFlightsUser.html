@@ -53,7 +53,7 @@
                     <td th:text="${flight?.departure_date_time} "></td>
                     <td th:text="${flight?.arrivalDateTime} "></td>
                     <td>
-                        <a th:href="@{/reservations/cancel/{id}(id = ${flight.getFlightID})}" class="btn btn-danger">Cancel</a>
+                        <a th:href="@{/reservations/cancel/{username}/{id}(username = ${user.getUsername}, id = ${flight.getFlightID})}" class="btn btn-danger">Cancel</a>
                     </td>
 
                 </tbody>

@@ -103,23 +103,21 @@ public class ReservationController {
     @GetMapping("/getUserReservations/{username}")
     public String getUserReservations(@PathVariable(value = "username") String username, Model model, HttpServletRequest req) throws ReservationNotFoundException {
         User user = null;
+        User sessionUser = null;
 
         Principal userDetails = req.getUserPrincipal();
         if (userDetails != null) {
-            user = userRepository.findByUsername(username);
-            model.addAttribute("user", user);
+            sessionUser = userRepository.findByUsername(userDetails.getName());
+//          model.addAttribute("user", user);
         }
+
+        user = userRepository.findByUsername(username);
 
         if (user != null) {
 //            User user = userSession.getUser();
 
             // backend log messages
-            log.info(String.format("UserSession user info: " + user.toString()));
-
-
-            // add current user to the model
-//            model.addAttribute("user", user);
-
+            log.info(String.format("UserSession user info: " + user.toString() + "\n"));
 
             // find all reservations associated with a user
             List<Reservation> reservations = reservationRepository.findAllByUserAndCancelledIsFalse(user);
@@ -166,7 +164,8 @@ public class ReservationController {
             } else { // throw an error if there are no reservations
                 model.addAttribute("error", "No reservations found");
             }
-            model.addAttribute("user", userRepository.findByUsername(userDetails.getName()));
+            model.addAttribute("user", user);
+            model.addAttribute("sessionUser", sessionUser);
             return "viewFlightsUser.html";
 
         }
@@ -185,20 +184,22 @@ public class ReservationController {
         User user = null;
 
         Principal userDetails = req.getUserPrincipal();
-        if (userDetails != null) {
-            user = userRepository.findByUsername(userDetails.getName());
-            model.addAttribute("user", user);
-        }
+//        if (userDetails != null) {
+//            user = userRepository.findByUsername(username);
+//            model.addAttribute("user", user);
+//        }
+        user = userRepository.findByUsername(username);
 
         Flight flight = flightRepository.findFlightByFlightID(flightID);
+
 //        User user = userSession.getUser();
         Reservation reservation = reservationRepository.findByUserAndFlight(user, flight);
         reservation.setCancelled(true);
         reservationRepository.saveAndFlush(reservation);
         userRepository.saveAndFlush(user);
         flightRepository.saveAndFlush(flight);
-        model.addAttribute("user", user);
-        response.sendRedirect("/getUserReservations");
+        model.addAttribute("user", userRepository.findByUsername(userDetails.getName()));
+        response.sendRedirect("/getUserReservations/" + username);
     }
 
     @PostMapping("/getGuestReservations")

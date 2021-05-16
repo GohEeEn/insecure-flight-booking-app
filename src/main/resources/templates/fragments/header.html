@@ -63,7 +63,7 @@
             -->
 
             <!-- Guest user -->
-            <div th:if="${user==null}">
+            <div th:if="${sessionUser==null}">
                 <li class="nav-item list-inline-item">
                     <a class="nav-link" href="/register">
                         <i class="fa fa-user-plus" aria-hidden="true"></i>
@@ -80,18 +80,21 @@
             </div>
 
             <!-- Not a guest -->
-            <div th:unless="${user==null}">
+            <div th:unless="${sessionUser==null}">
 
                 <li class="nav-item dropdown list-inline-item">
                     <a class="nav-link dropdown-toggle"
                        href="#" id="member-drop-link" data-toggle="dropdown"
                        role="button" aria-haspopup="true" aria-expanded="false"
                     ><i class="fa fa-user" aria-hidden="true"></i>
-                        &nbsp; <span th:text="${user.getUsername()}"></span>
+                        &nbsp; <span th:text="${sessionUser.getUsername()}"></span>
+                        <div th:if="${user != null} and (${user.getUsername()} != ${(sessionUser.getUsername())})">
+                            <span th:text="'Administering: ' +  ${user.getUsername()}"></span>
+                        </div>
                     </a>
 
                     <!-- Member user -->
-                    <div th:each="entry: ${user.getRoles()}">
+                    <div th:each="entry: ${sessionUser.getRoles()}">
                         <div th:if="${entry.name} == 'MEMBER'" class="dropdown-menu"
                              aria-labelledby="member-drop-link">
 
@@ -99,7 +102,7 @@
                                 &nbsp;Reservations
                             </h6>
 
-                            <a class="dropdown-item" href="/getUserReservations">
+                            <a class="dropdown-item" th:href="@{/getUserReservations/{username}(username = ${sessionUser.getUsername()})}">
                                 <i class="fa fa-plane" aria-hidden="true"></i>
                                 &nbsp;Reservations
                             </a>
@@ -132,7 +135,7 @@
                                 &nbsp;Reservations
                             </h6>
 
-                            <a class="dropdown-item" href="/getUserReservations">
+                            <a class="dropdown-item" th:href="@{/getUserReservations/{username}(username = ${sessionUser.getUsername})}">
                                 <i class="fa fa-plane" aria-hidden="true"></i>
                                 &nbsp;Reservations
                             </a>
