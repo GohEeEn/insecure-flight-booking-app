@@ -39,7 +39,7 @@ public class AuthenticationController {
 
     @GetMapping("/logout")
     public void logout(HttpServletResponse response) throws Exception {
-        LOGGER.info("%s", "User <" + userSession.getUser().getUsername() + "> logged out");
+        LOGGER.info("%s", "User <" + userSession.getUser().getUsername() + "> with the role of <" + userSession.getUser().getRoles() + "> logged out successfully");
         userSession.setUser(null);
         response.sendRedirect("/");
     }
@@ -56,6 +56,8 @@ public class AuthenticationController {
 //            response.sendRedirect("/login");
 //        }
 //    }
+
+        LOGGER.info("%s", "User <" + username + "> with the role of <" + userSession.getUser().getRoles() + "> logged in successfully");
         return "index.html";
 
     }
