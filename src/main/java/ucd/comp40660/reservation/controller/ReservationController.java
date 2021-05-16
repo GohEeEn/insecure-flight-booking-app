@@ -203,7 +203,16 @@ public class ReservationController {
     }
 
     @PostMapping("/getGuestReservations")
-    public String getGuestReservations(Model model, String inputEmail, String inputReservationID) throws ReservationNotFoundException {
+    public String getGuestReservations(Model model, String inputEmail, String inputReservationID, HttpServletRequest req) throws ReservationNotFoundException {
+
+        User user = null;
+        User sessionUser = null;
+
+        Principal userDetails = req.getUserPrincipal();
+        if (userDetails != null) {
+            sessionUser = userRepository.findByUsername(userDetails.getName());
+            model.addAttribute("sessionUser", sessionUser);
+        }
 
 //        backend log messages
         if (inputEmail != null && inputReservationID != null) {

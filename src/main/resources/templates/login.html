@@ -43,6 +43,12 @@
                 <button type="submit" class="btn btn-primary">Login</button>
                 <a href="/register" class="btn btn-link">Register</a>
             </form>
+            <div>
+                <form method="POST" action="/guestLogin">
+                    <button type="submit" class="btn btn-primary">Proceed As Guest</button>
+                </form>
+            </div>
+
         </div>
 
         <div th:replace="fragments/footer :: footer"></div>

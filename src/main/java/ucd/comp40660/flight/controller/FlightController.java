@@ -280,7 +280,7 @@ public class FlightController {
 
         if (numberOfPassengers > 1) {
             return "passengerDetails.html";
-        } else if (user == null) {
+        } else if (isGuest(sessionUser)) {
             return "bookingDetails.html";
         } else {
             model.addAttribute("cards", user.getCredit_cards());
@@ -341,7 +341,25 @@ public class FlightController {
 
     @PostMapping("/processGuestPersonalDetails")
     public String processGuestPersonalDetails(String name, String surname, String email, String phoneNumber,
-                                              String address, Model model) {
+                                              String address, Model model, HttpServletRequest req) {
+
+        User sessionUser = null;
+
+        Principal userDetails = req.getUserPrincipal();
+        if (userDetails != null) {
+            sessionUser = userRepository.findByUsername(userDetails.getName());
+            model.addAttribute("sessionUser", sessionUser);
+        }
+
+        User user = null;
+        if(isAdmin(sessionUser)){
+            user = userSession.getUser();
+        }
+        else{
+            user = sessionUser;
+        }
+        model.addAttribute("user", user);
+
 
         guest.setName(name);
         guest.setSurname(surname);
@@ -349,7 +367,7 @@ public class FlightController {
         guest.setPhone(phoneNumber);
         guest.setAddress(address);
 
-        model.addAttribute("user", userSession.getUser());
+//        model.addAttribute("user", userSession.getUser());
 
         return "/displayPaymentPage";
     }
@@ -428,7 +446,25 @@ public class FlightController {
 
     @PostMapping("/processGuestPayment")
     public void processGuestPayment(String cardholder_name, String card_number, String card_type, int expiration_month,
-                                    int expiration_year, String security_code, HttpServletResponse response) throws IOException {
+                                    int expiration_year, String security_code,
+                                    HttpServletResponse response, HttpServletRequest req, Model model) throws IOException {
+
+        User sessionUser = null;
+
+        Principal userDetails = req.getUserPrincipal();
+        if (userDetails != null) {
+            sessionUser = userRepository.findByUsername(userDetails.getName());
+            model.addAttribute("sessionUser", sessionUser);
+        }
+
+        User user = null;
+        if(isAdmin(sessionUser)){
+            user = userSession.getUser();
+        }
+        else{
+            user = sessionUser;
+        }
+        model.addAttribute("user", user);
 
         Reservation reservation = new Reservation();
 
@@ -456,20 +492,37 @@ public class FlightController {
     }
 
     @GetMapping("/displayReservationId")
-    public String displayReservationId(Model model) {
+    public String displayReservationId(Model model, HttpServletRequest req) {
+        User sessionUser = null;
+
+        Principal userDetails = req.getUserPrincipal();
+        if (userDetails != null) {
+            sessionUser = userRepository.findByUsername(userDetails.getName());
+            model.addAttribute("sessionUser", sessionUser);
+        }
+
+        User user = null;
+        if(isAdmin(sessionUser)){
+            user = userSession.getUser();
+        }
+        else{
+            user = sessionUser;
+        }
+        model.addAttribute("user", user);
+
         List<Reservation> guestReservationId = new ArrayList<>();
-        List<Guest> guestList = guestRepository.findAll();
-        log.info(guestList.get(1).getPassengers().size());
+        List<Guest> allGuests = guestRepository.findAll();
+        log.info(allGuests.get(1).getPassengers().size());
 
-        List<Reservation> reservationList = reservationRepository.findAll();
+        List<Reservation> allReservations = reservationRepository.findAll();
 
-        for (Reservation reserved : reservationList) {
-            for (Guest value : guestList) {
-                List<Reservation> reservedLists = value.getReservations();
-                for (Reservation reservedList : reservedLists) {
-                    if (reservedList.getEmail().equals(reserved.getEmail()) && reservedList.getFlight_reference().equals(reserved.getFlight_reference())) {
-                        if (reserved.getFlight_reference().equals(temporaryFlightReference)) {
-                            guestReservationId.add(reserved);
+        for (Reservation reservation : allReservations) {
+            for (Guest guest : allGuests) {
+                List<Reservation> guestReservations = guest.getReservations();
+                for (Reservation guestReservation : guestReservations) {
+                    if (guestReservation.getEmail().equals(reservation.getEmail()) && guestReservation.getFlight_reference().equals(reservation.getFlight_reference())) {
+                        if (reservation.getFlight_reference().equals(temporaryFlightReference)) {
+                            guestReservationId.add(reservation);
                         }
                     }
                 }
@@ -499,7 +552,24 @@ public class FlightController {
     }
 
     @GetMapping("/getGuestReservations")
-    public String getGuestReservations(Model model) {
+    public String getGuestReservations(Model model, HttpServletRequest req) {
+        User sessionUser = null;
+
+        Principal userDetails = req.getUserPrincipal();
+        if (userDetails != null) {
+            sessionUser = userRepository.findByUsername(userDetails.getName());
+            model.addAttribute("sessionUser", sessionUser);
+        }
+
+        User user = null;
+        if(isAdmin(sessionUser)){
+            user = userSession.getUser();
+        }
+        else{
+            user = sessionUser;
+        }
+        model.addAttribute("user", user);
+
 
         Flight flight = flightRepository.findFlightByFlightID(temporaryFlightReference);
         Guest guest = guestRepository.findTopByOrderByIdDesc();
@@ -534,5 +604,17 @@ public class FlightController {
         }
         return isAdmin;
     }
+
+    private boolean isGuest(User sessionUser) {
+        boolean isGuest = false;
+        Iterator<Role> roleIterator = sessionUser.getRoles().iterator();
+        while(roleIterator.hasNext()){
+            if(roleIterator.next().getName().equals("GUEST")){
+                isGuest = true;
+            }
+        }
+        return isGuest;
+    }
+
 
 }

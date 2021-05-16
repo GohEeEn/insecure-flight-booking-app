@@ -68,6 +68,13 @@ public class UserController {
         return "index.html";
     }
 
+    @GetMapping("/guestLogin")
+    public String guestLogin(Model model){
+
+
+        return "index.html";
+    }
+
     //    Get all registrations
     @PreAuthorize("hasAuthority('ADMIN')")
     @GetMapping("/users")
@@ -184,6 +191,36 @@ public class UserController {
 
         return "index.html";
     }
+
+    @GetMapping("/guestRegister")
+    public String guestRegister(Model model, HttpServletResponse response) throws Exception {
+        if (userSession.isLoginFailed()) {
+            model.addAttribute("error", "Unable to create account, passwords do not match");
+            userSession.setLoginFailed(false);
+        }
+        if (userSession.getUser() != null) {
+            response.sendRedirect("/logout");
+        }
+        return "guestRegister.html";
+    }
+
+    @PostMapping("/guestRegister")
+    public String guestRegister(Model model, @ModelAttribute("userForm") User userForm, BindingResult bindingResult){
+        userValidator.validate(userForm, bindingResult);
+
+        if(bindingResult.hasErrors()){
+            model.addAttribute("error", bindingResult.getAllErrors().toString());
+            return "guestRegister.html";
+        }
+
+        userService.guestSave(userForm);
+
+        return "index.html";
+    }
+
+
+
+
 
 
 

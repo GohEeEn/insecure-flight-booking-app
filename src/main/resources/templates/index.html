@@ -14,22 +14,24 @@
 <div class="container">
 	<div class="row">
 		<div class="col-8">
-			<div class="row pl-3" th:if="${sessionUser == null}">
-				<form class="form-inline" action="/getGuestReservations" method="post">
-					<div class="form-group mb-2">
-						<label>Retrieve Reservation</label>
-					</div>
-					<div class="form-group mx-sm-3 mb-2">
-						<label class="sr-only" for="inputEmail">Email</label>
-						<input type="text" class="form-control" id="inputEmail" name="inputEmail" placeholder="Enter Email Address">
-					</div>
-					<div class="form-group mx-sm-3 mb-2">
-						<label class="sr-only" for="inputReservationID">Reservation ID</label>
-						<input type="text" class="form-control" id="inputReservationID" name="inputReservationID"
-							   placeholder="Enter Reservation ID">
-					</div>
-					<button type="submit" class="btn btn-outline-primary mb-2">Find</button>
-				</form>
+			<div th:each="entry: ${sessionUser.getRoles()}">
+				<div th:if="${entry.name} == 'GUEST'">
+					<form class="form-inline" action="/getGuestReservations" method="post">
+						<div class="form-group mb-2">
+							<label>Retrieve Reservation</label>
+						</div>
+						<div class="form-group mx-sm-3 mb-2">
+							<label class="sr-only" for="inputEmail">Email</label>
+							<input type="text" class="form-control" id="inputEmail" name="inputEmail" placeholder="Enter Email Address">
+						</div>
+						<div class="form-group mx-sm-3 mb-2">
+							<label class="sr-only" for="inputReservationID">Reservation ID</label>
+							<input type="text" class="form-control" id="inputReservationID" name="inputReservationID"
+								   placeholder="Enter Reservation ID">
+						</div>
+						<button type="submit" class="btn btn-outline-primary mb-2">Find</button>
+					</form>
+				</div>
 			</div>
 
 			<div id="carouselHomePage" class="carousel slide" data-ride="carousel">
@@ -58,7 +60,7 @@
 		<div class="col-4">
 			<h4>Choose Flights</h4>
 			<div th:each="entry: ${sessionUser.getRoles()}">
-				<div th:if="${entry.name} == 'MEMBER'">
+				<div th:if="${entry.name} == 'MEMBER' or (${entry.name} == 'GUEST')">
 					<form action="/processFlightSearch" method="post" >
 
 						<div class="form-group">

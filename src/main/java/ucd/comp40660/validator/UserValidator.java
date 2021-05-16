@@ -18,7 +18,7 @@ public class UserValidator implements Validator {
 
     private final String NAME_REGEX = "([A-Za-z]*).{2,32}";
 //    private final String PASSWORD_REGEX = "((?=.*[a-z])(?=.*\\d)(?=.*[A-Z])(?=.*[@#$%!]).{8,32})";
-private final String PASSWORD_REGEX = "([A-Za-z]*).{2,32}";
+    private final String PASSWORD_REGEX = "([A-Za-z]*).{2,32}";
 
 
     @Autowired
@@ -59,7 +59,7 @@ private final String PASSWORD_REGEX = "([A-Za-z]*).{2,32}";
             errors.rejectValue("passwordConfirm", "Diff.userForm.passwordConfirm");
     }
 
-        private boolean isEmailValid(String email){
+    private boolean isEmailValid(String email){
         return EmailValidator.getInstance().isValid(email);
     }
 
