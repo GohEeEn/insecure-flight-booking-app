@@ -81,7 +81,7 @@ public class UserController {
         if (userDetails != null) {
             User sessionUser = userRepository.findByUsername(userDetails.getName());
             model.addAttribute("sessionUser", sessionUser);
-            LOGGER.info("%s", "List all users called by <" + sessionUser.getUsername() + ">");
+            LOGGER.info("%s", "List all users called by <" + sessionUser.getUsername() + "> with the role of <" + sessionUser.getRoles() + ">");
         }
 
         List<User> users = userRepository.findAll();
@@ -98,7 +98,7 @@ public class UserController {
     public User getRegistrationByUsername(@PathVariable(value = "username") String username, HttpServletRequest req) throws UserNotFoundException {
 //        Principal userDetails = req.getUserPrincipal();
 
-        LOGGER.info("%s", "Called get a registration by id <" + username + "> from <" + userSession.getUser().getUsername());
+        LOGGER.info("%s", "Called get a registration by id <" + username + "> from <" + userSession.getUser().getUsername() + "> with the role of <" + userSession.getUser().getRoles() + ">");
         return userRepository.findByUsername(username);
     }
 
@@ -116,7 +116,7 @@ public class UserController {
         user.setPhone(userDetails.getPhone());
         user.setSurname(user.getSurname());
 
-        LOGGER.info("%s", "Successfully updated registration details for user <" + user.getUsername() + ">");
+        LOGGER.info("%s", "Successfully updated registration details for user <" + user.getUsername() + "> with the role of <" + user.getRoles() + ">");
 
         return userRepository.save(user);
     }
@@ -256,7 +256,7 @@ public class UserController {
 
         User user = userSession.getUser();
 
-        LOGGER.info("%s", "Profile edited by user <" + user.getUsername() + ">");
+        LOGGER.info("%s", "Profile edited by user <" + user.getUsername() + "> with the role of <" + user.getRoles() + ">");
 
         if (password.equals(user.getPassword())) {
 
