@@ -82,7 +82,7 @@ public class FlightController {
     @GetMapping("/flights")
     @ResponseBody
     public List<Flight> getAllFlights() {
-        LOGGER.info("%s", "Called getAllFlights() by user <" + userSession.getUser().getUsername() + ">");
+        LOGGER.info("%s", "Called getAllFlights() by user <" + userSession.getUser().getUsername() + "> with the role of <" + userSession.getUser().getRoles() + ">");
         return flightRepository.findAll();
     }
 
@@ -91,7 +91,7 @@ public class FlightController {
     @ResponseBody
     public Flight getFlightById(@PathVariable(value = "id") Long flightID) throws FlightNotFoundException {
 
-        LOGGER.info("%s", "Called getFlightById() with id = <" + flightID + "> by user <" + userSession.getUser().getUsername() + ">");
+        LOGGER.info("%s", "Called getFlightById() with id = <" + flightID + "> by user <" + userSession.getUser().getUsername() + "> with the role of <" + userSession.getUser().getRoles() + ">");
 
         return flightRepository.findById(flightID)
                 .orElseThrow(() -> new FlightNotFoundException(flightID));
@@ -109,7 +109,7 @@ public class FlightController {
         flight.setArrivalDateTime(flightDetails.getArrivalDateTime());
         flight.setDeparture_date_time(flightDetails.getDeparture_date_time());
 
-        LOGGER.info("%s", "Called updateFlight() with id <" + flightID + "> by user <" + userSession.getUser().getUsername() + ">");
+        LOGGER.info("%s", "Called updateFlight() with id <" + flightID + "> by user <" + userSession.getUser().getUsername() + "> with the role of <" + userSession.getUser().getRoles() + ">");
 
         return flightRepository.save(flight);
     }
@@ -123,7 +123,7 @@ public class FlightController {
 
         flightRepository.delete(flight);
 
-        LOGGER.info("%s", "Called deleteFlight() with id <" + flightID + "> by user <" + userSession.getUser().getUsername() + ">");
+        LOGGER.info("%s", "Called deleteFlight() with id <" + flightID + "> by user <" + userSession.getUser().getUsername() + "> with the role of <" + userSession.getUser().getRoles() + ">");
 
         return ResponseEntity.ok().build();
     }

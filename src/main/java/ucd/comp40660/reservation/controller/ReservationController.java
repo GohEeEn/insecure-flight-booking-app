@@ -59,7 +59,7 @@ public class ReservationController {
     @GetMapping("/reservations")
     @ResponseBody
     public List<Reservation> getAllReservations() {
-        LOGGER.info("%s", "Get list of reservations called by <" +  userSession.getUser().getUsername() + ">");
+        LOGGER.info("%s", "Get list of reservations called by <" +  userSession.getUser().getUsername() + "> with the role of <" + userSession.getUser().getRoles() + ">");
         return reservationRepository.findAll();
     }
 
@@ -67,7 +67,7 @@ public class ReservationController {
     @GetMapping("/reservations/{id}")
     @ResponseBody
     public Reservation getReservationById(@PathVariable(value = "id") Long reservationID) throws ReservationNotFoundException {
-        LOGGER.info("%s", "Get a single reservation by id called by <" + userSession.getUser().getUsername() + ">");
+        LOGGER.info("%s", "Get a single reservation by id called by <" + userSession.getUser().getUsername() + "> with the role of <" + userSession.getUser().getRoles() + ">");
         return reservationRepository.findById(reservationID)
                 .orElseThrow(() -> new ReservationNotFoundException(reservationID));
     }
@@ -84,7 +84,7 @@ public class ReservationController {
         reservation.setEmail(reservationDetails.getEmail());
         reservation.setFlight_reference(reservationDetails.getFlight_reference());
 
-        LOGGER.info("%s", "Update details of reservation with id = <" + reservationID + ">" + " by user <" + userSession.getUser().getUsername() + ">");
+        LOGGER.info("%s", "Update details of reservation with id = <" + reservationID + ">" + " by user <" + userSession.getUser().getUsername() + "> with the role of <" + userSession.getUser().getRoles() + ">");
 
         return reservationRepository.save(reservation);
     }
@@ -100,7 +100,9 @@ public class ReservationController {
 
         reservationRepository.delete(reservation);
 
-        LOGGER.info("%s", "Delete reservation with id = <" + reservationID + ">" + " by user <" + username + ">");
+        User tempUser = userRepository.findByUsername(username);
+
+        LOGGER.info("%s", "Delete reservation with id = <" + reservationID + ">" + " by user <" + username + "> with the role of <" + tempUser.getRoles() + ">");
 
         return ResponseEntity.ok().build();
     }
@@ -122,8 +124,6 @@ public class ReservationController {
         if (user != null) {
 //            User user = userSession.getUser();
 
-            // backend log messages
-            LOGGER.info(String.format("UserSession user info: " + user.toString() + "\n"));
 
             // find all reservations associated with a user
             List<Reservation> reservations = reservationRepository.findAllByUserAndCancelledIsFalse(user);
@@ -166,9 +166,10 @@ public class ReservationController {
                 model.addAttribute("upcoming_cancellable", upcoming_cancellable);
                 LOGGER.info("Added flights to front end as 'flightsUser'");
                 LOGGER.info("Cancelled Flights: " + cancelled_flights);
-                LOGGER.info("%s", "getUserReservations() called by <" + username + ">");
+                LOGGER.info("%s", "getUserReservations() called by <" + username + "> with the role of <" + userRepository.findByUsername(username).getRoles() + ">");
 
             } else { // throw an error if there are no reservations
+                LOGGER.warn("%s", "Unsuccessful attempt to get user reservations by user <" + username + "> with the role of <" + userRepository.findByUsername(username).getRoles() + ">");
                 model.addAttribute("error", "No reservations found");
             }
             model.addAttribute("user", user);
@@ -177,6 +178,7 @@ public class ReservationController {
 
         }
         else{
+            LOGGER.warn("%s", "Unsuccessful attempt to get user reservations by user <" + username + "> with the role of <" + userRepository.findByUsername(username).getRoles() + ">");
             model.addAttribute("error", "No Member logged in");
             return "index.html";
         }
@@ -207,7 +209,7 @@ public class ReservationController {
         flightRepository.saveAndFlush(flight);
         model.addAttribute("user", userRepository.findByUsername(userDetails.getName()));
 
-        LOGGER.info("%s", "Reservation cancelled with flight id = <" + flightID + "> by user <" + username + ">");
+        LOGGER.info("%s", "Reservation cancelled with flight id = <" + flightID + "> by user <" + username + "> with the role of <" + userRepository.findByUsername(username).getRoles() + ">");
 
         response.sendRedirect("/getUserReservations/" + username);
     }
