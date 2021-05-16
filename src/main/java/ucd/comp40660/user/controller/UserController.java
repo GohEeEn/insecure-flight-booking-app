@@ -1,5 +1,7 @@
 package ucd.comp40660.user.controller;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.validation.BindingResult;
 import ucd.comp40660.flight.model.Flight;
 import ucd.comp40660.flight.repository.FlightRepository;
@@ -34,6 +36,8 @@ import java.util.List;
 
 @Controller
 public class UserController {
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(UserController.class);
 
     @Autowired
     private UserSession userSession;
@@ -73,11 +77,12 @@ public class UserController {
     @GetMapping("/users")
     public String getAllUsers(Model model, HttpServletRequest req) {
         Principal userDetails = req.getUserPrincipal();
+
         if (userDetails != null) {
             User sessionUser = userRepository.findByUsername(userDetails.getName());
             model.addAttribute("sessionUser", sessionUser);
+            LOGGER.info("%s", "List all users called by <" + sessionUser.getUsername() + "> with the role of <" + sessionUser.getRoles() + ">");
         }
-
 
         List<User> users = userRepository.findAll();
         model.addAttribute("users", users);
@@ -92,6 +97,8 @@ public class UserController {
     @ResponseBody
     public User getRegistrationByUsername(@PathVariable(value = "username") String username, HttpServletRequest req) throws UserNotFoundException {
 //        Principal userDetails = req.getUserPrincipal();
+
+        LOGGER.info("%s", "Called get a registration by id <" + username + "> from <" + userSession.getUser().getUsername() + "> with the role of <" + userSession.getUser().getRoles() + ">");
         return userRepository.findByUsername(username);
     }
 
@@ -109,6 +116,8 @@ public class UserController {
         user.setPhone(userDetails.getPhone());
         user.setSurname(user.getSurname());
 
+        LOGGER.info("%s", "Successfully updated registration details for user <" + user.getUsername() + "> with the role of <" + user.getRoles() + ">");
+
         return userRepository.save(user);
     }
 
@@ -123,9 +132,10 @@ public class UserController {
 //        User user = userRepository.findById(registrationID)
 //                .orElseThrow(() -> new UserNotFoundException(registrationID));
 
+        LOGGER.info("%s", "Successfully deleted user registration for user <" + username + "> by admin <" + userSession.getUser().getUsername() + ">");
 
         userRepository.delete(user);
-        if(sessionUser.getUsername().equals(user.getUsername())) {
+        if (sessionUser.getUsername().equals(user.getUsername())) {
             userSession.setUser(null);
         }
 
@@ -146,14 +156,16 @@ public class UserController {
 
 
     @PostMapping("/register")
-    public String register(Model model, @ModelAttribute("userForm") User userForm, BindingResult bindingResult){
+    public String register(Model model, @ModelAttribute("userForm") User userForm, BindingResult bindingResult) {
         userValidator.validate(userForm, bindingResult);
 
-        if(bindingResult.hasErrors()){
+        if (bindingResult.hasErrors()) {
             model.addAttribute("error", bindingResult.getAllErrors().toString());
+            LOGGER.warn("%s", "Unable to register user with username <" + userForm.getUsername() + "> with the role of <" + userForm.getRoles());
             return "register.html";
         }
 
+        LOGGER.info("%s", "New user registered with username <" + userForm.getUsername() + "> with the role of <" + userForm.getRoles() + ">");
         userService.save(userForm);
 
         return "index.html";
@@ -172,20 +184,20 @@ public class UserController {
     }
 
     @PostMapping("/adminRegister")
-    public String adminRegister(Model model, @ModelAttribute("userForm") User userForm, BindingResult bindingResult){
+    public String adminRegister(Model model, @ModelAttribute("userForm") User userForm, BindingResult bindingResult) {
         userValidator.validate(userForm, bindingResult);
 
-        if(bindingResult.hasErrors()){
+        if (bindingResult.hasErrors()) {
             model.addAttribute("error", bindingResult.getAllErrors().toString());
+            LOGGER.warn("%s", "New admin could not be registered for user <" + userForm.getUsername() + ">");
             return "adminRegister.html";
         }
 
+        LOGGER.warn("New admin registered with username <" + userForm.getUsername() + ">");
         userService.adminSave(userForm);
 
         return "index.html";
     }
-
-
 
 
 //    @PostMapping("/register")
@@ -244,6 +256,8 @@ public class UserController {
 
         User user = userSession.getUser();
 
+        LOGGER.info("%s", "Profile edited by user <" + user.getUsername() + "> with the role of <" + user.getRoles() + ">");
+
         if (password.equals(user.getPassword())) {
 
             if (!(newName.isEmpty())) {
@@ -287,6 +301,7 @@ public class UserController {
             System.out.println("\n\nPASSWORD FOUND TO BE INCORRECT\n\n");
             model.addAttribute("user", userSession.getUser());
             model.addAttribute("error", "\nIncorrect Password, alterations denied.");
+            LOGGER.warn("%s", "Unsuccessful attempt of profile edit for user <" + user.getUsername() + "> with the role of <" + user.getRoles() + ">");
             return "editProfile.html";
         }
     }
@@ -311,6 +326,7 @@ public class UserController {
             } else {
                 model.addAttribute("error", "\nNew Password entries do not match, update denied.");
                 model.addAttribute("user", userSession.getUser());
+                LOGGER.warn("%s", "Password change rejected due to new password mismatch for user <" + user.getUsername() + "> with role of <" + user.getRoles() + ">");
 
                 return "editPassword.html";
             }
@@ -318,12 +334,15 @@ public class UserController {
             userRepository.save(user);
             model.addAttribute("user", userSession.getUser());
 
+            LOGGER.info("%s", "Password successfully changed by user <" + user.getUsername() + ">");
+
             return "viewProfile.html";
 
         } else {
             System.out.println("\n\nPASSWORD FOUND TO BE INCORRECT\n\n");
             model.addAttribute("user", userSession.getUser());
             model.addAttribute("error", "\nIncorrect Password, alterations denied.");
+            LOGGER.warn("%s", "Incorrectly entered password for user <" + user.getUsername() + "> with role of <" + user.getRoles() + ">");
         }
 
         return "editPassword.html";

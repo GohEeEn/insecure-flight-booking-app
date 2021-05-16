@@ -1,7 +1,8 @@
 package ucd.comp40660.reservation.controller;
 
 
-import lombok.extern.log4j.Log4j2;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -26,15 +27,14 @@ import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
-import lombok.extern.log4j.Log4j2;
 import ucd.comp40660.user.repository.UserRepository;
 import ucd.comp40660.validator.UserValidator;
 
 
-@Log4j2
 @Controller
 public class ReservationController {
 
+    private static final Logger LOGGER = LoggerFactory.getLogger(ReservationController.class);
     @Autowired
     ReservationRepository reservationRepository;
 
@@ -59,6 +59,7 @@ public class ReservationController {
     @GetMapping("/reservations")
     @ResponseBody
     public List<Reservation> getAllReservations() {
+        LOGGER.info("%s", "Get list of reservations called by <" +  userSession.getUser().getUsername() + "> with the role of <" + userSession.getUser().getRoles() + ">");
         return reservationRepository.findAll();
     }
 
@@ -66,6 +67,7 @@ public class ReservationController {
     @GetMapping("/reservations/{id}")
     @ResponseBody
     public Reservation getReservationById(@PathVariable(value = "id") Long reservationID) throws ReservationNotFoundException {
+        LOGGER.info("%s", "Get a single reservation by id called by <" + userSession.getUser().getUsername() + "> with the role of <" + userSession.getUser().getRoles() + ">");
         return reservationRepository.findById(reservationID)
                 .orElseThrow(() -> new ReservationNotFoundException(reservationID));
     }
@@ -82,6 +84,8 @@ public class ReservationController {
         reservation.setEmail(reservationDetails.getEmail());
         reservation.setFlight_reference(reservationDetails.getFlight_reference());
 
+        LOGGER.info("%s", "Update details of reservation with id = <" + reservationID + ">" + " by user <" + userSession.getUser().getUsername() + "> with the role of <" + userSession.getUser().getRoles() + ">");
+
         return reservationRepository.save(reservation);
     }
 
@@ -95,6 +99,10 @@ public class ReservationController {
                 .orElseThrow(() -> new ReservationNotFoundException(reservationID));
 
         reservationRepository.delete(reservation);
+
+        User tempUser = userRepository.findByUsername(username);
+
+        LOGGER.info("%s", "Delete reservation with id = <" + reservationID + ">" + " by user <" + username + "> with the role of <" + tempUser.getRoles() + ">");
 
         return ResponseEntity.ok().build();
     }
@@ -116,8 +124,6 @@ public class ReservationController {
         if (user != null) {
 //            User user = userSession.getUser();
 
-            // backend log messages
-            log.info(String.format("UserSession user info: " + user.toString() + "\n"));
 
             // find all reservations associated with a user
             List<Reservation> reservations = reservationRepository.findAllByUserAndCancelledIsFalse(user);
@@ -158,10 +164,12 @@ public class ReservationController {
                 model.addAttribute("past", past);
                 model.addAttribute("cancelled_flights", cancelled_flights);
                 model.addAttribute("upcoming_cancellable", upcoming_cancellable);
-                log.info("Added flights to front end as 'flightsUser'");
-                log.info("Cancelled Flights: " + cancelled_flights);
+                LOGGER.info("Added flights to front end as 'flightsUser'");
+                LOGGER.info("Cancelled Flights: " + cancelled_flights);
+                LOGGER.info("%s", "getUserReservations() called by <" + username + "> with the role of <" + userRepository.findByUsername(username).getRoles() + ">");
 
             } else { // throw an error if there are no reservations
+                LOGGER.warn("%s", "Unsuccessful attempt to get user reservations by user <" + username + "> with the role of <" + userRepository.findByUsername(username).getRoles() + ">");
                 model.addAttribute("error", "No reservations found");
             }
             model.addAttribute("user", user);
@@ -170,6 +178,7 @@ public class ReservationController {
 
         }
         else{
+            LOGGER.warn("%s", "Unsuccessful attempt to get user reservations by user <" + username + "> with the role of <" + userRepository.findByUsername(username).getRoles() + ">");
             model.addAttribute("error", "No Member logged in");
             return "index.html";
         }
@@ -199,6 +208,9 @@ public class ReservationController {
         userRepository.saveAndFlush(user);
         flightRepository.saveAndFlush(flight);
         model.addAttribute("user", userRepository.findByUsername(userDetails.getName()));
+
+        LOGGER.info("%s", "Reservation cancelled with flight id = <" + flightID + "> by user <" + username + "> with the role of <" + userRepository.findByUsername(username).getRoles() + ">");
+
         response.sendRedirect("/getUserReservations/" + username);
     }
 
@@ -207,8 +219,7 @@ public class ReservationController {
 
 //        backend log messages
         if (inputEmail != null && inputReservationID != null) {
-            log.info("getGuestReservations(): Email: " + inputEmail);
-            log.info("getGuestReservations(): Reservation ID: " + inputReservationID);
+            LOGGER.info("Called getGuestReservations(): with email <" + inputEmail + "> and reservation id <" + inputReservationID + ">");
         }
 
         Long id;
@@ -223,12 +234,12 @@ public class ReservationController {
         Reservation reservation = reservationRepository.findOneByEmailAndId(inputEmail, id);
 
         if (reservation != null) {
-            log.info(String.format("getGuestReservations(): Reservation info: '%s'", reservation));
+//            LOGGER.info(String.format("Called getGuestReservations(): Reservation info: '%s'", reservation));
 
             // find the flight via the reservation object
             Flight flight = flightRepository.findFlightByReservations(reservation);
 
-            log.info(String.format("getGuestReservations(): Flight info: '%s'", flight));
+//            LOGGER.info(String.format("Called getGuestReservations(): Flight info: '%s'", flight));
 
             // add flight to the model
             model.addAttribute("flightGuest", flight);
