@@ -16,5 +16,6 @@ public interface FlightRepository extends JpaRepository<Flight, Long> {
     List<Flight> findAllByReservationsAndArrivalDateTimeBefore(Reservation reservation, Date date);
     List<Flight> findAllByReservationsAndArrivalDateTimeAfter(Reservation reservation, Date date);
     List<Flight> findAllByReservationsAndArrivalDateTimeBetween(Reservation reservation, Date start, Date finish);
+    Flight deleteFlightByFlightID(Long id);
 
 }

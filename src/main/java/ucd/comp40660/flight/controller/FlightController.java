@@ -7,6 +7,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.web.bind.WebDataBinder;
 import org.springframework.web.bind.annotation.*;
 import ucd.comp40660.flight.exception.FlightNotFoundException;
 import ucd.comp40660.flight.model.Flight;
@@ -29,9 +30,15 @@ import javax.validation.Valid;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.security.Principal;
+import java.sql.Time;
+import java.sql.Timestamp;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Date;
+
 
 
 @Controller
@@ -79,11 +86,90 @@ public class FlightController {
     }
 
     //    Get all flights
+    @PreAuthorize("hasAuthority('ADMIN')")
     @GetMapping("/flights")
-    @ResponseBody
-    public List<Flight> getAllFlights() {
-        LOGGER.info("%s", "Called getAllFlights() by user <" + userSession.getUser().getUsername() + "> with the role of <" + userSession.getUser().getRoles() + ">");
-        return flightRepository.findAll();
+    public String getAllFlights(HttpServletRequest req, Model model) {
+        User sessionUser = null;
+
+        Principal userDetails = req.getUserPrincipal();
+        if (userDetails != null) {
+            sessionUser = userRepository.findByUsername(userDetails.getName());
+            model.addAttribute("sessionUser", sessionUser);
+        }
+
+        LOGGER.info("%s", "Called getAllFlights() by user <" + sessionUser.getUsername() + "> with the role of <" + sessionUser.getRoles() + ">");
+        List<Flight> flights =  flightRepository.findAll();
+        model.addAttribute("flights", flights);
+        model.addAttribute("sessionUser", sessionUser);
+
+
+
+        return "viewAllFlights.html";
+    }
+
+    @GetMapping("/registerFlight")
+    public String registerFlight(Model model, HttpServletRequest req){
+        User sessionUser = null;
+
+        Principal userDetails = req.getUserPrincipal();
+        if (userDetails != null) {
+            sessionUser = userRepository.findByUsername(userDetails.getName());
+            model.addAttribute("sessionUser", sessionUser);
+        }
+
+        return "/createFlight.html";
+
+    }
+
+    @PostMapping("/registerFlight")
+    public void registerFlight(Model model, HttpServletRequest req, HttpServletResponse response,
+                               String source, String destination,  String departureDate, String departureTime,
+                               String arrivalDate, String arrivalTime) throws IOException, ParseException {
+
+        LOGGER.info(String.format("VALUES!!!: %s, %s, %s, %s, %s, %s", source, destination, departureDate, departureTime,
+                                                                        arrivalDate, arrivalTime));
+
+
+        User sessionUser = null;
+
+        Principal userDetails = req.getUserPrincipal();
+        if (userDetails != null) {
+            sessionUser = userRepository.findByUsername(userDetails.getName());
+            model.addAttribute("sessionUser", sessionUser);
+        }
+
+        SimpleDateFormat hm = new SimpleDateFormat("HH:mm");
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
+        SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd HH:mm");
+
+        Date dep = df.parse(departureDate + " " + departureTime);
+        Date arr = df.parse(arrivalDate + " " + arrivalTime);
+        Date dt = hm.parse(departureTime);
+        Date at = hm.parse(arrivalTime);
+        Date dd = sdf.parse(departureDate);
+        Date ad = sdf.parse(arrivalDate);
+
+        LOGGER.info(String.format("Attempting to concatenate dates and times"));
+        LOGGER.info(String.format("dep & arr %s, %s", dep.getTime() , arr.getTime() ));
+        LOGGER.info(String.format("dt & at: %s, %s", dt.getTime(), at.getTime()));
+        LOGGER.info(String.format("dd & ad: %s, dt time: %s", dd.getTime() , ad.getTime() ));
+
+        Date departure = new Date(dd.getTime() + dt.getTime());
+        Date arrival = new Date(ad.getTime() + at.getTime());
+
+        LOGGER.info(String.format("Attempting to create Flight object"));
+
+        Flight flight = new Flight(source, destination, dep, arr);
+        flight.setReservations(null);
+
+        List<Flight> flights = flightRepository.findAll();
+        model.addAttribute("flights", flights);
+
+        LOGGER.info(String.format("Attempting to save Flight object"));
+
+        flightRepository.saveAndFlush(flight);
+
+        response.sendRedirect("/");
     }
 
     //    Get a single flight
@@ -98,7 +184,7 @@ public class FlightController {
     }
 
     //    Update flight details
-    @PutMapping("/flights/{id}")
+    @PutMapping("/updateFlight/{id}")
     @ResponseBody
     public Flight updateFlight(@PathVariable(value = "id") Long flightID, @Valid @RequestBody Flight flightDetails) throws FlightNotFoundException {
         Flight flight = flightRepository.findById(flightID)
@@ -121,9 +207,9 @@ public class FlightController {
         Flight flight = flightRepository.findById(flightID)
                 .orElseThrow(() -> new FlightNotFoundException(flightID));
 
-        flightRepository.delete(flight);
+        flightRepository.deleteFlightByFlightID(flightID);
 
-        LOGGER.info("%s", "Called deleteFlight() with id <" + flightID + "> by user <" + userSession.getUser().getUsername() + "> with the role of <" + userSession.getUser().getRoles() + ">");
+        LOGGER.info("%s", "Called deleteFlightByFlightID with id <" + flightID + "> by user <" + userSession.getUser().getUsername() + "> with the role of <" + userSession.getUser().getRoles() + ">");
 
         return ResponseEntity.ok().build();
     }
@@ -218,6 +304,7 @@ public class FlightController {
         flightSearch.setPassengers(passengers);
         flightSearch.setOutboundDate(outboundDate);
 
+        //TODO Better define Guest User object than hardcoded name.
         userSession.setUser(userRepository.findByUsername("testGuest"));
         model.addAttribute("user", userRepository.findByUsername("testguest"));
 

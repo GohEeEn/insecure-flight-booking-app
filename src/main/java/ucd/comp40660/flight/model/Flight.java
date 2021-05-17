@@ -45,8 +45,8 @@ public class Flight {
     }
 
 
-    public Flight(Long flightID, String from, String destination, Date departureDateTime, Date arrivalDateTime) {
-        this.flightID = flightID;
+    public Flight(String from, String destination, Date departureDateTime, Date arrivalDateTime) {
+//        this.flightID = flightID;
         this.source= from;
         this.destination= destination;
         this.departure_date_time= departureDateTime;
