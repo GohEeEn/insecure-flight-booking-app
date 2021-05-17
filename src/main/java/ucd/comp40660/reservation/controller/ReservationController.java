@@ -16,6 +16,7 @@ import ucd.comp40660.reservation.model.Reservation;
 import ucd.comp40660.reservation.repository.ReservationRepository;
 import ucd.comp40660.service.UserService;
 import ucd.comp40660.user.UserSession;
+import ucd.comp40660.user.model.Guest;
 import ucd.comp40660.user.model.User;
 
 import javax.servlet.http.HttpServletRequest;
@@ -27,6 +28,8 @@ import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+
+import ucd.comp40660.user.repository.GuestRepository;
 import ucd.comp40660.user.repository.UserRepository;
 import ucd.comp40660.validator.UserValidator;
 
@@ -43,6 +46,9 @@ public class ReservationController {
 
     @Autowired
     UserRepository userRepository;
+
+    @Autowired
+    GuestRepository guestRepository;
 
     //  use it to implement the get user/member reservations and display it
     @Autowired
@@ -214,6 +220,56 @@ public class ReservationController {
         response.sendRedirect("/getUserReservations/" + username);
     }
 
+//    @PreAuthorize("hasAuthority('ADMIN')")
+    @GetMapping("/guestReservations/cancel/{email}/{id}")
+    public void cancelGuestReservation(@PathVariable(value = "email") String email, @PathVariable(value = "id") Long flightID,
+                                  Model model, HttpServletResponse response, HttpServletRequest req) throws ReservationNotFoundException, IOException {
+
+        LOGGER.info("Beginning Guest cancellation process.");
+
+        Principal userDetails = req.getUserPrincipal();
+        User user = userRepository.findByUsername(userDetails.getName());
+        User sessionUser = null;
+
+
+        if (userDetails != null) {
+            sessionUser = userRepository.findByUsername(userDetails.getName());
+            model.addAttribute("sessionUser", sessionUser);
+//            LOGGER.info("%s", "List all users called by <" + sessionUser.getUsername() + "> with the role of <" + sessionUser.getRoles() + ">");
+        }
+
+        user = sessionUser;
+        model.addAttribute("user", user);
+
+//        List<User> users = userRepository.findAll();
+//        model.addAttribute("users", users);
+        LOGGER.info("Attempting to get Flight Info");
+
+        Flight flight = flightRepository.findFlightByFlightID(flightID);
+
+        LOGGER.info("Attempting to get Guest Info");
+
+        Guest guest = guestRepository.findByEmail(email);
+        LOGGER.info("Flight ID: '%s', Guest: '%s %s' %s", flight.getFlightID(), guest.getName(), guest.getSurname(), guest.getEmail());
+
+
+        Reservation reservation = reservationRepository.findByGuestAndFlight(guest, flight);
+        reservation.setCancelled(true);
+        reservationRepository.saveAndFlush(reservation);
+        guestRepository.saveAndFlush(guest);
+        flightRepository.saveAndFlush(flight);
+
+        assert sessionUser != null;
+        LOGGER.info("%s", "Reservation cancelled with flight id = <" + flightID + "> by user <" + sessionUser.getUsername() + "> with the role of <" + sessionUser.getRoles() + ">");
+
+        response.sendRedirect("/");
+
+
+    }
+
+
+
+
     @PostMapping("/getGuestReservations")
     public String getGuestReservations(Model model, String inputEmail, String inputReservationID, HttpServletRequest req) throws ReservationNotFoundException {
 
@@ -225,6 +281,8 @@ public class ReservationController {
             sessionUser = userRepository.findByUsername(userDetails.getName());
             model.addAttribute("sessionUser", sessionUser);
         }
+
+
 
 //        backend log messages
         if (inputEmail != null && inputReservationID != null) {
@@ -247,11 +305,17 @@ public class ReservationController {
 
             // find the flight via the reservation object
             Flight flight = flightRepository.findFlightByReservations(reservation);
+            Guest guest = guestRepository.findByEmail(inputEmail);
+            LOGGER.info(String.format("Called guest findByEmail from repo, found guest '%s %s'", guest.getName(), guest.getSurname() ));
+
 
 //            LOGGER.info(String.format("Called getGuestReservations(): Flight info: '%s'", flight));
 
-            // add flight to the model
+            // add flight and guest to the model
             model.addAttribute("flightGuest", flight);
+            model.addAttribute("guest", guest);
+            model.addAttribute("reservation", reservation);
+
 
             return "viewFlightsGuest.html";
         } else {

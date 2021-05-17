@@ -15,7 +15,7 @@
 	<div class="row">
 		<div class="col-8">
 			<div th:each="entry: ${sessionUser.getRoles()}">
-				<div th:if="${entry.name} == 'GUEST'">
+				<div th:if="${entry.name} == 'GUEST' or ${entry.name} == 'ADMIN'">
 					<form class="form-inline" action="/getGuestReservations" method="post">
 						<div class="form-group mb-2">
 							<label>Retrieve Reservation</label>
