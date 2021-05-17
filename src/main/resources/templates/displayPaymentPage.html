@@ -2,7 +2,7 @@
 
 <html lang="en" xmlns:th="http://www.thymeleaf.org">
 	<head>
-		<title>Home</title>
+		<title>Select Payment Method</title>
 
 		<div th:replace="fragments/header :: header-data"></div>
 	</head>
@@ -12,7 +12,7 @@
 		<div class="container">
 
 			<h4>Payment Method</h4>
-			<div th:each="entry: ${sessionUser.getRoles()}">
+			<div th:each="entry: ${user.getRoles()}">
 				<div th:if="${entry.name} == 'MEMBER'">
 					<div class="container">
 						<form th:if="${cards.size() > 0}" action="/processMemberPayment" method="post" >

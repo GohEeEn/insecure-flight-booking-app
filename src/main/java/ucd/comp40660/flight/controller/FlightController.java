@@ -152,9 +152,31 @@ public class FlightController {
         response.sendRedirect("/flightSearchResults");
     }
 
+//    @PreAuthorize("hasAuthority('ADMIN')")
+//    @PostMapping("/adminProcessFlightSearch")
+//    public void determineBookingType(String departure, String destinationInput, int passengers, String outboundDate, String username,
+//                                     Model model, HttpServletResponse response, HttpServletRequest req) throws IOException {
+//        User sessionUser = null;
+//
+//        Principal userDetails = req.getUserPrincipal();
+//        if (userDetails != null) {
+//            sessionUser = userRepository.findByUsername(userDetails.getName());
+//            model.addAttribute("sessionUser", sessionUser);
+//        }
+//
+//        if (username.contains("@")) {
+//            response.sendRedirect("/adminProcessGuestFlightSearch");
+//        }
+//        else{
+//            response.sendRedirect("/adminProcessUserFlightSearch");
+//        }
+//
+//    }
+
+
     @PreAuthorize("hasAuthority('ADMIN')")
-    @PostMapping("/adminProcessFlightSearch")
-    public void adminProcessFlightSearch(String departure, String destinationInput, int passengers, String outboundDate, String username,
+    @PostMapping("/adminProcessUserFlightSearch")
+    public void adminProcessUserFlightSearch(String departure, String destinationInput, int passengers, String outboundDate, String username,
                                     Model model, HttpServletResponse response, HttpServletRequest req) throws IOException {
         User sessionUser = null;
 
@@ -173,6 +195,31 @@ public class FlightController {
 
         userSession.setUser(userRepository.findByUsername(username));
         model.addAttribute("user", userRepository.findByUsername(username));
+
+        response.sendRedirect("/flightSearchResults");
+    }
+
+    @PreAuthorize("hasAuthority('ADMIN')")
+    @PostMapping("/adminProcessGuestFlightSearch")
+    public void adminProcessGuestFlightSearch(String departure, String destinationInput, int passengers, String outboundDate, String username,
+                                         Model model, HttpServletResponse response, HttpServletRequest req) throws IOException {
+        User sessionUser = null;
+
+        Principal userDetails = req.getUserPrincipal();
+        if (userDetails != null) {
+            sessionUser = userRepository.findByUsername(userDetails.getName());
+            model.addAttribute("sessionUser", sessionUser);
+        }
+
+
+        numberOfPassengers = passengers;
+        flightSearch.setDeparture(departure);
+        flightSearch.setDestinationInput(destinationInput);
+        flightSearch.setPassengers(passengers);
+        flightSearch.setOutboundDate(outboundDate);
+
+        userSession.setUser(userRepository.findByUsername("testGuest"));
+        model.addAttribute("user", userRepository.findByUsername("testguest"));
 
         response.sendRedirect("/flightSearchResults");
     }
@@ -289,7 +336,7 @@ public class FlightController {
 
         if (numberOfPassengers > 1) {
             return "passengerDetails.html";
-        } else if (isGuest(sessionUser)) {
+        } else if (isGuest(user)) {
             return "bookingDetails.html";
         } else {
             model.addAttribute("cards", user.getCredit_cards());

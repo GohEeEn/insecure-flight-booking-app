@@ -14,7 +14,7 @@
 
 			<h3>Thank For Booking with Secure Airways</h3>
 
-			<div th:each="entry: ${sessionUser.getRoles()}">
+			<div th:each="entry: ${user.getRoles()}">
 				<table th:if="${entry.name} == 'MEMBER'" class=table>
 <!--				<table th:if="${user != null}" class="table">-->
 					<thead>
