@@ -1,5 +1,6 @@
 package ucd.comp40660.user.controller;
 
+import com.sun.xml.bind.v2.runtime.output.SAXOutput;
 import ucd.comp40660.flight.model.Flight;
 import ucd.comp40660.flight.repository.FlightRepository;
 import ucd.comp40660.reservation.exception.ReservationNotFoundException;
@@ -50,12 +51,12 @@ public class UserController {
         return "index.html";
     }
 
-    //    Get all registrations
-    @GetMapping("/users")
-    @ResponseBody
-    public List<User> getAllUsers() {
-        return userRepository.findAll();
-    }
+//    //    Get all registrations
+//    @GetMapping("/users")
+//    @ResponseBody
+//    public List<User> getAllUsers() {
+//        return userRepository.findAll();
+//    }
 
     //    Get a single registration by id
 //    the id can be changed to any other attribute
@@ -83,15 +84,16 @@ public class UserController {
     }
 
     //    Delete a registration record
-    @GetMapping("/delete/{id}")
-    public String deleteRegistration(@PathVariable(value = "id") Long registrationID) throws UserNotFoundException {
+    @GetMapping("/delete")
+    public void deleteRegistration(HttpServletResponse response) throws UserNotFoundException, IOException {
+        Long registrationID =   userSession.getUser().getRegistrationID();
         User user = userRepository.findById(registrationID)
                 .orElseThrow(() -> new UserNotFoundException(registrationID));
 
         userRepository.delete(user);
         userSession.setUser(null);
 
-        return "index.html";
+        response.sendRedirect("/");
     }
 
     @GetMapping("/register")

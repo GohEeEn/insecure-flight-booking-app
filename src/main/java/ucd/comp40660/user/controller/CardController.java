@@ -35,11 +35,11 @@ public class CardController {
     @Autowired
     CreditCardRepository creditCardRepository;
 
-    @GetMapping("/cards")
-    @ResponseBody
-    public List<CreditCard> getCreditCards() {
-        return creditCardRepository.findAll();
-    }
+//    @GetMapping("/cards")
+//    @ResponseBody
+//    public List<CreditCard> getCreditCards() {
+//        return creditCardRepository.findAll();
+//    }
 
 
     @PostMapping("/addMemberCreditCard")
