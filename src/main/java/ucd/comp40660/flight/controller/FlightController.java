@@ -134,17 +134,6 @@ public class FlightController {
         return "flightResults.html";
     }
 
-//    @PostMapping("/flightSearchResults")
-//    public String flightSearchResults( Model model) {
-//        List<Flight> flightList = flightCheck();
-//
-//        model.addAttribute("displayedFlights", flightList);
-//        model.addAttribute("user", userSession.getUser());
-//
-//        return "flightResults.html";
-//    }
-
-
 
     @PostMapping("/selectFlight")
     public void selectFlight(String flightIndexSelected, Model model, HttpServletResponse response) throws IOException {
