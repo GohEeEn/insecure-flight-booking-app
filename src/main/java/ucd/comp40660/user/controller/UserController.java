@@ -60,12 +60,12 @@ public class UserController {
 
     //    Get a single registration by id
 //    the id can be changed to any other attribute
-    @GetMapping("/users/{id}")
-    @ResponseBody
-    public User getRegistrationById(@PathVariable(value = "id") Long registrationId) throws UserNotFoundException {
-        return userRepository.findById(registrationId)
-                .orElseThrow(() -> new UserNotFoundException(registrationId));
-    }
+//    @GetMapping("/users/{id}")
+//    @ResponseBody
+//    public User getRegistrationById(@PathVariable(value = "id") Long registrationId) throws UserNotFoundException {
+//        return userRepository.findById(registrationId)
+//                .orElseThrow(() -> new UserNotFoundException(registrationId));
+//    }
 
     //    update registration details
     @PutMapping("/users/{id}")
