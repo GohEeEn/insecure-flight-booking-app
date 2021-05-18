@@ -31,20 +31,22 @@ public class UserValidator implements Validator {
         User user = (User) o;
 
         if(!isValid(user.getName(), NAME_REGEX))
-            errors.rejectValue("firstname", "InvalidFirstName");
+            errors.rejectValue("name", "InvalidFirstName");
 
         if(!isValid(user.getSurname(), NAME_REGEX))
-            errors.rejectValue("lastname","InvalidLastName");
+            errors.rejectValue("surname","InvalidLastName");
 
-        if(!isEmailValid(user.getEmail()))
+        if(!isEmailValid(user.getEmail()) || (userService.findByEmail(user.getEmail())!=null))
             errors.rejectValue("email", "InvalidEmail");
 
-        if ((user.getUsername().length() < 4 || user.getUsername().length() > 32) ||
+        if(userService.findByPhone(user.getPhone()) != null)
+            errors.rejectValue("phone", "InvalidPhone");
+
+        if ((!user.getPasswordConfirm().equals(user.getPassword())) ||
+            (!isValid(user.getPassword(), PASSWORD_REGEX)) ||
+            (user.getUsername().length() < 4 || user.getUsername().length() > 32) ||
             (!isUserValid(user.getUsername())) ||
-            (userService.findByEmail(user.getEmail())!=null) ||
-            (userService.findByUsername(user.getUsername()) != null) ||
-            (!user.getPasswordConfirm().equals(user.getPassword())) ||
-            (!isValid(user.getPassword(), PASSWORD_REGEX))
+            (userService.findByUsername(user.getUsername()) != null)
         )
             errors.rejectValue("passwordConfirm", "Diff.userForm.passwordConfirm");
     }

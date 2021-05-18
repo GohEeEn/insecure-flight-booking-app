@@ -50,8 +50,6 @@ public class UserServiceImplementation implements UserService {
         userRepository.save(user);
     }
 
-
-
     @Override
     public User findByUsername(String username) {
         return userRepository.findByUsername(username);
@@ -63,9 +61,12 @@ public class UserServiceImplementation implements UserService {
     }
 
     @Override
-    public void save(ConfirmationToken token) {
+    public User findByPhone(String phone) {
+        return userRepository.findByPhone(phone);
+    }
 
-        // Save it
+    @Override
+    public void save(ConfirmationToken token) {
         confirmationTokenRepository.save(token);
     }
 

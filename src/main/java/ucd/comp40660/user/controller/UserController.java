@@ -124,7 +124,7 @@ public class UserController {
     }
 
     @GetMapping("/register")
-    public String register(Model model, HttpServletResponse response) throws Exception {
+    public String register(Model model, @ModelAttribute("userForm") User userForm, HttpServletResponse response) throws Exception {
         if (userSession.isLoginFailed()) {
             model.addAttribute("error", "Unable to create account, passwords do not match");
             userSession.setLoginFailed(false);
@@ -137,11 +137,10 @@ public class UserController {
 
 
     @PostMapping("/register")
-    public String register(Model model, @ModelAttribute("userForm") User userForm, BindingResult bindingResult){
+    public String register(Model model, @Valid @ModelAttribute("userForm") User userForm, BindingResult bindingResult){
         userValidator.validate(userForm, bindingResult);
 
         if(bindingResult.hasErrors()){
-            model.addAttribute("error", bindingResult.getAllErrors().toString()); // TODO
             return "register.html";
         }
 

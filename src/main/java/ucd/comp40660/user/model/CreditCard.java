@@ -9,8 +9,11 @@ import ucd.comp40660.reservation.model.Reservation;
 
 import javax.persistence.*;
 import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.Pattern;
 import java.util.ArrayList;
 import java.util.List;
+
+import static ucd.comp40660.filter.RegexConstants.CREDIT_CARD_REGEX;
 
 @Entity
 @Table(name="credit_cards", uniqueConstraints = {@UniqueConstraint(columnNames = {"card_number"})})
@@ -25,6 +28,7 @@ public class CreditCard {
     private String cardholder_name;
 
     @NotBlank
+    @Pattern(regexp = CREDIT_CARD_REGEX, message = "Invalid card number")
     private String card_number;
 
     @NotBlank
@@ -49,7 +53,6 @@ public class CreditCard {
     @JsonIgnore
     @ToString.Exclude
     private List<Reservation> reservations = new ArrayList<>();
-
 
     public CreditCard() { super(); }
 
