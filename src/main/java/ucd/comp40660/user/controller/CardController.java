@@ -68,14 +68,14 @@ public class CardController {
             newCard.setUser(user);
             user.getCredit_cards().add(newCard);
         } else {
-            LOGGER.warn("%s", "Unsuccessful attempt to add credit card details by a non-logged in user.");
+            LOGGER.warn("Unsuccessful attempt to add credit card details by a non-logged in user.");
             model.addAttribute("error", "\nError, No Member logged in to save card details.");
             return "login.html";
         }
 
         newCard = creditCardRepository.saveAndFlush(newCard);
 
-        LOGGER.info("%s", "Member credit card added for user <" + user.getUsername() + "> with the role of <" + user.getRoles() + ">");
+        LOGGER.info("Member credit card added for user <" + user.getUsername() + "> with the role of <" + user.getRoles() + ">");
         return "viewProfile.html";
     }
 
@@ -92,7 +92,7 @@ public class CardController {
 
         model.addAttribute("cards", creditCardRepository.findAllByUser(sessionUser));
 
-        LOGGER.info("%s", "Called viewCreditCards(): by user <" + username + "> with the role of <" + userRepository.findByUsername(username).getRoles() + ">");
+        LOGGER.info("Called viewCreditCards(): by user <" + username + "> with the role of <" + userRepository.findByUsername(username).getRoles() + ">");
         return "viewCreditCards.html";
     }
 
@@ -128,7 +128,7 @@ public class CardController {
         model.addAttribute("user", user);
         model.addAttribute("cards", creditCardRepository.findAllByUser(user));
 
-        LOGGER.info("%s", "Deleted credit card by user <" + user.getUsername() + "> with the role of <" + user.getRoles() + ">");
+        LOGGER.info("Deleted credit card by user <" + user.getUsername() + "> with the role of <" + user.getRoles() + ">");
 
         return "viewCreditCards.html";
     }
