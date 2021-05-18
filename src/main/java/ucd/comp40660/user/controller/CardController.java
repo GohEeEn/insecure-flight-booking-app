@@ -79,22 +79,21 @@ public class CardController {
         return "viewProfile.html";
     }
 
+
     @PreAuthorize("#username == authentication.name")
-    @GetMapping("/viewCreditCards/{username}")
-    public String viewMemberCreditCards(@PathVariable(value = "username") String username, Model model, HttpServletRequest req) {
-        User sessionUser = null;
+    @GetMapping("/viewMemberCreditCards/{username}")
+    public String viewMemberCreditCards(@PathVariable String username, Model model, HttpServletRequest req) {
 
-        Principal userDetails = req.getUserPrincipal();
-        if (userDetails != null) {
-            sessionUser = userRepository.findByUsername(userDetails.getName());
-            model.addAttribute("sessionUser", sessionUser);
-        }
+        User user = null;
+        user = userRepository.findByUsername(username);
 
-        model.addAttribute("cards", creditCardRepository.findAllByUser(sessionUser));
+        model.addAttribute("cards", creditCardRepository.findAllByUser(user));
+        model.addAttribute("user", user);
 
-        LOGGER.info("%s", "Called viewCreditCards(): by user <" + username + "> with the role of <" + userRepository.findByUsername(username).getRoles() + ">");
+//        LOGGER.info("%s", "Called viewCreditCards(): by user <" + username + "> with the role of <" + userRepository.findByUsername(username).getRoles() + ">");
         return "viewCreditCards.html";
     }
+
 
     @GetMapping("/registerCard")
     public String registerCardView(Model model, HttpServletRequest req) {

@@ -63,10 +63,21 @@ public class ReservationController {
 
     //    Get all reservations
     @GetMapping("/reservations")
-    @ResponseBody
-    public List<Reservation> getAllReservations() {
-        LOGGER.info("%s", "Get list of reservations called by <" +  userSession.getUser().getUsername() + "> with the role of <" + userSession.getUser().getRoles() + ">");
-        return reservationRepository.findAll();
+    public String getAllReservations(HttpServletRequest req, Model model) {
+
+        User sessionUser = null;
+
+        Principal userDetails = req.getUserPrincipal();
+        if (userDetails != null) {
+            sessionUser = userRepository.findByUsername(userDetails.getName());
+            model.addAttribute("sessionUser", sessionUser);
+        }
+
+        LOGGER.info("%s", "Get list of reservations called by <" +  sessionUser.getUsername() + "> with the role of <" + sessionUser.getRoles() + ">");
+        List<Reservation> reservations = reservationRepository.findAll();
+        model.addAttribute("reservations", reservations);
+
+        return "viewReservations.html";
     }
 
     //    Get a single reservation by id

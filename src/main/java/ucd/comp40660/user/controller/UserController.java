@@ -14,6 +14,7 @@ import org.springframework.stereotype.Controller;
 import ucd.comp40660.user.exception.CreditCardNotFoundException;
 import ucd.comp40660.user.exception.UserNotFoundException;
 import ucd.comp40660.user.model.CreditCard;
+import ucd.comp40660.user.model.Role;
 import ucd.comp40660.user.model.User;
 import ucd.comp40660.user.repository.CreditCardRepository;
 import ucd.comp40660.user.repository.UserRepository;
@@ -31,6 +32,7 @@ import java.io.IOException;
 import java.security.Principal;
 import java.sql.SQLIntegrityConstraintViolationException;
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 
 
@@ -233,45 +235,6 @@ public class UserController {
     }
 
 
-
-
-
-
-//    @PostMapping("/register")
-//    public String createUser(String name, String surname, String username, String phone, String address, String email,
-//                             String password, String passwordDuplicate, Model model) throws SQLIntegrityConstraintViolationException, IOException {
-//
-//        if (userRepository.existsByUsername(username)) {
-//            System.out.println("\n\nDUPLICATE USERNAME DETECTED\n\n");
-//            model.addAttribute("error", "Username already exists.");
-//            return "register.html";
-//        } else if (userRepository.existsByEmail(email)) {
-//            model.addAttribute("error", "E-mail address already in use.");
-//            return "register.html";
-//        } else if (userRepository.existsByPhone(phone)) {
-//            model.addAttribute("error", "Phone number already in use.");
-//            return "register.html";
-//        } else {
-//            if (password.equals(passwordDuplicate)) {
-//                User user = new User();
-//                user.setName(name);
-//                user.setSurname(surname);
-//                user.setUsername(username);
-//                user.setPhone(phone);
-//                user.setAddress(address);
-//                user.setEmail(email);
-//                user.setRole("MEMBER");
-//                user.setPassword(password);
-//                userRepository.save(user);
-//                userSession.setUser(user);
-//                return "index.html";
-//            } else {
-//                userSession.setLoginFailed(true);
-//                return "register.html";
-//            }
-//        }
-//    }
-
     @GetMapping("/viewProfile")
     public String viewProfile(Model model, HttpServletRequest req) {
         Principal userDetails = req.getUserPrincipal();
@@ -282,8 +245,27 @@ public class UserController {
     }
 
     @GetMapping("/editProfile")
-    public String loadEditProfile(Model model) {
-        model.addAttribute("user", userSession.getUser());
+    public String loadEditProfile(Model model, HttpServletRequest req) {
+
+        User sessionUser = null;
+
+        Principal userDetails = req.getUserPrincipal();
+        if (userDetails != null) {
+            sessionUser = userRepository.findByUsername(userDetails.getName());
+            model.addAttribute("sessionUser", sessionUser);
+        }
+
+        //Determine if booking as admin
+        User user = null;
+        if(isAdmin(sessionUser)){
+            user = userSession.getUser();
+        }
+        else{
+            user = sessionUser;
+        }
+        model.addAttribute("user", user);
+
+//        model.addAttribute("user", userSession.getUser());
         return "editProfile.html";
     }
 
@@ -384,4 +366,27 @@ public class UserController {
 
         return "editPassword.html";
     }
+
+    private boolean isAdmin(User sessionUser) {
+        boolean isAdmin = false;
+        Iterator<Role> roleIterator = sessionUser.getRoles().iterator();
+        while(roleIterator.hasNext()){
+            if(roleIterator.next().getName().equals("ADMIN")){
+                isAdmin = true;
+            }
+        }
+        return isAdmin;
+    }
+
+    private boolean isGuest(User sessionUser) {
+        boolean isGuest = false;
+        Iterator<Role> roleIterator = sessionUser.getRoles().iterator();
+        while(roleIterator.hasNext()){
+            if(roleIterator.next().getName().equals("GUEST")){
+                isGuest = true;
+            }
+        }
+        return isGuest;
+    }
+
 }
