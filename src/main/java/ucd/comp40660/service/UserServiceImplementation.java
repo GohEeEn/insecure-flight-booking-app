@@ -25,11 +25,13 @@ public class UserServiceImplementation implements UserService {
     @Autowired
     private RoleRepository roleRepository;
     @Autowired
-    private BCryptPasswordEncoder bCryptPasswordEncoder = new BCryptPasswordEncoder(12);
+    private BCryptPasswordEncoder bCryptPasswordEncoder;
 
     @Override
     public void save(User user) {
+        bCryptPasswordEncoder = new BCryptPasswordEncoder(12);
         user.setPassword(bCryptPasswordEncoder.encode(user.getPassword()));
+        System.out.println(bCryptPasswordEncoder.encode(user.getPassword()));
         Role userRole = roleRepository.findByName("MEMBER");
         Set<Role> roleSet = new HashSet<Role>();
         roleSet.add(userRole);
@@ -39,7 +41,9 @@ public class UserServiceImplementation implements UserService {
 
     @Override
     public void adminSave(User user) {
+        bCryptPasswordEncoder = new BCryptPasswordEncoder(12);
         user.setPassword(bCryptPasswordEncoder.encode(user.getPassword()));
+        System.out.println(bCryptPasswordEncoder.encode(user.getPassword()));
         Role userRole = roleRepository.findByName("ADMIN");
         System.out.println("\n\nROLE FOUND: ");
         System.out.println(userRole.getName());
@@ -49,7 +53,6 @@ public class UserServiceImplementation implements UserService {
         user.setRoles(roleSet);
         userRepository.save(user);
     }
-
 
 
     @Override
@@ -74,7 +77,7 @@ public class UserServiceImplementation implements UserService {
         ConfirmationToken token = confirmationTokenRepository.findByConfirmationToken(confirmationToken);
 
         if (token != null) {
-            if(!isTokenExpired(token.getCreatedDate()) && !token.isUsed()) {
+            if (!isTokenExpired(token.getCreatedDate()) && !token.isUsed()) {
                 User user = userRepository.findByEmail(token.getUser().getEmail());
                 token.setUsed(true);
                 confirmationTokenRepository.save(token);
@@ -89,19 +92,20 @@ public class UserServiceImplementation implements UserService {
     @Override
     public void savePassword(String email, String password) {
         User tokenUser = userRepository.findByEmail(email);
+        bCryptPasswordEncoder = new BCryptPasswordEncoder(12);
         tokenUser.setPassword(bCryptPasswordEncoder.encode(password));
+        System.out.println(bCryptPasswordEncoder.encode(password));
         userRepository.save(tokenUser);
     }
 
 
-
-    private boolean isTokenExpired(Date createdDate){
+    private boolean isTokenExpired(Date createdDate) {
         Date now = new Date();
 
         long milliseconds1 = createdDate.getTime();
         long milliseconds2 = now.getTime();
-        long diffMinutes = (milliseconds2 - milliseconds1)/ (60 * 1000);
-        if(diffMinutes <= 20 ) return false;
+        long diffMinutes = (milliseconds2 - milliseconds1) / (60 * 1000);
+        if (diffMinutes <= 20) return false;
 
 
         return true;

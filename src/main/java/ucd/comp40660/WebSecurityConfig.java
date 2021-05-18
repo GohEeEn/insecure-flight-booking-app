@@ -52,6 +52,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter{
     public DaoAuthenticationProvider authenticationProvider(){
         DaoAuthenticationProvider authProvider = new DaoAuthenticationProvider();
         authProvider.setUserDetailsService(userDetailsService);
+        bCryptPasswordEncoder = new BCryptPasswordEncoder(12);
         authProvider.setPasswordEncoder(bCryptPasswordEncoder);
         return authProvider;
     }
@@ -66,12 +67,12 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter{
 
         http.cors().and().csrf().disable()
                 .authorizeRequests()
-                .antMatchers("/error", "/resources/**", "/login","/register", "/forgotpassword", "/confirm-reset", "/")
+                .antMatchers("/error", "/adminRegister", "/resources/**", "/login","/register", "/forgotpassword", "/confirm-reset", "/")
                 .permitAll()
                 .antMatchers("/user").access("hasAnyAuthority('ADMIN','USER')")
                 .antMatchers("/admin").access("hasAuthority('ADMIN')")
                 .antMatchers("/users").access("hasAuthority('ADMIN')")
-                .antMatchers("/adminRegister").access("hasAuthority('ADMIN')")
+//                .antMatchers("/adminRegister").access("hasAuthority('ADMIN')")
                 .anyRequest().authenticated()
                 .and()
                 .formLogin()
