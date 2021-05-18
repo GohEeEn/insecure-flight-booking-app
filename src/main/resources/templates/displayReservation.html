@@ -39,27 +39,27 @@
 					</tbody>
 <!--				</table>-->
 				</table>
+
+
+				<table th:if="${entry.name} == 'GUEST'" class="table">
+					<caption style="color: red">
+						Note : Remember this reservation id and your registered email address to access it in future
+					</caption>
+
+					<thead>
+						<tr>
+							<th>#</th>
+							<th>Reservation ID</th>
+						</tr>
+					</thead>
+					<tbody>
+						<tr th:each="guestReservationId : ${guestReservationIds}">
+							<td></td>
+							<td th:text="${guestReservationId.id}"></td>
+						</tr>
+					</tbody>
+				</table>
 			</div>
-
-			<table th:if="${entry.name} == 'GUEST'" class="table">
-				<caption style="color: red">
-					Note : Remember this reservation id and your registered email address to access it in future
-				</caption>
-
-				<thead>
-					<tr>
-						<th>#</th>
-						<th>Reservation ID</th>
-					</tr>
-				</thead>
-				<tbody>
-					<tr th:each="guestReservationId : ${guestReservationIds}">
-						<td></td>
-						<td th:text="${guestReservationId.id}"></td>
-					</tr>
-				</tbody>
-			</table>
-
 			<div class="row">
 				<form action="/home" class="inline" method="post">
 					<button type="submit" class="btn btn-primary btn-lg">Home</button>

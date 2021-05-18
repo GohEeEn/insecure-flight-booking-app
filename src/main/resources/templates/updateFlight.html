@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="en" xmlns:th="http://www.thymeleaf.org">
 <head>
-  <title>Flight Registration</title>
+  <title>Update Flight</title>
 
   <div th:replace="fragments/header :: header-data"></div>
 </head>
@@ -12,7 +12,6 @@
 <div class="container">
 
   <h2>Update Flight Details</h2>
-  <h3 th:text="${FLIGHTID}"></h3>
 
   <form th:action="@{/updateFlightInfo}" method="GET">
 
@@ -84,7 +83,7 @@
       </div>
     </div>
 
-    <button type="submit" class="btn btn-primary">Register Flight</button>
+    <button type="submit" class="btn btn-primary">Update Flight</button>
   </form>
 </div>
 

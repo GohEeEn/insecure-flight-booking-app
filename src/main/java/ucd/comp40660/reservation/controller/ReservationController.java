@@ -28,6 +28,7 @@ import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.Optional;
 
 import ucd.comp40660.user.repository.GuestRepository;
 import ucd.comp40660.user.repository.UserRepository;
@@ -333,9 +334,62 @@ public class ReservationController {
 
 //            if no reservation found with the provided details, keep user on the same page
             model.addAttribute("error", "No such reservation found.");
-          
+
             return "index.html";
         }
+    }
+
+
+    @GetMapping("/updateReservation")
+    public String updateReservation(@ModelAttribute(value = "id") String reservationID, Model model, HttpServletRequest req){
+        User sessionUser = null;
+
+        Principal userDetails = req.getUserPrincipal();
+        if (userDetails != null) {
+            sessionUser = userRepository.findByUsername(userDetails.getName());
+            model.addAttribute("sessionUser", sessionUser);
+        }
+        model.addAttribute("reservationID", reservationID);
+
+
+        return "/updateReservation.html";
+    }
+
+
+
+
+    @GetMapping("/updateReservationInfo")
+    public String updateReservationInfo(@ModelAttribute(value="id") Long reservationID, String guestEmail,
+                                    String username, Long flightID){
+
+        Optional<Reservation> optionalReservation = reservationRepository.findById(reservationID);
+        Guest guest = guestRepository.findByEmail(guestEmail);
+        User user = userRepository.findByUsername(username);
+        Flight flight = flightRepository.findFlightByFlightID(flightID);
+
+        if(optionalReservation.isPresent()){
+            Reservation reservation = optionalReservation.get();
+
+            if(guest != null){
+                reservation.setEmail(guest.getEmail());
+                reservation.setGuest(guest);
+                reservation.setFlight(flight);
+            }
+            else {
+                reservation.setEmail(user.getEmail());
+                reservation.setUser(user);
+                reservation.setFlight(flight);
+            }
+
+            reservationRepository.saveAndFlush(reservation);
+
+        }
+
+        else{
+            //error
+        }
+
+        return "/viewReservations";
     }
 
 }

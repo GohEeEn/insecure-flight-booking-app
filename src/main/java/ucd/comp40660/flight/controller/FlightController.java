@@ -560,6 +560,7 @@ public class FlightController {
         return "displayPaymentPage.html";
     }
 
+//    @PreAuthorize("hasAuthority('MEMBER') or hasAuthority('ADMIN')")
     @PostMapping("/processMemberPayment")
     public String processMemberPayment(Model model, CreditCard card, HttpServletRequest req) {
 
@@ -573,6 +574,7 @@ public class FlightController {
 
         //Determine if booking as admin
         User user = null;
+        assert sessionUser != null;
         if(isAdmin(sessionUser)){
             user = userSession.getUser();
         }
@@ -596,6 +598,7 @@ public class FlightController {
           return "index.html";
       } else {
           reservation.setFlight(flight);
+          reservation.setEmail(user.getEmail());
           flight.getReservations().add(reservation);
           flightRepository.saveAndFlush(flight);
           reservationRepository.saveAndFlush(reservation);
