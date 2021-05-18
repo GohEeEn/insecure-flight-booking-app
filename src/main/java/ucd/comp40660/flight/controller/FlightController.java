@@ -185,19 +185,16 @@ public class FlightController {
                 .orElseThrow(() -> new FlightNotFoundException(flightID));
     }
 
-    @GetMapping("/updateFlight/{id}")
-    public String updateFlight(@PathVariable(value = "id") String flightID, Model model, HttpServletRequest req){
+    @GetMapping("/updateFlight")
+    public String updateFlight(@ModelAttribute(value = "id") String flightID, Model model, HttpServletRequest req){
         User sessionUser = null;
-
-
-
 
         Principal userDetails = req.getUserPrincipal();
         if (userDetails != null) {
             sessionUser = userRepository.findByUsername(userDetails.getName());
             model.addAttribute("sessionUser", sessionUser);
         }
-        model.addAttribute("id", flightID);
+        model.addAttribute("FLIGHTID", flightID);
 
         return "/updateFlight.html";
 
@@ -205,10 +202,9 @@ public class FlightController {
 
 
     //    Update flight details
-    @PutMapping("/updateFlight/{id}")
-    @ResponseBody
-    public Flight updateFlight(@PathVariable(value = "id") Long flightID, String source, String destination,  String departureDate, String departureTime,
-                               String arrivalDate, String arrivalTime) throws FlightNotFoundException, ParseException {
+    @GetMapping("/updateFlightInfo")
+    public void updateFlightInfo(@RequestParam(value = "FLIGHTID") Long flightID, String source, String destination,  String departureDate, String departureTime,
+                               String arrivalDate, String arrivalTime, HttpServletResponse response, HttpServletRequest req) throws FlightNotFoundException, ParseException, IOException {
         Flight flight = flightRepository.findById(flightID)
                 .orElseThrow(() -> new FlightNotFoundException(flightID));
 
@@ -222,9 +218,11 @@ public class FlightController {
         flight.setArrivalDateTime(arr);
         flight.setDeparture_date_time(dep);
 
-        LOGGER.info("%s", "Called updateFlight() with id <" + flightID + "> by user <" + userSession.getUser().getUsername() + "> with the role of <" + userSession.getUser().getRoles() + ">");
+        LOGGER.info("%s", "Called updateFlight() with id <" + flightID );
 
-        return flightRepository.saveAndFlush(flight);
+        flightRepository.saveAndFlush(flight);
+
+        response.sendRedirect("/flights");
     }
 
     //    Delete a flight record
