@@ -137,7 +137,7 @@ public class UserController {
 
 
     @PostMapping("/register")
-    public String register(Model model, @Valid @ModelAttribute("userForm") User userForm, BindingResult bindingResult){
+    public String register(@Valid @ModelAttribute("userForm") User userForm, BindingResult bindingResult){
         userValidator.validate(userForm, bindingResult);
 
         if(bindingResult.hasErrors()){
@@ -150,7 +150,7 @@ public class UserController {
     }
 
     @GetMapping("/adminRegister")
-    public String adminRegister(Model model, HttpServletResponse response) throws Exception {
+    public String adminRegister(Model model, @ModelAttribute("userForm") User userForm, HttpServletResponse response) throws Exception {
         if (userSession.isLoginFailed()) {
             model.addAttribute("error", "Unable to create account, passwords do not match");
             userSession.setLoginFailed(false);
@@ -162,11 +162,10 @@ public class UserController {
     }
 
     @PostMapping("/adminRegister")
-    public String adminRegister(Model model, @ModelAttribute("userForm") User userForm, BindingResult bindingResult){
+    public String adminRegister(@Valid @ModelAttribute("userForm") User userForm, BindingResult bindingResult){
         userValidator.validate(userForm, bindingResult);
 
         if(bindingResult.hasErrors()){
-            model.addAttribute("error", bindingResult.getAllErrors().toString()); // TODO
             return "adminRegister.html";
         }
 

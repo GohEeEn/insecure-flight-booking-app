@@ -13,52 +13,60 @@
 
   <h2>Register your account</h2>
 
-  <form action="/adminRegister" method="POST" th:object="${user}">
+  <form action="/adminRegister" method="POST" th:object="${userForm}">
 
     <div class="form-group">
       <label for="name">First Name</label>
-      <input id="name" class="form-control" type="text" name="name" placeholder="First Name" required/>
+      <input id="name" class="form-control" type="text" name="name" placeholder="First Name" th:field="*{name}" onkeydown="clearErrors()" required/>
+      <span class="error" th:if="${#fields.hasErrors('name')}" th:errors="*{name}"></span>
     </div>
 
     <div class="form-group">
       <label for="surname">Surname</label>
-      <input id="surname" class="form-control" type="text" name="surname" placeholder="Surname" required/>
+      <input id="surname" class="form-control" type="text" name="surname" placeholder="Surname" th:field="*{surname}" onkeydown="clearErrors()" required/>
+      <span class="error" th:if="${#fields.hasErrors('surname')}" th:errors="*{surname}"></span>
     </div>
 
     <div class="form-group">
       <label for="username">Username</label>
-      <input id="username" class="form-control" type="text" name="username" placeholder="Username" required/>
+      <input id="username" class="form-control" type="text" name="username" placeholder="Username, must be at least 4 characters" th:field="*{username}" onkeydown="clearErrors()" autocomplete="username" required/>
+      <span class="error" th:if="${#fields.hasErrors('username')}" th:errors="*{username}"></span>
     </div>
 
-    <div class="form-group">
-      <label for="password">Password</label>
-      <input id="password" class="form-control" type="password" name="password" placeholder="Password" required/>
+    <div class="form-row">
+      <div class="form-group col-md-6">
+        <label for="password">Password</label>
+        <input id="password" class="form-control" type="password" name="password" placeholder="Password" onkeyup="CheckPasswordStrength(this.value);" onkeydown="clearErrors()" autocomplete="new-password" required/>
+      </div>
+
+      <div class="form-group col-md-6">
+        <label for="passwordConfirm">Confirm Password</label>
+        <input id="passwordConfirm" class="form-control" type="password" name="passwordConfirm" placeholder="Confirm Password" th:field="*{passwordConfirm}" onkeydown="clearErrors()" autocomplete="new-password" required/>
+      </div>
     </div>
 
-    <div class="form-group">
-      <label for="passwordConfirm">Confirm Password</label>
-      <input id="passwordConfirm" class="form-control" type="password" name="passwordConfirm" placeholder="Confirm Password" required/>
+    <div class="custom-control custom-checkbox mb-3">
+      <input type="checkbox" onclick="showPassword()" class="custom-control-input" id="viewPwd">
+      <label class="custom-control-label" for="viewPwd">Show <span id="password_strength"></span> Password</label>
+      <br/>
+      <span class="error" th:if="${#fields.hasErrors('passwordConfirm')}" th:errors="*{passwordConfirm}"></span>
     </div>
 
     <div class="form-group">
       <label for="phone">Phone Number</label>
-      <input id="phone" class="form-control" type="text" name="phone" placeholder="Phone Number" required/>
+      <input id="phone" class="form-control" type="text" name="phone" placeholder="Phone Number" th:field="*{phone}" onkeydown="clearErrors()" required/>
+      <span class="error" th:if="${#fields.hasErrors('phone')}" th:errors="*{phone}"></span>
     </div>
 
     <div class="form-group">
       <label for="email">Email</label>
-      <input id="email" class="form-control" type="text" name="email" placeholder="E-mail Address" required/>
+      <input id="email" class="form-control" type="text" name="email" placeholder="E-mail Address" th:field="*{email}" onkeydown="clearErrors()" required/>
+      <span class="error" th:if="${#fields.hasErrors('email')}" th:errors="*{email}"></span>
     </div>
 
     <div class="form-group">
       <label for="address">Address</label>
       <input id="address" class="form-control" type="text" name="address" placeholder="Living Address" required/>
-    </div>
-
-    <div class="container" th:if="error != null">
-      <div class="row">
-        <p class="error" th:text="${error}"></p>
-      </div>
     </div>
 
     <button type="submit" class="btn btn-primary">Register</button>
