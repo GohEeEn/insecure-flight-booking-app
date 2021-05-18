@@ -6,6 +6,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Controller;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.WebDataBinder;
 import org.springframework.web.bind.annotation.*;
@@ -24,6 +25,7 @@ import ucd.comp40660.user.repository.PassengerRepository;
 import ucd.comp40660.user.repository.UserRepository;
 import ucd.comp40660.validator.UserValidator;
 
+import javax.persistence.Transient;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
@@ -86,7 +88,7 @@ public class FlightController {
     }
 
     //    Get all flights
-    @PreAuthorize("hasAuthority('ADMIN')")
+//    @PreAuthorize("hasAuthority('ADMIN')")
     @GetMapping("/flights")
     public String getAllFlights(HttpServletRequest req, Model model) {
         User sessionUser = null;
@@ -183,39 +185,64 @@ public class FlightController {
                 .orElseThrow(() -> new FlightNotFoundException(flightID));
     }
 
+    @GetMapping("/updateFlight/{id}")
+    public String updateFlight(@PathVariable(value = "id") String flightID, Model model, HttpServletRequest req){
+        User sessionUser = null;
+
+
+
+
+        Principal userDetails = req.getUserPrincipal();
+        if (userDetails != null) {
+            sessionUser = userRepository.findByUsername(userDetails.getName());
+            model.addAttribute("sessionUser", sessionUser);
+        }
+        model.addAttribute("id", flightID);
+
+        return "/updateFlight.html";
+
+    }
+
+
     //    Update flight details
     @PutMapping("/updateFlight/{id}")
     @ResponseBody
-    public Flight updateFlight(@PathVariable(value = "id") Long flightID, @Valid @RequestBody Flight flightDetails) throws FlightNotFoundException {
+    public Flight updateFlight(@PathVariable(value = "id") Long flightID, String source, String destination,  String departureDate, String departureTime,
+                               String arrivalDate, String arrivalTime) throws FlightNotFoundException, ParseException {
         Flight flight = flightRepository.findById(flightID)
                 .orElseThrow(() -> new FlightNotFoundException(flightID));
 
-        flight.setSource(flightDetails.getSource());
-        flight.setDestination(flightDetails.getDestination());
-        flight.setArrivalDateTime(flightDetails.getArrivalDateTime());
-        flight.setDeparture_date_time(flightDetails.getDeparture_date_time());
+        SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd HH:mm");
+
+        Date dep = df.parse(departureDate + " " + departureTime);
+        Date arr = df.parse(arrivalDate + " " + arrivalTime);
+
+        flight.setSource(source);
+        flight.setDestination(destination);
+        flight.setArrivalDateTime(arr);
+        flight.setDeparture_date_time(dep);
 
         LOGGER.info("%s", "Called updateFlight() with id <" + flightID + "> by user <" + userSession.getUser().getUsername() + "> with the role of <" + userSession.getUser().getRoles() + ">");
 
-        return flightRepository.save(flight);
+        return flightRepository.saveAndFlush(flight);
     }
 
     //    Delete a flight record
-    @DeleteMapping("/flights/{id}")
-    @ResponseBody
-    public ResponseEntity<?> deleteFlight(@PathVariable(value = "id") Long flightID) throws FlightNotFoundException {
+    @GetMapping(value = "/deleteFlight")
+    public void deleteFlight(@RequestParam(value = "id") Long flightID, HttpServletResponse response) throws FlightNotFoundException, IOException {
+        LOGGER.info("Flight ID: " + flightID);
+
         Flight flight = flightRepository.findById(flightID)
                 .orElseThrow(() -> new FlightNotFoundException(flightID));
 
-        flightRepository.deleteFlightByFlightID(flightID);
+        flightRepository.delete(flight);
 
-        LOGGER.info("%s", "Called deleteFlightByFlightID with id <" + flightID + "> by user <" + userSession.getUser().getUsername() + "> with the role of <" + userSession.getUser().getRoles() + ">");
+        LOGGER.info("%s, Called deleteFlightByFlightID with id <" + flightID);
 
-        return ResponseEntity.ok().build();
+        response.sendRedirect("/flights");
     }
 
     @PostMapping("/processFlightSearch")
-
     public void processFlightSearch(String departure, String destinationInput, int passengers, String outboundDate,
                                     Model model, HttpServletResponse response, HttpServletRequest req) throws IOException {
 

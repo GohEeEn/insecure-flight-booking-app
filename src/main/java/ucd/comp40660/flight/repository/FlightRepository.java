@@ -1,5 +1,6 @@
 package ucd.comp40660.flight.repository;
 
+import org.springframework.transaction.annotation.Transactional;
 import ucd.comp40660.flight.model.Flight;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
@@ -16,6 +17,8 @@ public interface FlightRepository extends JpaRepository<Flight, Long> {
     List<Flight> findAllByReservationsAndArrivalDateTimeBefore(Reservation reservation, Date date);
     List<Flight> findAllByReservationsAndArrivalDateTimeAfter(Reservation reservation, Date date);
     List<Flight> findAllByReservationsAndArrivalDateTimeBetween(Reservation reservation, Date start, Date finish);
+
+    @Transactional
     Flight deleteFlightByFlightID(Long id);
 
 }

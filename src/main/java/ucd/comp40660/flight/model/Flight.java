@@ -37,7 +37,7 @@ public class Flight {
     private Date arrivalDateTime;
 
     @Column
-    @OneToMany(mappedBy = "flight")
+    @OneToMany(mappedBy = "flight", cascade = CascadeType.ALL)
     private List<Reservation> reservations = new ArrayList<>();
 
     public Flight() {
