@@ -1,6 +1,7 @@
 package ucd.comp40660.flight.controller;
 
-import lombok.extern.log4j.Log4j2;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -33,12 +34,12 @@ import java.util.Iterator;
 import java.util.List;
 
 
-@Log4j2
 @Controller
 public class FlightController {
 
     private final FlightSearch flightSearch = new FlightSearch();
     private Guest guest = new Guest();
+    private static final Logger LOGGER = LoggerFactory.getLogger(FlightController.class);
 
     @Autowired
     ReservationRepository reservationRepository;
@@ -81,6 +82,7 @@ public class FlightController {
     @GetMapping("/flights")
     @ResponseBody
     public List<Flight> getAllFlights() {
+        LOGGER.info("%s", "Called getAllFlights() by user <" + userSession.getUser().getUsername() + "> with the role of <" + userSession.getUser().getRoles() + ">");
         return flightRepository.findAll();
     }
 
@@ -88,6 +90,9 @@ public class FlightController {
     @GetMapping("/flights/{id}")
     @ResponseBody
     public Flight getFlightById(@PathVariable(value = "id") Long flightID) throws FlightNotFoundException {
+
+        LOGGER.info("%s", "Called getFlightById() with id = <" + flightID + "> by user <" + userSession.getUser().getUsername() + "> with the role of <" + userSession.getUser().getRoles() + ">");
+
         return flightRepository.findById(flightID)
                 .orElseThrow(() -> new FlightNotFoundException(flightID));
     }
@@ -104,6 +109,8 @@ public class FlightController {
         flight.setArrivalDateTime(flightDetails.getArrivalDateTime());
         flight.setDeparture_date_time(flightDetails.getDeparture_date_time());
 
+        LOGGER.info("%s", "Called updateFlight() with id <" + flightID + "> by user <" + userSession.getUser().getUsername() + "> with the role of <" + userSession.getUser().getRoles() + ">");
+
         return flightRepository.save(flight);
     }
 
@@ -115,6 +122,8 @@ public class FlightController {
                 .orElseThrow(() -> new FlightNotFoundException(flightID));
 
         flightRepository.delete(flight);
+
+        LOGGER.info("%s", "Called deleteFlight() with id <" + flightID + "> by user <" + userSession.getUser().getUsername() + "> with the role of <" + userSession.getUser().getRoles() + ">");
 
         return ResponseEntity.ok().build();
     }
@@ -264,6 +273,7 @@ public class FlightController {
             sessionUser = userRepository.findByUsername(userDetails.getName());
             model.addAttribute("sessionUser", sessionUser);
         }
+        model.addAttribute("user", user);
 
         User user = null;
         if(isAdmin(sessionUser)){
@@ -395,34 +405,44 @@ public class FlightController {
         }
         model.addAttribute("user", user);
 
+        //Determine if booking as admin
+        User user = null;
+        if(isAdmin(sessionUser)){
+            user = userSession.getUser();
+        }
+        else{
+            user = sessionUser;
+        }
+        model.addAttribute("user", user);
+
 //      User user = userSession.getUser();
-      Reservation reservation = new Reservation();
-//        if(!user.getReservations().contains())
-      user.getReservations().add(reservation);
-      userRepository.flush();
-      reservation.setUser(user);
+        Reservation reservation = new Reservation();
+    //        if(!user.getReservations().contains())
+        user.getReservations().add(reservation);
+        userRepository.flush();
+        reservation.setUser(user);
 
 
-      Flight flight = flightRepository.findFlightByFlightID(temporaryFlightReference);
-      if (reservationRepository.existsByUserAndFlight(user, flight)) {
-          model.addAttribute("user", user);
-          model.addAttribute("error", "Flight already booked by Member, new booking cancelled.\n");
-          return "index.html";
-      } else {
-          reservation.setFlight(flight);
-          flight.getReservations().add(reservation);
-          flightRepository.saveAndFlush(flight);
-          reservationRepository.saveAndFlush(reservation);
-          reservation.setCredit_card(card);
+        Flight flight = flightRepository.findFlightByFlightID(temporaryFlightReference);
+        if (reservationRepository.existsByUserAndFlight(user, flight)) {
+            model.addAttribute("user", user);
+            model.addAttribute("error", "Flight already booked by Member, new booking cancelled.\n");
+            return "index.html";
+        } else {
+            reservation.setFlight(flight);
+            flight.getReservations().add(reservation);
+            flightRepository.saveAndFlush(flight);
+            reservationRepository.saveAndFlush(reservation);
+            reservation.setCredit_card(card);
 
-          model.addAttribute("user", user);
-          model.addAttribute("reservation", reservation);
-          model.addAttribute("flight", flight);
+            model.addAttribute("user", user);
+            model.addAttribute("reservation", reservation);
+            model.addAttribute("flight", flight);
 
-          return "displayReservation.html";
+            return "displayReservation.html";
 
-      }
-  }
+        }
+    }
 
 
 
@@ -459,7 +479,7 @@ public class FlightController {
     public String displayReservationId(Model model) {
         List<Reservation> guestReservationId = new ArrayList<>();
         List<Guest> guestList = guestRepository.findAll();
-        log.info(guestList.get(1).getPassengers().size());
+//        LOGGER.info("%s", guestList.get(1).getPassengers().size());
 
         List<Reservation> reservationList = reservationRepository.findAll();
 
@@ -505,18 +525,19 @@ public class FlightController {
         Guest guest = guestRepository.findTopByOrderByIdDesc();
 
         if (guest != null)
-            log.info("getGuestReservations(): Guest info: " + guest);
+            LOGGER.info("getGuestReservations(): Guest info: " + guest);
         else
-            log.info("getGuestReservations(): Guest is null");
+            LOGGER.info("getGuestReservations(): Guest is null");
 
         if (flight != null)
-            log.info("getGuestReservations(): Flight info: " + flight);
+            LOGGER.info("getGuestReservations(): Flight info: " + flight);
         else
-            log.info("getGuestReservations(): Flight is null");
+            LOGGER.info("getGuestReservations(): Flight is null");
 
         if (flight != null) {
             model.addAttribute("guest", guest);
             model.addAttribute("flightGuest", flight);
+            LOGGER.info("%s", "Called getGuestReservations(): by guest <" + guest + ">");
         } else {
             model.addAttribute("error", "Flight is null");
         }
