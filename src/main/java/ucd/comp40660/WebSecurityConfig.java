@@ -18,6 +18,8 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
+import ucd.comp40660.filter.JWTAuthenticationFilter;
+import ucd.comp40660.filter.JWTAuthorisationFilter;
 import ucd.comp40660.service.UserDetailsServiceImplementation;
 
 import java.util.Arrays;
@@ -71,6 +73,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter{
                 .authorizeRequests()
                 .antMatchers("/error","/resources/**","/img/**", "/css/**","/js/**", "/login","/register","/").permitAll()
                 .antMatchers("/user").access("hasAnyAuthority('ADMIN','USER')")
+                .antMatchers("/editProfile").access("hasAuthority('USER')")
                 .antMatchers("/admin", "/adminRegister", "/users").access("hasAuthority('ADMIN')")
                 .anyRequest().authenticated()   // Authenticate all requests, with exception URL regexes mentioned above
                 .and()
@@ -87,8 +90,8 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter{
                 .permitAll()
                 .and()
                 // Filtering by intercepting incoming requests and execute predefined methods
-//                .addFilter(new JWTAuthenticationFilter(authenticationManager()))    // filter support authentication
-//                .addFilter(new JWTAuthorisationFilter(authenticationManager()))     // filter support authorization
+                .addFilter(new JWTAuthenticationFilter(authenticationManager()))    // filter support authentication
+                .addFilter(new JWTAuthorisationFilter(authenticationManager()))     // filter support authorization
                 // Enforce stateless sessions : this disables session creation 0on Spring Security
                 .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS);
     }

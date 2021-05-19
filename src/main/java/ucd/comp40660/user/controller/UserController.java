@@ -1,11 +1,11 @@
 package ucd.comp40660.user.controller;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 import ucd.comp40660.flight.repository.FlightRepository;
@@ -246,8 +246,6 @@ public class UserController {
 
         User user = userSession.getUser();
 
-        LOGGER.info("%s", "Profile edited by user <" + user.getUsername() + "> with the role of <" + user.getRoles() + ">");
-
         if (password.equals(user.getPassword())) {
 
             if (!(newName.isEmpty())) {
@@ -291,8 +289,8 @@ public class UserController {
             }
 
             userRepository.save(user);
-
             model.addAttribute("user", userSession.getUser());
+            LOGGER.info("%s", "Profile edited by user <" + user.getUsername() + "> with the role of <" + user.getRoles() + ">");
 
             return "viewProfile.html";
 
@@ -319,43 +317,31 @@ public class UserController {
         // Check if the given password matches the current password
         if (password.equals(user.getPassword())) {
 
-            userValidator.validatePassword(newPassword, bindingResult);
-
-            if (newPassword.equals(newPasswordDuplicate) && (!(newPassword.isEmpty()))) {
-                user.setPassword(newPassword);
-            } else {
-                model.addAttribute("error", "\nNew Password entries do not match, update denied.");
-                model.addAttribute("user", userSession.getUser());
-                LOGGER.warn("%s", "Password change rejected due to new password mismatch for user <" + user.getUsername() + "> with role of <" + user.getRoles() + ">");
-            }
+            userValidator.validatePassword(newPassword, bindingResult); // Check if the new password follow the policy
 
             if(bindingResult.hasErrors()) {
-                model.addAttribute("error", "\nInsufficient Password Strength, update denied.");
+                model.addAttribute("error", "\nInvalid Password Strength, update denied.");
+                return "editPassword.html";
+
             } else {
-                if (newPassword.equals(newPasswordDuplicate) && (!(newPassword.isEmpty()))) {
+                if (newPassword.equals(newPasswordDuplicate)) {
                     user.setPassword(newPassword);
                     userRepository.save(user);
                     model.addAttribute("user", userSession.getUser());
+                    LOGGER.info("%s", "Password successfully changed by user <" + user.getUsername() + ">");
                     return "viewProfile.html";
 
                 } else {
+                    LOGGER.warn("%s", "Password change rejected due to new password mismatch for user <" + user.getUsername() + "> with role of <" + user.getRoles() + ">");
                     model.addAttribute("error", "\nNew Password entries do not match, update denied.");
                     model.addAttribute("user", userSession.getUser());
                 }
             }
 
-            userRepository.save(user);
-            model.addAttribute("user", userSession.getUser());
-
-            LOGGER.info("%s", "Password successfully changed by user <" + user.getUsername() + ">");
-
-            return "viewProfile.html";
-
         } else {
-            System.out.println("\n\nPASSWORD FOUND TO BE INCORRECT\n\n");
-            model.addAttribute("user", userSession.getUser());
-            model.addAttribute("error", "\nIncorrect Password, alterations denied.");
             LOGGER.warn("%s", "Incorrectly entered password for user <" + user.getUsername() + "> with role of <" + user.getRoles() + ">");
+            model.addAttribute("user", userSession.getUser());
+            model.addAttribute("error", "\nIncorrect Password, update denied.");
         }
 
         return "editPassword.html";

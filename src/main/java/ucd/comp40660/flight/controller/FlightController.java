@@ -273,7 +273,6 @@ public class FlightController {
             sessionUser = userRepository.findByUsername(userDetails.getName());
             model.addAttribute("sessionUser", sessionUser);
         }
-        model.addAttribute("user", user);
 
         User user = null;
         if(isAdmin(sessionUser)){
@@ -405,23 +404,12 @@ public class FlightController {
         }
         model.addAttribute("user", user);
 
-        //Determine if booking as admin
-        User user = null;
-        if(isAdmin(sessionUser)){
-            user = userSession.getUser();
-        }
-        else{
-            user = sessionUser;
-        }
-        model.addAttribute("user", user);
-
 //      User user = userSession.getUser();
         Reservation reservation = new Reservation();
     //        if(!user.getReservations().contains())
         user.getReservations().add(reservation);
         userRepository.flush();
         reservation.setUser(user);
-
 
         Flight flight = flightRepository.findFlightByFlightID(temporaryFlightReference);
         if (reservationRepository.existsByUserAndFlight(user, flight)) {
