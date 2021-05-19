@@ -95,16 +95,16 @@ public class ReservationController {
     @PutMapping("/reservations/{username}/{id}")
     @ResponseBody
     public Reservation updateReservation(@PathVariable(value = "username") String username, @PathVariable(value = "id") Long reservationID,
-                                         @Valid @RequestBody Reservation reservationDetails) throws ReservationNotFoundException {
+                                         @Valid @RequestBody Reservation reservationDetails, HttpServletRequest req) throws ReservationNotFoundException {
         Reservation reservation = reservationRepository.findById(reservationID)
                 .orElseThrow(() -> new ReservationNotFoundException(reservationID));
 
         reservation.setEmail(reservationDetails.getEmail());
         reservation.setFlight_reference(reservationDetails.getFlight_reference());
 
-        LOGGER.info("%s", "Update details of reservation with id = <" + reservationID + ">" + " by user <" + userSession.getUser().getUsername() + "> with the role of <" + userSession.getUser().getRoles() + ">");
+//        LOGGER.info("%s", "Update details of reservation with id = <" + reservationID + ">" + " by user <" + userSession.getUser().getUsername() + "> with the role of <" + userSession.getUser().getRoles() + ">");
 
-        return reservationRepository.save(reservation);
+        return reservationRepository.saveAndFlush(reservation);
     }
 
     //    Delete a reservation record
@@ -359,8 +359,8 @@ public class ReservationController {
 
 
     @GetMapping("/updateReservationInfo")
-    public String updateReservationInfo(@RequestParam(value="id") Long reservationID, String userDetails,
-                                     String flightID){
+    public void updateReservationInfo(@RequestParam(value="reservationID") Long reservationID, String userDetails,
+                                     String flightID, HttpServletResponse response) throws IOException {
 
         Long flID = Long.parseLong(flightID);
 
@@ -375,6 +375,8 @@ public class ReservationController {
                 reservation.setEmail(guest.getEmail());
                 reservation.setGuest(guest);
                 reservation.setFlight(flight);
+                reservation.setFlight_reference(flight.getFlightID());
+
                 reservationRepository.saveAndFlush(reservation);
 
                 }
@@ -383,6 +385,8 @@ public class ReservationController {
                     reservation.setEmail(user.getEmail());
                     reservation.setUser(user);
                     reservation.setFlight(flight);
+                    reservation.setFlight_reference(flight.getFlightID());
+
                     reservationRepository.saveAndFlush(reservation);
 
                 }
@@ -391,7 +395,20 @@ public class ReservationController {
             //error
         }
 
-        return "/viewReservations";
+        response.sendRedirect("/reservations");
     }
+
+    @GetMapping("/deleteReservation")
+    public void updateReservationInfo(@RequestParam(value="id") Long reservationID, HttpServletResponse response)
+                                                                            throws ReservationNotFoundException, IOException{
+
+        Reservation reservation = reservationRepository.findById(reservationID)
+                .orElseThrow(() -> new ReservationNotFoundException(reservationID));
+
+        reservationRepository.deleteById(reservationID);
+
+        response.sendRedirect("/reservations");
+    }
+
 
 }

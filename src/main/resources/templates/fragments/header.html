@@ -60,7 +60,7 @@
             -->
 
             <!-- Guest user -->
-            <div th:if="${sessionUser==null}">
+            <div th:if="${sessionUser == null}">
                 <li class="nav-item list-inline-item">
                     <a class="nav-link" href="/register">
                         <i class="fa fa-user-plus" aria-hidden="true"></i>
@@ -77,7 +77,7 @@
             </div>
 
             <!-- Not a guest -->
-            <div th:unless="${sessionUser==null}">
+            <div th:unless="${sessionUser == null}">
 
                 <li class="nav-item dropdown list-inline-item">
                     <a class="nav-link dropdown-toggle"
@@ -104,11 +104,6 @@
                                 &nbsp;Reservations
                             </a>
 
-                            <!--                                <a class="dropdown-item" href="/getUserReservations">-->
-                            <!--                                    <i class="fa fa-history" aria-hidden="true"></i>-->
-                            <!--                                        &nbsp;History-->
-                            <!--                                </a>-->
-
                             <div class="dropdown-divider"></div>
 
                             <h6 class="dropdown-header">
@@ -124,7 +119,9 @@
                                 <i class="fa fa-sign-out" aria-hidden="true"></i>
                                 &nbsp;Log Out
                             </a>
-                        </div>>
+                        </div>
+
+<!--                        Admin dropdown menu-->
                         <div th:if="${entry.name} == 'ADMIN'" class="dropdown-menu"
                              aria-labelledby="member-drop-link">
 
@@ -147,12 +144,6 @@
                                 Reservations
                             </a>
 
-
-                            <!--                                <a class="dropdown-item" href="/getUserReservations">-->
-                            <!--                                    <i class="fa fa-history" aria-hidden="true"></i>-->
-                            <!--                                        &nbsp;History-->
-                            <!--                                </a>-->
-
                             <div class="dropdown-divider"></div>
 
                             <h6 class="dropdown-header">
@@ -168,69 +159,17 @@
                                 <i class="fa fa-sign-out" aria-hidden="true"></i>
                                 &nbsp;Log Out
                             </a>
-                        </div>>
+                        </div>
+
+                        <div th:if="${entry.name} == 'GUEST'" class="dropdown-menu"
+                             aria-labelledby="member-drop-link">
+
+                            <a class="dropdown-item" href="/login">
+                                <i class="fa fa-sign-out" aria-hidden="true"></i>
+                                &nbsp;Log In
+                            </a>
+                        </div>
                     </div>
-<!--                    </div>-->
-
-
-<!--                    <div th:if="${user.getRoles() == 'MEMBER'}" class="dropdown-menu"-->
-<!--                         aria-labelledby="member-drop-link">-->
-
-<!--                                <h6 class="dropdown-header">-->
-<!--                                    &nbsp;Reservations-->
-<!--                                </h6>-->
-
-<!--                                <a class="dropdown-item" href="/getUserReservations">-->
-<!--                                    <i class="fa fa-plane" aria-hidden="true"></i>-->
-<!--                                        &nbsp;Reservations-->
-<!--                                </a>-->
-
-<!--&lt;!&ndash;                                <a class="dropdown-item" href="/getUserReservations">&ndash;&gt;-->
-<!--&lt;!&ndash;                                    <i class="fa fa-history" aria-hidden="true"></i>&ndash;&gt;-->
-<!--&lt;!&ndash;                                        &nbsp;History&ndash;&gt;-->
-<!--&lt;!&ndash;                                </a>&ndash;&gt;-->
-
-<!--                        <div class="dropdown-divider"></div>-->
-
-<!--                        <h6 class="dropdown-header">-->
-<!--                            &nbsp;Setting-->
-<!--                        </h6>-->
-
-<!--                        <a class="dropdown-item" href="/viewProfile">-->
-<!--                            <i class="fa fa-user-circle" aria-hidden="true"></i>-->
-<!--                                &nbsp;Profile-->
-<!--                        </a>-->
-
-<!--                        <a class="dropdown-item" href="/logout">-->
-<!--                            <i class="fa fa-sign-out" aria-hidden="true"></i>-->
-<!--                                &nbsp;Log Out-->
-<!--                        </a>-->
-<!--                    </div>-->
-
-                    <!-- Admin user -->
-<!--                    <div th:if="${user.getRole() == 'admin'}" class="dropdown-menu"-->
-<!--                         aria-labelledby="member-drop-link">-->
-
-<!--                        <h6 class="dropdown-header">-->
-<!--                            &nbsp;Manage-->
-<!--                        </h6>-->
-
-<!--                        <a class="dropdown-item" href="#">-->
-<!--                            <i class="fa fa-users" aria-hidden="true"></i>-->
-<!--                                &nbsp;Members-->
-<!--                        </a>-->
-
-<!--                        <div class="dropdown-divider"></div>-->
-
-<!--                        <h6 class="dropdown-header">-->
-<!--                            &nbsp;Setting-->
-<!--                        </h6>-->
-
-<!--                        <a class="dropdown-item" href="/logout">-->
-<!--                            <i class="fa fa-sign-out" aria-hidden="true"></i>-->
-<!--                                &nbsp;Log Out-->
-<!--                        </a>-->
-<!--                    </div>-->
                 </li>
             </div>
         </ul>
