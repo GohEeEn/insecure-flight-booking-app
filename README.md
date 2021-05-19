@@ -27,12 +27,28 @@ This is the Flight Reservation Web Application repository for UCD BSc Computer S
     ```properties
     # schema_name=`application` by default
     spring.datasource.url=jdbc:mysql://localhost:3306/application?createDatabaseIfNotExist=true
-    spring.datasource.username=<your_user_name>
-    spring.datasource.password=<your_user_password>
+    spring.datasource.username=ENC(<your_encoded_username>)
+    spring.datasource.password=ENC(<your_encoded_password>)
     ```
 
     (**Note** : *Make sure the user account of credential given used has the privilege to modify the schema*)
 
+   - Encryption of sensitive properties inside file application.properties is enabled with [Jasypt](http://www.jasypt.org)
+   - To generate the encoded credential value, go to maven library path ` ~/.m2/repository/org/jasypt/jasypt/1.9.0` on terminal (CLI)
+   - Use the following commmand to run the JAR program to generate the encoded value
+     ```
+      java -cp jasypt-1.9.0.jar org.jasypt.intf.cli.JasyptPBEStringEncryptionCLI input="value" password=<key> algorithm=PBEWithMD5AndDES
+     ```
+      - __input__ - The value in string to be encoded
+      - __password__ - The key for both encryption and decryption of the input
+      - __algorithm__ - The encoding algorithm, that here we use a Password-Based version of DES Encryption algorithm, with the MD5 hash of the password as the encryption key
+   - Jasypt reads all the properties from _application.properties_ or any classpath properties that you passed, with value prefix __ENC(__ and suffix __)__
+   - The password is required to run this application, with the following Maven argument :
+     
+     `-Djasypt.encryptor.password=<key>`
+     
+   - Reference : <https://medium.com/@mail2rajeevshukla/hiding-encrypting-database-password-in-the-application-properties-34d59fe104eb>
+   
 3. Open a terminal on the root directory of this project (ie. where this doc is stored)
 4. Run the command `mvn clean install` to run tests and build the project
 5. Run the command `mvn spring-boot:run` to run the Spring Boot application
