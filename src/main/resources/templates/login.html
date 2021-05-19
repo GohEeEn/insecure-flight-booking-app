@@ -28,7 +28,7 @@
                 </div>
 
                 <div class="custom-control custom-checkbox mb-3">
-                    <input type="checkbox" onclick="showPwd()" class="custom-control-input" id="viewPwd">
+                    <input type="checkbox" onclick="showPassword()" class="custom-control-input" id="viewPwd">
                     <label class="custom-control-label" for="viewPwd">Show Password</label>
                 </div>
 
@@ -46,17 +46,5 @@
         </div>
 
         <div th:replace="fragments/footer :: footer"></div>
-
-        <script>
-            function showPwd() {
-                var x = document.getElementById("password");
-
-                if(x.type === "password") {
-                    x.type = "text";
-                } else {
-                    x.type = "password";
-                }
-            }
-        </script>
     </body>
 </html>

@@ -126,7 +126,12 @@
             <version>0.0.20131108.vaadin1</version>
         </dependency>
 
-
+        <!-- Jasypt : https://github.com/ulisesbocchio/jasypt-spring-boot -->
+        <dependency>
+            <groupId>com.github.ulisesbocchio</groupId>
+            <artifactId>jasypt-spring-boot</artifactId>
+            <version>2.1.1</version>
+        </dependency>
     </dependencies>
 
     <build>

@@ -1,24 +1,18 @@
 package ucd.comp40660.filter;
 
 import com.auth0.jwt.JWT;
-
-import ucd.comp40660.service.ACUserDetails;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
-import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.web.DefaultRedirectStrategy;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
-import org.springframework.web.context.WebApplicationContext;
-import org.springframework.web.context.support.WebApplicationContextUtils;
+import ucd.comp40660.service.ACUserDetails;
 
 import javax.servlet.FilterChain;
-import javax.servlet.ServletContext;
 import javax.servlet.ServletException;
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
@@ -52,7 +46,6 @@ public class JWTAuthenticationFilter  extends UsernamePasswordAuthenticationFilt
         UsernamePasswordAuthenticationToken usernamePasswordAuthenticationToken =
                 new UsernamePasswordAuthenticationToken(userDetails, request.getParameter("password"), userDetails.getAuthorities());
         return authenticationManager.authenticate(usernamePasswordAuthenticationToken);
-
     }
 
     @Override
@@ -80,18 +73,15 @@ public class JWTAuthenticationFilter  extends UsernamePasswordAuthenticationFilt
         // create a cookie
         Cookie cookie = new Cookie(COOKIE_NAME, token);
 
-        // expires in 7 days
-        cookie.setMaxAge(7 * 24 * 60 * 60);
+        // expires in 30 minutes
+        cookie.setMaxAge(30 * 60);
 
         // optional properties
-        //cookie.setSecure(true);
+        cookie.setSecure(true);
         cookie.setHttpOnly(true);
         cookie.setPath("/");
 
         // add cookie to response
         response.addCookie(cookie);
-
-
     }
-
 }

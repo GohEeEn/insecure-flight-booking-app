@@ -3,8 +3,6 @@ package ucd.comp40660.service;
 import ucd.comp40660.user.model.ConfirmationToken;
 import ucd.comp40660.user.model.User;
 
-import java.util.Optional;
-
 public interface UserService {
 
     void save(User user);
@@ -14,6 +12,8 @@ public interface UserService {
     User findByUsername(String username);
 
     User findByEmail(String email);
+
+    User findByPhone(String phone);
 
     void save(ConfirmationToken confirmationToken);
 
