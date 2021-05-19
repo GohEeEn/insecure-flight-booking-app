@@ -49,14 +49,23 @@
 					<thead>
 						<tr>
 							<th>#</th>
-							<th>Reservation ID</th>
+							<th>Reservation ID</th>\
+							<th>E-mail</th>
+							<th>Departure</th>
+							<th>Destination</th>
+							<th>Departure Date</th>
+							<th>Arrival Date</th>
+
 						</tr>
 					</thead>
 					<tbody>
-						<tr th:each="guestReservationId : ${guestReservationIds}">
-							<td></td>
-							<td th:text="${guestReservationId.id}"></td>
-						</tr>
+						<td><span th:text="${reservation.id}"></span></td>
+						<td><span th:text="${reservation.email}"></span></td>
+						<td><span th:text="${flight.source}" ></span></td>
+						<td><span th:text="${flight.destination}" ></span></td>
+						<td><span th:text="${flight.departure_date_time}" ></span></td>
+						<td><span th:text="${flight.arrivalDateTime}" ></span></td>
+
 					</tbody>
 				</table>
 			</div>

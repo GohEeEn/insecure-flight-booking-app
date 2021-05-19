@@ -535,7 +535,7 @@ public class FlightController {
         guest.setPhone(phoneNumber);
         guest.setAddress(address);
 
-        model.addAttribute("user", userSession.getUser());
+//        model.addAttribute("user", userSession.getUser());
 
         return "/displayPaymentPage";
     }
@@ -616,7 +616,7 @@ public class FlightController {
 
 
     @PostMapping("/processGuestPayment")
-    public void processGuestPayment(String cardholder_name, String card_number, String card_type, int expiration_month,
+    public String processGuestPayment(String cardholder_name, String card_number, String card_type, int expiration_month,
                                     int expiration_year, String security_code,
                                     HttpServletResponse response, HttpServletRequest req, Model model) throws IOException {
 
@@ -657,9 +657,14 @@ public class FlightController {
         guest.getReservations().add(reservation);
 
         guestRepository.save(guest);
+
         guest = new Guest();
 
-        response.sendRedirect("/displayReservationId");
+        model.addAttribute("reservation", reservation);
+        model.addAttribute("flight", flightRepository.findFlightByFlightID(temporaryFlightReference));
+//        response.sendRedirect("/displayReservationId");
+        return "displayReservation.html";
+
     }
 
     @GetMapping("/displayReservationId")
@@ -679,6 +684,7 @@ public class FlightController {
         else{
             user = sessionUser;
         }
+        model.addAttribute("sessionUser",sessionUser);
         model.addAttribute("user", user);
 
         List<Reservation> guestReservationId = new ArrayList<>();
@@ -687,19 +693,19 @@ public class FlightController {
 
         List<Reservation> allReservations = reservationRepository.findAll();
 
-        for (Reservation reservation : allReservations) {
-            for (Guest guest : allGuests) {
-                List<Reservation> guestReservations = guest.getReservations();
-                for (Reservation guestReservation : guestReservations) {
-                    if (guestReservation.getEmail().equals(reservation.getEmail()) && guestReservation.getFlight_reference().equals(reservation.getFlight_reference())) {
-                        if (reservation.getFlight_reference().equals(temporaryFlightReference)) {
-                            guestReservationId.add(reservation);
-                        }
-                    }
-                }
-            }
-        }
-        model.addAttribute("guestReservationIds", guestReservationId);
+//        for (Reservation reservation : allReservations) {
+//            for (Guest guest : allGuests) {
+//                List<Reservation> guestReservations = guest.getReservations();
+//                for (Reservation guestReservation : guestReservations) {
+//                    if (guestReservation.getEmail().equals(reservation.getEmail()) && guestReservation.getFlight_reference().equals(reservation.getFlight_reference())) {
+//                        if (reservation.getFlight_reference().equals(temporaryFlightReference)) {
+//                            guestReservationId.add(reservation);
+//                        }
+//                    }
+//                }
+//            }
+//        }
+        model.addAttribute("reservation", model.getAttribute("reservation"));
         return "displayReservation.html";
     }
 
