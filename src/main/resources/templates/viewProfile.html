@@ -50,8 +50,9 @@
                 <button type="submit" class="btn btn-primary">Edit Profile</button>
                 <a href="/viewMemberCreditCards" class="btn btn-outline-primary">View Credit Cards</a>
                 <a href="/editPassword" class="btn btn-secondary">Change Password</a>
-                <a th:href="@{/delete/{id}(id = ${user.getRegistrationID()})}" class="btn btn-danger">Delete</a>
+                <a th:href="@{/delete/{id}(id=${user.getRegistrationID()})}" class="btn btn-danger">Delete</a>
             </form>
+
         </div>
 
         <div th:replace="fragments/footer :: footer"></div>
