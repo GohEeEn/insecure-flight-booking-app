@@ -92,6 +92,7 @@ h1#welcome-home {
 .error {
     color: red;
     font-weight: bold;
+    margin-top: 1px;
 }
 
 #page-container {
