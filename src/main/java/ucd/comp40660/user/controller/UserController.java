@@ -13,6 +13,7 @@ import ucd.comp40660.reservation.repository.ReservationRepository;
 import ucd.comp40660.service.UserService;
 import ucd.comp40660.user.UserSession;
 import ucd.comp40660.user.exception.UserNotFoundException;
+import ucd.comp40660.user.model.Role;
 import ucd.comp40660.user.model.User;
 import ucd.comp40660.user.repository.CreditCardRepository;
 import ucd.comp40660.user.repository.UserRepository;
@@ -72,7 +73,13 @@ public class UserController {
         if (userDetails != null) {
             User sessionUser = userRepository.findByUsername(userDetails.getName());
             model.addAttribute("sessionUser", sessionUser);
-            LOGGER.info("List all users called by <" + sessionUser.getUsername() + "> with the role of <" + sessionUser.getRoles() + ">");
+
+            StringBuilder userRoles = new StringBuilder();
+            for (Role role : userRepository.findByUsername(sessionUser.getUsername()).getRoles()) {
+                userRoles.append(role.getName());
+            }
+
+            LOGGER.info("List all users called by <" + sessionUser.getUsername() + "> with the role of <" + userRoles + ">");
         }
 
         List<User> users = userRepository.findAll();
@@ -89,7 +96,12 @@ public class UserController {
     public User getRegistrationByUsername(@PathVariable(value = "username") String username, HttpServletRequest req) throws UserNotFoundException {
 //        Principal userDetails = req.getUserPrincipal();
 
-        LOGGER.info("Called get a registration by id <" + username + "> from <" + userSession.getUser().getUsername() + "> with the role of <" + userSession.getUser().getRoles() + ">");
+        StringBuilder userRoles = new StringBuilder();
+        for (Role role : userRepository.findByUsername(userSession.getUser().getUsername()).getRoles()) {
+            userRoles.append(role.getName());
+        }
+
+        LOGGER.info("Called get a registration by id <" + username + "> from <" + userSession.getUser().getUsername() + "> with the role of <" + userRoles + ">");
         return userRepository.findByUsername(username);
     }
 
@@ -107,7 +119,12 @@ public class UserController {
         user.setPhone(userDetails.getPhone());
         user.setSurname(user.getSurname());
 
-        LOGGER.info("Successfully updated registration details for user <" + user.getUsername() + "> with the role of <" + user.getRoles() + ">");
+        StringBuilder userRoles = new StringBuilder();
+        for (Role role : userRepository.findByUsername(user.getUsername()).getRoles()) {
+            userRoles.append(role.getName());
+        }
+
+        LOGGER.info("Successfully updated registration details for user <" + user.getUsername() + "> with the role of <" + userRoles + ">");
 
         return userRepository.save(user);
     }
@@ -148,15 +165,21 @@ public class UserController {
 
 
     @PostMapping("/register")
-    public String register(@Valid @ModelAttribute("userForm") User userForm, BindingResult bindingResult){
+    public String register(@Valid @ModelAttribute("userForm") User userForm, BindingResult bindingResult) {
         userValidator.validate(userForm, bindingResult);
 
-        if(bindingResult.hasErrors()){
-            LOGGER.warn("Unable to register user with username <" + userForm.getUsername() + "> with the role of <" + userForm.getRoles());
+        StringBuilder userRoles = new StringBuilder();
+        for (Role role : userForm.getRoles()) {
+            userRoles.append(role.getName());
+        }
+
+        if (bindingResult.hasErrors()) {
+
+            LOGGER.warn("Unable to register user with username <" + userForm.getUsername() + "> with the role of <" + userRoles + ">");
             return "register.html";
         }
 
-        LOGGER.info("New user registered with username <" + userForm.getUsername() + "> with the role of <" + userForm.getRoles() + ">");
+        LOGGER.info("New user registered with username <" + userForm.getUsername() + "> with the role of <" + userRoles + ">");
         userService.save(userForm);
 
         return "index.html";
@@ -175,11 +198,11 @@ public class UserController {
     }
 
     @PostMapping("/adminRegister")
-    public String adminRegister(@Valid @ModelAttribute("userForm") User userForm, BindingResult bindingResult){
+    public String adminRegister(@Valid @ModelAttribute("userForm") User userForm, BindingResult bindingResult) {
         userValidator.validate(userForm, bindingResult);
 
-        if(bindingResult.hasErrors()){
-            LOGGER.warn("New admin could not be registered for user <" + userForm.getUsername() + ">");
+        if (bindingResult.hasErrors()) {
+            LOGGER.warn("New admin could not be registered with username <" + userForm.getUsername() + ">");
             return "adminRegister.html";
         }
 
@@ -246,7 +269,12 @@ public class UserController {
 
         User user = userSession.getUser();
 
-        LOGGER.info("Profile edited by user <" + user.getUsername() + "> with the role of <" + user.getRoles() + ">");
+        StringBuilder userRoles = new StringBuilder();
+        for (Role role : user.getRoles()) {
+            userRoles.append(role.getName());
+        }
+
+        LOGGER.info("Profile edited by user <" + user.getUsername() + "> with the role of <" + userRoles + ">");
 
         if (password.equals(user.getPassword())) {
 
@@ -277,7 +305,7 @@ public class UserController {
             }
             if (!(newUsername.isEmpty())) {
 
-                if(!user.getUsername().equals(newUsername) && userService.findByUsername(newUsername) == null)
+                if (!user.getUsername().equals(newUsername) && userService.findByUsername(newUsername) == null)
                     user.setUsername(newUsername);
                 else {
                     System.out.println("\n\nINVALID USERNAME <" + newUsername + "> \n\n");
@@ -300,7 +328,7 @@ public class UserController {
             System.out.println("\n\nPASSWORD FOUND TO BE INCORRECT\n\n");
             model.addAttribute("user", userSession.getUser());
             model.addAttribute("error", "\nIncorrect Password, alterations denied.");
-            LOGGER.warn("Unsuccessful attempt of profile edit for user <" + user.getUsername() + "> with the role of <" + user.getRoles() + ">");
+            LOGGER.warn("Unsuccessful attempt of profile edit for user <" + user.getUsername() + "> with the role of <" + userRoles + ">");
             return "editProfile.html";
         }
     }
@@ -318,6 +346,11 @@ public class UserController {
 
         User user = userSession.getUser();
 
+        StringBuilder userRoles = new StringBuilder();
+        for (Role role : user.getRoles()) {
+            userRoles.append(role.getName());
+        }
+
         if (password.equals(user.getPassword())) {
 
             if (newPassword.equals(newPasswordDuplicate) && (!(newPassword.isEmpty()))) {
@@ -325,7 +358,7 @@ public class UserController {
             } else {
                 model.addAttribute("error", "\nNew Password entries do not match, update denied.");
                 model.addAttribute("user", userSession.getUser());
-                LOGGER.warn("Password change rejected due to new password mismatch for user <" + user.getUsername() + "> with role of <" + user.getRoles() + ">");
+                LOGGER.warn("Password change rejected due to new password mismatch for user <" + user.getUsername() + "> with role of <" + userRoles + ">");
 
                 return "editPassword.html";
             }
@@ -341,7 +374,7 @@ public class UserController {
             System.out.println("\n\nPASSWORD FOUND TO BE INCORRECT\n\n");
             model.addAttribute("user", userSession.getUser());
             model.addAttribute("error", "\nIncorrect Password, alterations denied.");
-            LOGGER.warn("Incorrectly entered password for user <" + user.getUsername() + "> with role of <" + user.getRoles() + ">");
+            LOGGER.warn("Incorrectly entered password for user <" + user.getUsername() + "> with role of <" + userRoles + ">");
         }
 
         return "editPassword.html";
