@@ -2,6 +2,11 @@ package ucd.comp40660.user.controller;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.web.authentication.WebAuthenticationDetails;
 import org.springframework.validation.BindingResult;
 import ucd.comp40660.flight.model.Flight;
 import ucd.comp40660.flight.repository.FlightRepository;
@@ -61,6 +66,9 @@ public class UserController {
 
     @Autowired
     UserService userService;
+
+    @Autowired
+    protected AuthenticationManager authenticationManager;
 
 
     @GetMapping("/")
@@ -159,7 +167,7 @@ public class UserController {
 
 
     @PostMapping("/register")
-    public String register(Model model, @ModelAttribute("userForm") User userForm, BindingResult bindingResult) {
+    public String register(Model model, @ModelAttribute("userForm") User userForm, BindingResult bindingResult, HttpServletRequest req) {
         userValidator.validate(userForm, bindingResult);
 
         if (bindingResult.hasErrors()) {
@@ -170,8 +178,24 @@ public class UserController {
 
         LOGGER.info("%s", "New user registered with username <" + userForm.getUsername() + "> with the role of <" + userForm.getRoles() + ">");
         userService.save(userForm);
+        authenticateUserAndSetSession(userForm, req);
 
         return "redirect:/";
+    }
+
+    private void authenticateUserAndSetSession(User user, HttpServletRequest req) {
+
+        String username = user.getUsername();
+        String password = user.getPassword();
+        UsernamePasswordAuthenticationToken token = new UsernamePasswordAuthenticationToken(username, password);
+
+        // generate session if one doesn't exist
+        req.getSession();
+
+        token.setDetails(new WebAuthenticationDetails(req));
+        Authentication authenticatedUser = authenticationManager.authenticate(token);
+
+        SecurityContextHolder.getContext().setAuthentication(authenticatedUser);
     }
 
     @GetMapping("/adminRegister")
