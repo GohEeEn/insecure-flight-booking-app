@@ -9,6 +9,7 @@ import org.springframework.stereotype.Controller;
 import ucd.comp40660.user.exception.CreditCardNotFoundException;
 import ucd.comp40660.user.exception.UserNotFoundException;
 import ucd.comp40660.user.model.CreditCard;
+import ucd.comp40660.user.model.Role;
 import ucd.comp40660.user.model.User;
 import ucd.comp40660.user.repository.CreditCardRepository;
 import ucd.comp40660.user.repository.GuestRepository;
@@ -84,7 +85,13 @@ public class CardController {
 
         newCard = creditCardRepository.saveAndFlush(newCard);
 
-        LOGGER.info("Member credit card added for user <" + user.getUsername() + "> with the role of <" + user.getRoles() + ">");
+        StringBuilder userRoles = new StringBuilder();
+        for (Role role : userRepository.findByUsername(user.getUsername()).getRoles()) {
+            userRoles.append(role.getName());
+        }
+
+        LOGGER.info("Member credit card added for user <" + user.getUsername() + "> with the role of <" + userRoles + ">");
+
         return "viewProfile.html";
     }
 
@@ -112,7 +119,13 @@ public class CardController {
 
         model.addAttribute("cards", creditCardRepository.findAllByUser(sessionUser));
 
-        LOGGER.info("Called viewCreditCards(): by user <" + username + "> with the role of <" + userRepository.findByUsername(username).getRoles() + ">");
+        StringBuilder userRoles = new StringBuilder();
+        for (Role role : userRepository.findByUsername(username).getRoles()) {
+            userRoles.append(role.getName());
+        }
+
+        LOGGER.info("Called viewCreditCards(): by user <" + username + "> with the role of <" + userRoles + ">");
+
         return "viewCreditCards.html";
     }
 
@@ -148,7 +161,12 @@ public class CardController {
         model.addAttribute("user", user);
         model.addAttribute("cards", creditCardRepository.findAllByUser(user));
 
-        LOGGER.info("Deleted credit card by user <" + user.getUsername() + "> with the role of <" + user.getRoles() + ">");
+        StringBuilder userRoles = new StringBuilder();
+        for (Role role : userRepository.findByUsername(user.getUsername()).getRoles()) {
+            userRoles.append(role.getName());
+        }
+
+        LOGGER.info("Deleted credit card by user <" + user.getUsername() + "> with the role of <" + userRoles + ">");
 
         return "viewCreditCards.html";
     }
