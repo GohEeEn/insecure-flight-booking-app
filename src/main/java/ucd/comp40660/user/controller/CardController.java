@@ -3,6 +3,7 @@ package ucd.comp40660.user.controller;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.security.access.prepost.PreAuthorize;
+import ucd.comp40660.service.EncryptionService;
 import ucd.comp40660.user.UserSession;
 import org.springframework.stereotype.Controller;
 import ucd.comp40660.user.exception.CreditCardNotFoundException;
@@ -55,15 +56,23 @@ public class CardController {
                                       int expiration_month, int expiration_year, String security_code, Model model, HttpServletRequest req) {
         User user = null;
 
+        // encrypt card_number and security_code before saving it in the database
+        String encryptedCardholderName = EncryptionService.encrypt(cardholder_name);
+        String encryptedCardNumber = EncryptionService.encrypt(card_number);
+        String encryptedCardType = EncryptionService.encrypt(card_type);
+        String encryptedSecurityCode = EncryptionService.encrypt(security_code);
+
         Principal userDetails = req.getUserPrincipal();
         if (userDetails != null) {
             user = userRepository.findByUsername(userDetails.getName());
+
+
             model.addAttribute("user", user);
         }
 
 //        User user = userSession.getUser();
         model.addAttribute("user", user);
-        CreditCard newCard = new CreditCard(cardholder_name, card_number, card_type, expiration_month, expiration_year, security_code);
+        CreditCard newCard = new CreditCard(encryptedCardholderName, encryptedCardNumber, encryptedCardType, expiration_month, expiration_year, encryptedSecurityCode);
         if (user != null) {
             newCard.setUser(user);
             user.getCredit_cards().add(newCard);
@@ -87,6 +96,17 @@ public class CardController {
         Principal userDetails = req.getUserPrincipal();
         if (userDetails != null) {
             sessionUser = userRepository.findByUsername(userDetails.getName());
+            List<CreditCard> creditCards = sessionUser.getCredit_cards();
+
+            for (CreditCard card : creditCards) {
+                card.setCardholder_name(EncryptionService.decrypt(card.getCardholder_name()));
+                card.setCard_number(EncryptionService.decrypt(card.getCard_number()));
+                card.setType(EncryptionService.decrypt(card.getType()));
+                card.setSecurity_code(EncryptionService.decrypt(card.getSecurity_code()));
+            }
+
+            sessionUser.setCredit_cards(creditCards);
+
             model.addAttribute("sessionUser", sessionUser);
         }
 
