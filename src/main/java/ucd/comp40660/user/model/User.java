@@ -8,13 +8,14 @@ import org.hibernate.annotations.LazyCollectionOption;
 import ucd.comp40660.reservation.model.Reservation;
 
 import javax.persistence.*;
-import javax.validation.constraints.Email;
-import javax.validation.constraints.NotBlank;
-import javax.validation.constraints.NotNull;
+import javax.validation.constraints.*;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+
+import static ucd.comp40660.filter.RegexConstants.NAME_REGEX;
+import static ucd.comp40660.filter.RegexConstants.PASSWORD_REGEX;
 
 @Entity
 @Table(name = "users", uniqueConstraints = {@UniqueConstraint(columnNames = {"username", "email", "phone"})})
@@ -26,9 +27,13 @@ public class User {
     private Long registrationID;
 
     @NotBlank(message = "First Name field must not be empty.")
+    @Size(min = 2, max = 100, message = "Invalid name")
+    @Pattern(regexp = NAME_REGEX)
     private String name;
 
     @NotBlank(message = "Surname field must not be empty.")
+    @Size(min = 2, max = 100, message = "Invalid surname")
+    @Pattern(regexp = NAME_REGEX)
     private String surname;
 
 //    @NotBlank(message = "Role improperly initialised.")
@@ -36,13 +41,15 @@ public class User {
 
     @Column(unique = true)
     @NotBlank(message = "Username field must not be empty.")
+    @Size(min = 4, max = 32, message = "Invalid username")
     private String username;
 
     @NotBlank(message = "Password field must not be empty.")
+    @Pattern(regexp = PASSWORD_REGEX)
     private String password;
 
     @Column(unique = true)
-    @NotNull(message = "Password Duplicate field must not be empty.")
+    @NotNull(message = "Phone number field must not be empty.")
     private String phone;
 
     @Column(unique = true)

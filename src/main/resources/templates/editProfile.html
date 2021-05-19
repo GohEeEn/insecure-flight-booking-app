@@ -15,55 +15,71 @@
 
             <h2>Edit Profile</h2>
 
-            <form method="POST" action="/editProfile">
+            <form method="POST" action="/editProfile" th:object="${userForm}">
 
                 <div class="form-group">
                     <label for="newName">First Name</label>
-                    <input type="text" name="newName"
+                    <input type="text" name="newName" placeholder="First Name"
                            id="newName" class="form-control"
-                           th:value="${user.name}" required/>
+                           th:value="${user.getName()}" th:field="*{name}"
+                           onkeydown="clearErrors()" required/>
+                    <span class="error" th:if="${#fields.hasErrors('name')}" th:errors="*{name}"></span>
                 </div>
 
                 <div class="form-group">
                     <label for="newSurname">Surname: </label>
-                    <input  type="text" name="newSurname"
+                    <input  type="text" name="newSurname" placeholder="Surname"
                            id="newSurname" class="form-control"
-                           th:value="${user.surname}" required/>
+                           th:field="*{surname}" onkeydown="clearErrors()"
+                           th:value="${user.getSurname()}" required/>
+                    <span class="error" th:if="${#fields.hasErrors('surname')}" th:errors="*{surname}"></span>
                 </div>
 
                 <div class="form-group">
                     <label for="newUsername">Username:</label>
-                    <input  type="text" name="newUsername"
-                               id="newUsername" class="form-control"
-                               th:value="${user.username}" required/>
+                    <input  type="text" name="newUsername" placeholder="Username"
+                            id="newUsername" class="form-control" th:field="*{username}"
+                            onkeydown="clearErrors()" autocomplete="username"
+                            th:value="${user.getUsername()}" required/>
+                    <span class="error" th:if="${#fields.hasErrors('username')}" th:errors="*{username}"></span>
                 </div>
 
                 <div class="form-group">
                     <label for="newPhone">Phone: </label>
-                    <input  type="text" name="newPhone"
-                           id="newPhone" class="form-control"
-                           th:value="${user.phone}" required/>
+                    <input  type="text" name="newPhone" id="newPhone" class="form-control"
+                            placeholder="Phone Number" th:field="*{phone}" onkeydown="clearErrors()"
+                           th:value="${user.getPhone()}" required/>
+                    <span class="error" th:if="${#fields.hasErrors('phone')}" th:errors="*{phone}"></span>
                 </div>
 
                 <div class="form-group">
                     <label for="newEmail">E-mail: </label>
                     <input  type="text" name="newEmail"
                            id="newEmail" class="form-control"
+                           placeholder="E-mail Address" th:field="*{email}" onkeydown="clearErrors()"
                            th:value="${user.getEmail()}" required/>
+                    <span class="error" th:if="${#fields.hasErrors('email')}" th:errors="*{email}"></span>
                 </div>
 
                 <div class="form-group">
                     <label for="newAddress">Address: </label>
-                    <input  type="text" name="newAddress"
+                    <input  type="text" name="newAddress" placeholder="New Living Address"
                            id="newAddress" class="form-control"
                            th:value="${user.getAddress()}" required/>
                 </div>
 
                 <div class="form-group">
                     <label for="password">Confirm Current Password: </label>
-                    <input type="password" name="password"
-                           id="password" class="form-control"
-                           placeholder="Enter Password" required/>
+                    <input type="password" name="password" id="password" class="form-control"
+                           th:field="*{passwordConfirm}" onkeydown="clearErrors()"
+                           autocomplete="new-password" placeholder="Enter Password" required/>
+                </div>
+
+                <div class="custom-control custom-checkbox mb-3">
+                    <input type="checkbox" onclick="showPassword()" class="custom-control-input" id="viewPwd">
+                    <label class="custom-control-label" for="viewPwd">Show Password</label>
+                    <br/>
+                    <span class="error" th:if="${#fields.hasErrors('passwordConfirm')}" th:errors="*{passwordConfirm}"></span>
                 </div>
 
                 <div class="container row" th:if="error != null">

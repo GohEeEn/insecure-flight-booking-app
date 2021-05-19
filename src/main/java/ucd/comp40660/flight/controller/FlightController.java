@@ -263,28 +263,6 @@ public class FlightController {
         response.sendRedirect("/flightSearchResults");
     }
 
-//    @PreAuthorize("hasAuthority('ADMIN')")
-//    @PostMapping("/adminProcessFlightSearch")
-//    public void determineBookingType(String departure, String destinationInput, int passengers, String outboundDate, String username,
-//                                     Model model, HttpServletResponse response, HttpServletRequest req) throws IOException {
-//        User sessionUser = null;
-//
-//        Principal userDetails = req.getUserPrincipal();
-//        if (userDetails != null) {
-//            sessionUser = userRepository.findByUsername(userDetails.getName());
-//            model.addAttribute("sessionUser", sessionUser);
-//        }
-//
-//        if (username.contains("@")) {
-//            response.sendRedirect("/adminProcessGuestFlightSearch");
-//        }
-//        else{
-//            response.sendRedirect("/adminProcessUserFlightSearch");
-//        }
-//
-//    }
-
-
     @PreAuthorize("hasAuthority('ADMIN')")
     @PostMapping("/adminProcessUserFlightSearch")
     public void adminProcessUserFlightSearch(String departure, String destinationInput, int passengers, String outboundDate, String username,
@@ -584,11 +562,11 @@ public class FlightController {
         model.addAttribute("user", user);
 
 //      User user = userSession.getUser();
-      Reservation reservation = new Reservation();
-//        if(!user.getReservations().contains())
-      user.getReservations().add(reservation);
-      userRepository.flush();
-      reservation.setUser(user);
+        Reservation reservation = new Reservation();
+    //        if(!user.getReservations().contains())
+        user.getReservations().add(reservation);
+        userRepository.flush();
+        reservation.setUser(user);
 
 
       Flight flight = flightRepository.findFlightByFlightID(temporaryFlightReference);
@@ -604,14 +582,14 @@ public class FlightController {
           reservationRepository.saveAndFlush(reservation);
           reservation.setCredit_card(card);
 
-          model.addAttribute("user", user);
-          model.addAttribute("reservation", reservation);
-          model.addAttribute("flight", flight);
+            model.addAttribute("user", user);
+            model.addAttribute("reservation", reservation);
+            model.addAttribute("flight", flight);
 
-          return "displayReservation.html";
+            return "displayReservation.html";
 
-      }
-  }
+        }
+    }
 
 
 
