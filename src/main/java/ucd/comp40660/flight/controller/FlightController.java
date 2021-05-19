@@ -69,7 +69,6 @@ public class FlightController {
     UserService userService;
 
 
-
     Long temporaryFlightReference;
     int numberOfPassengers;
 
@@ -82,7 +81,12 @@ public class FlightController {
     @GetMapping("/flights")
     @ResponseBody
     public List<Flight> getAllFlights() {
-        LOGGER.info("%s", "Called getAllFlights() by user <" + userSession.getUser().getUsername() + "> with the role of <" + userSession.getUser().getRoles() + ">");
+        StringBuilder userRoles = new StringBuilder();
+        for (Role role : userSession.getUser().getRoles()) {
+            userRoles.append(role.getName());
+        }
+
+        LOGGER.info("Called getAllFlights() by user <" + userSession.getUser().getUsername() + "> with the role of <" + userRoles + ">");
         return flightRepository.findAll();
     }
 
@@ -91,7 +95,12 @@ public class FlightController {
     @ResponseBody
     public Flight getFlightById(@PathVariable(value = "id") Long flightID) throws FlightNotFoundException {
 
-        LOGGER.info("%s", "Called getFlightById() with id = <" + flightID + "> by user <" + userSession.getUser().getUsername() + "> with the role of <" + userSession.getUser().getRoles() + ">");
+        StringBuilder userRoles = new StringBuilder();
+        for (Role role : userSession.getUser().getRoles()) {
+            userRoles.append(role.getName());
+        }
+
+        LOGGER.info("Called getFlightById() with id = <" + flightID + "> by user <" + userSession.getUser().getUsername() + "> with the role of <" + userRoles + ">");
 
         return flightRepository.findById(flightID)
                 .orElseThrow(() -> new FlightNotFoundException(flightID));
@@ -109,7 +118,12 @@ public class FlightController {
         flight.setArrivalDateTime(flightDetails.getArrivalDateTime());
         flight.setDeparture_date_time(flightDetails.getDeparture_date_time());
 
-        LOGGER.info("%s", "Called updateFlight() with id <" + flightID + "> by user <" + userSession.getUser().getUsername() + "> with the role of <" + userSession.getUser().getRoles() + ">");
+        StringBuilder userRoles = new StringBuilder();
+        for (Role role : userSession.getUser().getRoles()) {
+            userRoles.append(role.getName());
+        }
+
+        LOGGER.info("Called updateFlight() with id <" + flightID + "> by user <" + userSession.getUser().getUsername() + "> with the role of <" + userRoles + ">");
 
         return flightRepository.save(flight);
     }
@@ -123,7 +137,12 @@ public class FlightController {
 
         flightRepository.delete(flight);
 
-        LOGGER.info("%s", "Called deleteFlight() with id <" + flightID + "> by user <" + userSession.getUser().getUsername() + "> with the role of <" + userSession.getUser().getRoles() + ">");
+        StringBuilder userRoles = new StringBuilder();
+        for (Role role : userSession.getUser().getRoles()) {
+            userRoles.append(role.getName());
+        }
+
+        LOGGER.info("Called deleteFlight() with id <" + flightID + "> by user <" + userSession.getUser().getUsername() + "> with the role of <" + userRoles + ">");
 
         return ResponseEntity.ok().build();
     }
@@ -155,7 +174,7 @@ public class FlightController {
     @PreAuthorize("hasAuthority('ADMIN')")
     @PostMapping("/adminProcessFlightSearch")
     public void adminProcessFlightSearch(String departure, String destinationInput, int passengers, String outboundDate, String username,
-                                    Model model, HttpServletResponse response, HttpServletRequest req) throws IOException {
+                                         Model model, HttpServletResponse response, HttpServletRequest req) throws IOException {
         User sessionUser = null;
 
         Principal userDetails = req.getUserPrincipal();
@@ -195,10 +214,9 @@ public class FlightController {
 
         //Determine if booking as a Member/Guest, or as an admin.
         User user = null;
-        if(isAdmin(sessionUser)){
+        if (isAdmin(sessionUser)) {
             user = userSession.getUser();
-        }
-        else{
+        } else {
             user = sessionUser;
         }
         model.addAttribute("user", user);
@@ -219,10 +237,9 @@ public class FlightController {
         }
 
         User user = null;
-        if(isAdmin(sessionUser)){
+        if (isAdmin(sessionUser)) {
             user = userSession.getUser();
-        }
-        else{
+        } else {
             user = sessionUser;
         }
         model.addAttribute("user", user);
@@ -262,7 +279,6 @@ public class FlightController {
     }
 
 
-
     @GetMapping("/displayBookingPage")
     public String guestBooking(Model model, HttpServletRequest req) {
 
@@ -275,10 +291,9 @@ public class FlightController {
         }
 
         User user = null;
-        if(isAdmin(sessionUser)){
+        if (isAdmin(sessionUser)) {
             user = userSession.getUser();
-        }
-        else{
+        } else {
             user = sessionUser;
         }
         model.addAttribute("user", user);
@@ -318,10 +333,9 @@ public class FlightController {
         }
 
         User user = null;
-        if(isAdmin(sessionUser)){
+        if (isAdmin(sessionUser)) {
             user = userSession.getUser();
-        }
-        else{
+        } else {
             user = sessionUser;
         }
 
@@ -396,17 +410,16 @@ public class FlightController {
 
         //Determine if booking as admin
         User user = null;
-        if(isAdmin(sessionUser)){
+        if (isAdmin(sessionUser)) {
             user = userSession.getUser();
-        }
-        else{
+        } else {
             user = sessionUser;
         }
         model.addAttribute("user", user);
 
 //      User user = userSession.getUser();
         Reservation reservation = new Reservation();
-    //        if(!user.getReservations().contains())
+        //        if(!user.getReservations().contains())
         user.getReservations().add(reservation);
         userRepository.flush();
         reservation.setUser(user);
@@ -431,7 +444,6 @@ public class FlightController {
 
         }
     }
-
 
 
     @PostMapping("/processGuestPayment")
@@ -525,7 +537,7 @@ public class FlightController {
         if (flight != null) {
             model.addAttribute("guest", guest);
             model.addAttribute("flightGuest", flight);
-            LOGGER.info("%s", "Called getGuestReservations(): by guest <" + guest + ">");
+            LOGGER.info("Called getGuestReservations(): by guest <" + guest.toString() + ">");
         } else {
             model.addAttribute("error", "Flight is null");
         }
@@ -536,8 +548,8 @@ public class FlightController {
     private boolean isAdmin(User sessionUser) {
         boolean isAdmin = false;
         Iterator<Role> roleIterator = sessionUser.getRoles().iterator();
-        while(roleIterator.hasNext()){
-            if(roleIterator.next().getName().equals("ADMIN")){
+        while (roleIterator.hasNext()) {
+            if (roleIterator.next().getName().equals("ADMIN")) {
                 isAdmin = true;
             }
         }
