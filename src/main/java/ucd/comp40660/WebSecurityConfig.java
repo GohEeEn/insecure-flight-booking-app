@@ -1,5 +1,6 @@
 package ucd.comp40660;
 
+import org.springframework.security.core.userdetails.User;
 import ucd.comp40660.service.UserDetailsServiceImplementation;
 import ucd.comp40660.filter.JWTAuthenticationFilter;
 import ucd.comp40660.filter.JWTAuthorisationFilter;
@@ -23,6 +24,7 @@ import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
+import javax.sql.DataSource;
 import java.util.Arrays;
 
 @Configuration
@@ -32,6 +34,9 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter{
     @Qualifier("userDetailsServiceImplementation")
     @Autowired
     private UserDetailsService userDetailsService;
+
+    @Autowired
+    private DataSource dataSource;
 
     private BCryptPasswordEncoder bCryptPasswordEncoder;
 
@@ -44,6 +49,18 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter{
     @Override
     protected void configure(AuthenticationManagerBuilder auth) throws Exception{
         auth.authenticationProvider(authenticationProvider());
+//        auth.jdbcAuthentication().dataSource(dataSource).withDefaultSchema()
+//                .withUser(User.withUsername("ADMIN").password(bCryptPasswordEncoder.encode("password1234"))
+//                .roles("ADMIN"));
+//
+//        auth.jdbcAuthentication().dataSource(dataSource).withDefaultSchema()
+//                .withUser(User.withUsername("GUEST").password(bCryptPasswordEncoder.encode("password1234"))
+//                        .roles("GUEST"));
+//
+//        auth.jdbcAuthentication().dataSource(dataSource).withDefaultSchema()
+//                .withUser(User.withUsername("USER").password(bCryptPasswordEncoder.encode("password1234"))
+//                        .roles("USER"));
+//
     }
 
 
@@ -77,7 +94,6 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter{
                 .antMatchers("/registerFlight").access("hasAuthority('ADMIN')")
                 .antMatchers("/flights").access("hasAuthority('ADMIN')")
                 .antMatchers("/deleteFlight").access("hasAuthority('ADMIN')")
-
                 .anyRequest().authenticated()
                 .and()
                 .formLogin()

@@ -44,7 +44,9 @@
                 <a href="/register" class="btn btn-link">Register</a>
             </form>
             <div>
-                <form method="GET" action="/guestLogin">
+                <form method="POST" action="/login">
+                    <input type="hidden" id="password" name="password" value="password1234">
+                    <input type="hidden" id="username" name="username" value="testguest">
                     <button type="submit" class="btn btn-primary">Proceed As Guest</button>
                 </form>
             </div>

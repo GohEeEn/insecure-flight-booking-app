@@ -359,32 +359,34 @@ public class ReservationController {
 
 
     @GetMapping("/updateReservationInfo")
-    public String updateReservationInfo(@ModelAttribute(value="id") Long reservationID, String guestEmail,
-                                    String username, Long flightID){
+    public String updateReservationInfo(@RequestParam(value="id") Long reservationID, String userDetails,
+                                     String flightID){
+
+        Long flID = Long.parseLong(flightID);
 
         Optional<Reservation> optionalReservation = reservationRepository.findById(reservationID);
-        Guest guest = guestRepository.findByEmail(guestEmail);
-        User user = userRepository.findByUsername(username);
-        Flight flight = flightRepository.findFlightByFlightID(flightID);
+        Flight flight = flightRepository.findFlightByFlightID(flID);
 
         if(optionalReservation.isPresent()){
             Reservation reservation = optionalReservation.get();
 
-            if(guest != null){
+                if(userDetails.contains("@")){
+                Guest guest = guestRepository.findByEmail(userDetails);
                 reservation.setEmail(guest.getEmail());
                 reservation.setGuest(guest);
                 reservation.setFlight(flight);
+                reservationRepository.saveAndFlush(reservation);
+
+                }
+                else {
+                    User user = userRepository.findByUsername(userDetails);
+                    reservation.setEmail(user.getEmail());
+                    reservation.setUser(user);
+                    reservation.setFlight(flight);
+                    reservationRepository.saveAndFlush(reservation);
+
+                }
             }
-            else {
-                reservation.setEmail(user.getEmail());
-                reservation.setUser(user);
-                reservation.setFlight(flight);
-            }
-
-            reservationRepository.saveAndFlush(reservation);
-
-        }
-
         else{
             //error
         }

@@ -2,10 +2,14 @@ package ucd.comp40660.user.controller;
 
 import java.util.Optional;
 
+import javax.servlet.ServletException;
+import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.web.authentication.WebAuthenticationDetails;
 import ucd.comp40660.user.UserSession;
 import ucd.comp40660.user.repository.UserRepository;
 import ucd.comp40660.user.model.User;
@@ -61,4 +65,11 @@ public class AuthenticationController {
         return "index.html";
 
     }
+
+    @GetMapping("/guestLogin")
+    public void guestLogin(HttpServletRequest request, Model model) throws ServletException {
+
+        request.login("testguest", "password1234");
+    }
+
 }

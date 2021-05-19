@@ -74,12 +74,6 @@ public class UserController {
         return "index.html";
     }
 
-    @GetMapping("/guestLogin")
-    public String guestLogin(Model model){
-
-
-        return "index.html";
-    }
 
     //    Get all registrations
     @PreAuthorize("hasAuthority('ADMIN')")
@@ -177,7 +171,7 @@ public class UserController {
         LOGGER.info("%s", "New user registered with username <" + userForm.getUsername() + "> with the role of <" + userForm.getRoles() + ">");
         userService.save(userForm);
 
-        return "index.html";
+        return "redirect:/";
     }
 
     @GetMapping("/adminRegister")

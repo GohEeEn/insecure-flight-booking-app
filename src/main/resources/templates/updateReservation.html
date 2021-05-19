@@ -13,24 +13,19 @@
 
   <h2>Update Reservation Details</h2>
 
-  <form th:action="@{/updateRedservationInfo}" method="GET">
+  <form th:action="@{/updateReservationInfo}" method="GET">
     <div>
       <input type="hidden" id="reservationID" name="reservationID" th:value="${reservationID}">
     </div>
 
     <div class="form-group">
-      <label for="guestEmail">Guest</label>
-      <input type="text" id="guestEmail" name="guestEmail" placeholder="GUEST E-mail">
+      <label for="userDetails">Guest</label>
+      <input type="text" id="userDetails" name="userDetails" placeholder="User Details(Member Username or Guest E-mail)">
     </div>
 
     <div class="form-group">
-      <label for="userID">User Name</label>
-      <input type="text" id="username" name="username" placeholder="User Name">
-    </div>
-
-    <div class="form-group">
-      <label for="userID">Flight</label>
-      <input type="number" id="flightID" name="flightID" placeholder="Flight ID">
+      <label for="flightID">Flight</label>
+      <input type="text" id="flightID" name="flightID" placeholder="Flight ID">
     </div>
 
     <button type="submit" class="btn btn-primary">Update Reservation</button>
