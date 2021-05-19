@@ -29,6 +29,7 @@ public class UserServiceImplementation implements UserService {
 
     @Override
     public void save(User user) {
+        bCryptPasswordEncoder = new BCryptPasswordEncoder(12);
         user.setPassword(bCryptPasswordEncoder.encode(user.getPassword()));
         Role userRole = roleRepository.findByName("MEMBER");
         Set<Role> roleSet = new HashSet<Role>();
@@ -39,6 +40,7 @@ public class UserServiceImplementation implements UserService {
 
     @Override
     public void adminSave(User user) {
+        bCryptPasswordEncoder = new BCryptPasswordEncoder(12);
         user.setPassword(bCryptPasswordEncoder.encode(user.getPassword()));
         Role userRole = roleRepository.findByName("ADMIN");
         System.out.println("\n\nROLE FOUND: ");
@@ -90,6 +92,7 @@ public class UserServiceImplementation implements UserService {
     @Override
     public void savePassword(String email, String password) {
         User tokenUser = userRepository.findByEmail(email);
+        bCryptPasswordEncoder = new BCryptPasswordEncoder(12);
         tokenUser.setPassword(bCryptPasswordEncoder.encode(password));
         userRepository.save(tokenUser);
     }
