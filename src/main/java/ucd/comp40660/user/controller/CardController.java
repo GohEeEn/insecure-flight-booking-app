@@ -3,6 +3,8 @@ package ucd.comp40660.user.controller;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UserDetails;
 import ucd.comp40660.service.EncryptionService;
 import ucd.comp40660.user.UserSession;
 import org.springframework.stereotype.Controller;
@@ -132,6 +134,7 @@ public class CardController {
     @GetMapping("/registerCard")
     public String registerCardView(Model model, HttpServletRequest req) {
         User user = null;
+
 
         Principal userDetails = req.getUserPrincipal();
         if (userDetails != null) {

@@ -35,7 +35,7 @@
               <tbody>
               <tr th:each="reservation : ${reservations}">
                 <td th:text="${reservation.id}"></td>
-                <td th:text="${reservation.flight_reference}"></td>
+                <td th:text="${reservation.flight.flightID}"></td>
                 <td th:text="${reservation.flight.source}"></td>
                 <td th:text="${reservation.flight.departure_date_time}"></td>
                 <td th:text="${reservation.flight.destination}"></td>

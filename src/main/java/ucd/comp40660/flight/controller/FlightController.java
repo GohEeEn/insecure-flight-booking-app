@@ -279,7 +279,7 @@ public class FlightController {
     }
 
     @PreAuthorize("hasAuthority('ADMIN')")
-    @PostMapping("/adminProcessFlightSearch")
+    @PostMapping("/adminProcessUserFlightSearch")
     public void adminProcessFlightSearch(String departure, String destinationInput, int passengers, String outboundDate, String username,
                                          Model model, HttpServletResponse response, HttpServletRequest req) throws IOException {
         User sessionUser = null;
@@ -523,7 +523,6 @@ public class FlightController {
         guest.setPhone(phoneNumber);
         guest.setAddress(address);
 
-        model.addAttribute("user", userSession.getUser());
 
         return "/displayPaymentPage";
     }
@@ -673,10 +672,10 @@ public class FlightController {
         model.addAttribute("user", user);
 
         List<Reservation> guestReservationId = new ArrayList<>();
-        List<Guest> allGuests = guestRepository.findAll();
+        List<Guest> guestList = guestRepository.findAll();
 //        log.info(allGuests.get(1).getPassengers().size());
 
-        List<Reservation> allReservations = reservationRepository.findAll();
+        List<Reservation> reservationList = reservationRepository.findAll();
 
         for (Reservation reserved : reservationList) {
             for (Guest value : guestList) {
