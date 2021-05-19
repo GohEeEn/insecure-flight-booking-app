@@ -132,10 +132,21 @@
                                 &nbsp;Reservations
                             </h6>
 
-                            <a class="dropdown-item" th:href="@{/getUserReservations/{username}(username = ${sessionUser.getUsername})}">
+                            <a class="dropdown-item" th:href="@{/users}">
                                 <i class="fa fa-plane" aria-hidden="true"></i>
-                                &nbsp;Reservations
+                                &nbsp;Users
                             </a>
+
+                            <a class="dropdown-item" th:href="@{/flights}">
+                                <i class="fa fa-plane" aria-hidden="true"></i>
+                                Flights
+                            </a>
+
+                            <a class="dropdown-item" th:href="@{/reservations}">
+                                <i class="fa fa-plane" aria-hidden="true"></i>
+                                Reservations
+                            </a>
+
 
                             <!--                                <a class="dropdown-item" href="/getUserReservations">-->
                             <!--                                    <i class="fa fa-history" aria-hidden="true"></i>-->

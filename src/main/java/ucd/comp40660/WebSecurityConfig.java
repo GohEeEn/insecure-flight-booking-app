@@ -94,6 +94,8 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter{
                 .antMatchers("/registerFlight").access("hasAuthority('ADMIN')")
                 .antMatchers("/flights").access("hasAuthority('ADMIN')")
                 .antMatchers("/deleteFlight").access("hasAuthority('ADMIN')")
+                .antMatchers("/reservations").access("hasAuthority('ADMIN')")
+
                 .anyRequest().authenticated()
                 .and()
                 .formLogin()
