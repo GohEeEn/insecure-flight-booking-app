@@ -17,6 +17,7 @@ import ucd.comp40660.reservation.repository.ReservationRepository;
 import ucd.comp40660.service.UserService;
 import ucd.comp40660.user.UserSession;
 import ucd.comp40660.user.model.Guest;
+import ucd.comp40660.user.model.Role;
 import ucd.comp40660.user.model.User;
 
 import javax.servlet.http.HttpServletRequest;
@@ -31,6 +32,7 @@ import java.util.List;
 import java.util.Optional;
 
 import ucd.comp40660.user.repository.GuestRepository;
+
 import ucd.comp40660.user.repository.UserRepository;
 import ucd.comp40660.validator.UserValidator;
 
@@ -85,7 +87,13 @@ public class ReservationController {
     @GetMapping("/reservations/{id}")
     @ResponseBody
     public Reservation getReservationById(@PathVariable(value = "id") Long reservationID) throws ReservationNotFoundException {
-        LOGGER.info("%s", "Get a single reservation by id called by <" + userSession.getUser().getUsername() + "> with the role of <" + userSession.getUser().getRoles() + ">");
+
+        StringBuilder userRoles = new StringBuilder();
+        for (Role role : userSession.getUser().getRoles()) {
+            userRoles.append(role.getName());
+        }
+
+        LOGGER.info("Get a single reservation by id called by <" + userSession.getUser().getUsername() + "> with the role of <" + userRoles + ">");
         return reservationRepository.findById(reservationID)
                 .orElseThrow(() -> new ReservationNotFoundException(reservationID));
     }
@@ -102,7 +110,12 @@ public class ReservationController {
         reservation.setEmail(reservationDetails.getEmail());
         reservation.setFlight_reference(reservationDetails.getFlight_reference());
 
-//        LOGGER.info("%s", "Update details of reservation with id = <" + reservationID + ">" + " by user <" + userSession.getUser().getUsername() + "> with the role of <" + userSession.getUser().getRoles() + ">");
+        StringBuilder userRoles = new StringBuilder();
+        for (Role role : userSession.getUser().getRoles()) {
+            userRoles.append(role.getName());
+        }
+
+        LOGGER.info("Update details of reservation with id = <" + reservationID + ">" + " by user <" + userSession.getUser().getUsername() + "> with the role of <" + userRoles + ">");
 
         return reservationRepository.saveAndFlush(reservation);
     }
@@ -120,7 +133,12 @@ public class ReservationController {
 
         User tempUser = userRepository.findByUsername(username);
 
-        LOGGER.info("%s", "Delete reservation with id = <" + reservationID + ">" + " by user <" + username + "> with the role of <" + tempUser.getRoles() + ">");
+        StringBuilder userRoles = new StringBuilder();
+        for (Role role : userSession.getUser().getRoles()) {
+            userRoles.append(role.getName());
+        }
+
+        LOGGER.info("Delete reservation with id = <" + reservationID + ">" + " by user <" + username + "> with the role of <" + userRoles + ">");
 
         return ResponseEntity.ok().build();
     }
@@ -130,6 +148,11 @@ public class ReservationController {
     public String getUserReservations(@PathVariable(value = "username") String username, Model model, HttpServletRequest req) throws ReservationNotFoundException {
         User user = null;
         User sessionUser = null;
+
+        StringBuilder userRoles = new StringBuilder();
+        for (Role role : userRepository.findByUsername(username).getRoles()) {
+            userRoles.append(role.getName());
+        }
 
         Principal userDetails = req.getUserPrincipal();
         if (userDetails != null) {
@@ -184,19 +207,18 @@ public class ReservationController {
                 model.addAttribute("upcoming_cancellable", upcoming_cancellable);
                 LOGGER.info("Added flights to front end as 'flightsUser'");
                 LOGGER.info("Cancelled Flights: " + cancelled_flights);
-                LOGGER.info("%s", "getUserReservations() called by <" + username + "> with the role of <" + userRepository.findByUsername(username).getRoles() + ">");
+                LOGGER.info("getUserReservations() called by <" + username + "> with the role of <" + userRoles + ">");
 
             } else { // throw an error if there are no reservations
-                LOGGER.warn("%s", "Unsuccessful attempt to get user reservations by user <" + username + "> with the role of <" + userRepository.findByUsername(username).getRoles() + ">");
+                LOGGER.warn("Unsuccessful attempt to get user reservations by user <" + username + "> with the role of <" + userRoles + ">");
                 model.addAttribute("error", "No reservations found");
             }
             model.addAttribute("user", user);
             model.addAttribute("sessionUser", sessionUser);
             return "viewFlightsUser.html";
 
-        }
-        else{
-            LOGGER.warn("%s", "Unsuccessful attempt to get user reservations by user <" + username + "> with the role of <" + userRepository.findByUsername(username).getRoles() + ">");
+        } else {
+            LOGGER.warn("Unsuccessful attempt to get user reservations by user <" + username + "> with the role of <" + userRoles + ">");
             model.addAttribute("error", "No Member logged in");
             return "index.html";
         }
@@ -227,7 +249,12 @@ public class ReservationController {
         flightRepository.saveAndFlush(flight);
         model.addAttribute("user", userRepository.findByUsername(userDetails.getName()));
 
-        LOGGER.info("%s", "Reservation cancelled with flight id = <" + flightID + "> by user <" + username + "> with the role of <" + userRepository.findByUsername(username).getRoles() + ">");
+        StringBuilder userRoles = new StringBuilder();
+        for (Role role : userRepository.findByUsername(username).getRoles()) {
+            userRoles.append(role.getName());
+        }
+
+        LOGGER.info("Reservation cancelled with flight id = <" + flightID + "> by user <" + username + "> with the role of <" + userRoles + ">");
 
         response.sendRedirect("/getUserReservations/" + username);
     }

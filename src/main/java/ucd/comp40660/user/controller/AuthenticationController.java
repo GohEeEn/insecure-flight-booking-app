@@ -11,6 +11,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.web.authentication.WebAuthenticationDetails;
 import ucd.comp40660.user.UserSession;
+import ucd.comp40660.user.model.Role;
 import ucd.comp40660.user.repository.UserRepository;
 import ucd.comp40660.user.model.User;
 import ucd.comp40660.user.controller.UserController;
@@ -43,7 +44,13 @@ public class AuthenticationController {
 
     @GetMapping("/logout")
     public void logout(HttpServletResponse response) throws Exception {
-        LOGGER.info("%s", "User <" + userSession.getUser().getUsername() + "> with the role of <" + userSession.getUser().getRoles() + "> logged out successfully");
+
+        StringBuilder userRoles = new StringBuilder();
+        for (Role role : userSession.getUser().getRoles()) {
+            userRoles.append(role.getName());
+        }
+
+        LOGGER.info("User <" + userSession.getUser().getUsername() + "> with the role of <" + userRoles + "> logged out successfully");
         userSession.setUser(null);
         response.sendRedirect("/");
     }
@@ -61,7 +68,12 @@ public class AuthenticationController {
 //        }
 //    }
 
-        LOGGER.info("%s", "User <" + username + "> with the role of <" + userSession.getUser().getRoles() + "> logged in successfully");
+        StringBuilder userRoles = new StringBuilder();
+        for (Role role : userSession.getUser().getRoles()) {
+            userRoles.append(role.getName());
+        }
+
+        LOGGER.info("User <" + username + "> with the role of <" + userRoles + "> logged in successfully");
         return "index.html";
 
     }

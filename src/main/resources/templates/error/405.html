@@ -1,0 +1,37 @@
+<!DOCTYPE HTML>
+
+<html lang="en" xmlns:th="http://www.thymeleaf.org" >
+
+    <head>
+        <meta charset="utf-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <title>BAFlight : Method Not Allowed</title>
+        <meta name="description" content="">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+
+        <div th:replace="fragments/header :: header-data"></div>
+        <link rel="stylesheet" href="/css/error.css">
+    </head>
+
+    <body>
+
+        <div id="error-content" class="container text-center align-middle">
+
+            <h1>405</h1>
+
+            <div class="container ">
+                <p><em>HTTP 405 Method Not Allowed</em></p>
+                <p>Page or Server Not Found</p>
+
+                <div class="mt-5">
+                    <p>: Return to :</p>
+                    <a href="/" class="btn btn-light">Home</a> 
+                    <a href="javascript:history.back()" class="btn btn-primary">Back</a> 
+                </div>
+            </div>
+        </div>
+
+    </body>
+
+</html>
+

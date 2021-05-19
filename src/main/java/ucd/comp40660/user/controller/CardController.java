@@ -3,11 +3,13 @@ package ucd.comp40660.user.controller;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.security.access.prepost.PreAuthorize;
+import ucd.comp40660.service.EncryptionService;
 import ucd.comp40660.user.UserSession;
 import org.springframework.stereotype.Controller;
 import ucd.comp40660.user.exception.CreditCardNotFoundException;
 import ucd.comp40660.user.exception.UserNotFoundException;
 import ucd.comp40660.user.model.CreditCard;
+import ucd.comp40660.user.model.Role;
 import ucd.comp40660.user.model.User;
 import ucd.comp40660.user.repository.CreditCardRepository;
 import ucd.comp40660.user.repository.GuestRepository;
@@ -55,45 +57,77 @@ public class CardController {
                                       int expiration_month, int expiration_year, String security_code, Model model, HttpServletRequest req) {
         User user = null;
 
+        // encrypt card_number and security_code before saving it in the database
+        String encryptedCardholderName = EncryptionService.encrypt(cardholder_name);
+        String encryptedCardNumber = EncryptionService.encrypt(card_number);
+        String encryptedCardType = EncryptionService.encrypt(card_type);
+        String encryptedSecurityCode = EncryptionService.encrypt(security_code);
+
         Principal userDetails = req.getUserPrincipal();
         if (userDetails != null) {
             user = userRepository.findByUsername(userDetails.getName());
+
+
             model.addAttribute("user", user);
         }
 
 //        User user = userSession.getUser();
         model.addAttribute("user", user);
-        CreditCard newCard = new CreditCard(cardholder_name, card_number, card_type, expiration_month, expiration_year, security_code);
+        CreditCard newCard = new CreditCard(encryptedCardholderName, encryptedCardNumber, encryptedCardType, expiration_month, expiration_year, encryptedSecurityCode);
         if (user != null) {
             newCard.setUser(user);
             user.getCredit_cards().add(newCard);
         } else {
-            LOGGER.warn("%s", "Unsuccessful attempt to add credit card details by a non-logged in user.");
+            LOGGER.warn("Unsuccessful attempt to add credit card details by a non-logged in user.");
             model.addAttribute("error", "\nError, No Member logged in to save card details.");
             return "login.html";
         }
 
         newCard = creditCardRepository.saveAndFlush(newCard);
 
-        LOGGER.info("%s", "Member credit card added for user <" + user.getUsername() + "> with the role of <" + user.getRoles() + ">");
+        StringBuilder userRoles = new StringBuilder();
+        for (Role role : userRepository.findByUsername(user.getUsername()).getRoles()) {
+            userRoles.append(role.getName());
+        }
+
+        LOGGER.info("Member credit card added for user <" + user.getUsername() + "> with the role of <" + userRoles + ">");
+
         return "viewProfile.html";
     }
 
-
     @PreAuthorize("#username == authentication.name")
-    @GetMapping("/viewMemberCreditCards/{username}")
-    public String viewMemberCreditCards(@PathVariable String username, Model model, HttpServletRequest req) {
+    @GetMapping("/viewCreditCards/{username}")
+    public String viewMemberCreditCards(@PathVariable(value = "username") String username, Model model, HttpServletRequest req) {
+        User sessionUser = null;
 
-        User user = null;
-        user = userRepository.findByUsername(username);
+        Principal userDetails = req.getUserPrincipal();
+        if (userDetails != null) {
+            sessionUser = userRepository.findByUsername(userDetails.getName());
+            List<CreditCard> creditCards = sessionUser.getCredit_cards();
 
-        model.addAttribute("cards", creditCardRepository.findAllByUser(user));
-        model.addAttribute("user", user);
+            for (CreditCard card : creditCards) {
+                card.setCardholder_name(EncryptionService.decrypt(card.getCardholder_name()));
+                card.setCard_number(EncryptionService.decrypt(card.getCard_number()));
+                card.setType(EncryptionService.decrypt(card.getType()));
+                card.setSecurity_code(EncryptionService.decrypt(card.getSecurity_code()));
+            }
 
-//        LOGGER.info("%s", "Called viewCreditCards(): by user <" + username + "> with the role of <" + userRepository.findByUsername(username).getRoles() + ">");
+            sessionUser.setCredit_cards(creditCards);
+
+            model.addAttribute("sessionUser", sessionUser);
+        }
+
+        model.addAttribute("cards", creditCardRepository.findAllByUser(sessionUser));
+
+        StringBuilder userRoles = new StringBuilder();
+        for (Role role : userRepository.findByUsername(username).getRoles()) {
+            userRoles.append(role.getName());
+        }
+
+        LOGGER.info("Called viewCreditCards(): by user <" + username + "> with the role of <" + userRoles + ">");
+
         return "viewCreditCards.html";
     }
-
 
     @GetMapping("/registerCard")
     public String registerCardView(Model model, HttpServletRequest req) {
@@ -127,7 +161,12 @@ public class CardController {
         model.addAttribute("user", user);
         model.addAttribute("cards", creditCardRepository.findAllByUser(user));
 
-        LOGGER.info("%s", "Deleted credit card by user <" + user.getUsername() + "> with the role of <" + user.getRoles() + ">");
+        StringBuilder userRoles = new StringBuilder();
+        for (Role role : userRepository.findByUsername(user.getUsername()).getRoles()) {
+            userRoles.append(role.getName());
+        }
+
+        LOGGER.info("Deleted credit card by user <" + user.getUsername() + "> with the role of <" + userRoles + ">");
 
         return "viewCreditCards.html";
     }
