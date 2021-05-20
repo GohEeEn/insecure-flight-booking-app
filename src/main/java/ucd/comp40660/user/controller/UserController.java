@@ -426,18 +426,54 @@ public class UserController {
         }
     }
 
-    @GetMapping("/editPassword")
-    public String changePassword(Model model) {
-        model.addAttribute("user", userSession.getUser());
+    @PreAuthorize("#username == authentication.name or hasAuthority('ADMIN')")
+    @GetMapping("/editPassword/{username}")
+    public String changePassword(@PathVariable(value = "username") String username, Model model, HttpServletRequest req) {
+
+        User sessionUser = null;
+
+        Principal userDetails = req.getUserPrincipal();
+        if (userDetails != null) {
+            sessionUser = userRepository.findByUsername(userDetails.getName());
+            model.addAttribute("sessionUser", sessionUser);
+        }
+
+        //Determine if booking as admin
+        User user = null;
+        if(isAdmin(sessionUser)){
+            user = userRepository.findByUsername(username);
+        }
+        else{
+            user = sessionUser;
+        }
+        model.addAttribute("user", user);
+
         return "editPassword.html";
     }
 
-
+//    @PreAuthorize("#username == authentication.name or hasAuthority('ADMIN')")
     @PostMapping("/editPassword")
-    public String editPassword(String password, String newPassword, String newPasswordDuplicate, HttpServletResponse response, Model model)
+    public String editPassword(String username, String password, String newPassword, String newPasswordDuplicate,
+                               HttpServletResponse response, HttpServletRequest req, Model model)
             throws Exception {
 
-        User user = userSession.getUser();
+        User sessionUser = null;
+
+        Principal userDetails = req.getUserPrincipal();
+        if (userDetails != null) {
+            sessionUser = userRepository.findByUsername(userDetails.getName());
+            model.addAttribute("sessionUser", sessionUser);
+        }
+
+        //Determine if booking as admin
+        User user = null;
+        if(isAdmin(sessionUser)){
+            user = userRepository.findByUsername(username);
+        }
+        else{
+            user = sessionUser;
+        }
+        model.addAttribute("user", user);
 
         StringBuilder userRoles = new StringBuilder();
         for (Role role : user.getRoles()) {
