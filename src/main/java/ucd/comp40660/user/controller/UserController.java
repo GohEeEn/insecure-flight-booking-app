@@ -327,10 +327,10 @@ public class UserController {
         //Determine if booking as admin
         User user = null;
         if(isAdmin(sessionUser)){
-            user = userSession.getUser();
+            user = userRepository.findByUsername(username);
         }
         else{
-            user = userRepository.findByUsername(username);
+            user = sessionUser;
         }
         model.addAttribute("user", user);
 
