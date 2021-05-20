@@ -34,6 +34,7 @@
                     <th>Destination</th>
                     <th>Outbound Time</th>
                     <th>Arrival Time</th>
+                    <th>Action</th>
                 </tr>
                 </thead>
                 <tbody>
@@ -43,6 +44,19 @@
                     <td th:text="${flightGuest?.destination}"></td>
                     <td th:text="${flightGuest?.departure_date_time}"></td>
                     <td th:text="${flightGuest?.arrivalDateTime}"></td>
+<!--                    <td th:text="${guest?.getEmail}"></td>-->
+                    <div th:each="entry: ${sessionUser.getRoles()}">
+                        <div th:if="${not reservation.cancelled} and ${entry.name} == 'ADMIN'">
+                            <td>
+                                <a th:href="@{/guestReservations/cancel/{email}/{id}(email = ${guest.getEmail}, id = ${flightGuest.getFlightID})}">Cancel</a>
+                            </td>
+                        </div >
+                    </div>
+                    <div th:if="${reservation.cancelled}">
+                        <td>
+                            Cancelled
+                        </td>
+                    </div>
                 </tr>
                 </tbody>
             </table>

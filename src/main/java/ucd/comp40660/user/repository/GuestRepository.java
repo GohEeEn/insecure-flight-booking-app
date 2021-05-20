@@ -8,4 +8,5 @@ import java.util.Optional;
 @Repository
 public interface GuestRepository  extends JpaRepository<Guest, Long>{
    Guest findTopByOrderByIdDesc();
+   Guest findByEmail(String email);
 }

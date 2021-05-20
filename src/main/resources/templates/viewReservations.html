@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+  <title>Reservations</title>
+
+  <div th:replace="fragments/header :: header-data"></div>
+</head>
+
+<body>
+
+<nav th:replace="fragments/header :: navigation-bar"></nav>
+
+<div class="container">
+  <div class="row">
+    <div class="col-8">
+      <div th:each="entry: ${sessionUser.getRoles()}">
+        <div th:if="${entry.name} == 'ADMIN'">
+          <div class="col-lg-12 align-self-center">
+            <table class="table table-hover table-fixed">
+              <thead>
+              <tr>
+                <th>Reservation ID</th>
+                <th>Flight ID</th>
+                <th>Departs From</th>
+                <th>Departure Date</th>
+                <th>Destination</th>
+                <th>Arrival Date</th>
+                <th>Cancelled?</th>
+                <th>Guest</th>
+                <th>Member</th>
+                <th>Update</th>
+                <th>Delete</th>
+              </tr>
+              </thead>
+              <tbody>
+              <tr th:each="reservation : ${reservations}">
+                <td th:text="${reservation.id}"></td>
+                <td th:text="${reservation.flight.flightID}"></td>
+                <td th:text="${reservation.flight.source}"></td>
+                <td th:text="${reservation.flight.departure_date_time}"></td>
+                <td th:text="${reservation.flight.destination}"></td>
+                <td th:text="${reservation.flight.arrivalDateTime}"></td>
+                <td th:text="${reservation.cancelled}"></td>
+                <div th:if="${reservation.guest} != null">
+                  <td th:text="${reservation.guest.email}"></td>
+                  <td>No</td>
+                </div>
+                <div th:if="${reservation.user} != null">
+                  <td>No</td>
+                  <td th:text="${reservation.user.username}"></td>
+                </div>
+                <td><a th:href="@{/updateReservation(id=${reservation.id})}">Update</a></td>
+                <td><a th:href="@{/deleteReservation(id=${reservation.id})}" th:method="delete">Delete</a></td>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+</body>
+</html>

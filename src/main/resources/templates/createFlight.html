@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+  <title>Flight Registration</title>
+
+  <div th:replace="fragments/header :: header-data"></div>
+</head>
+<body>
+
+  <nav th:replace="fragments/header :: navigation-bar"></nav>
+
+    <div class="container">
+
+      <h2>Register your account</h2>
+
+      <form action="/registerFlight" method="POST" th:object="${flight}">
+
+    <!--    <div class="form-group">-->
+    <!--      <label for="source">First Name</label>-->
+    <!--      <input id="source" class="form-control" type="text" name="source" placeholder="Departs From..." required/>-->
+    <!--    </div>-->
+
+        <div class="form-group">
+          <label for="source">From</label>
+          <select class="form-control"  id="source" name="source" required>
+            <option value="">Departure City</option>
+            <option value="Sofia, Bulgaria">Sofia, Bulgaria</option>
+            <option value="Dublin, Ireland">Dublin, Ireland</option>
+            <option value="Stockholm, Sweden">Stockholm, Sweden</option>
+            <option value="Oslo, Norway">Oslo, Norway</option>
+            <option value="Rio de Janeiro, Brazil">Rio de Janeiro, Brazil</option>
+            <option value="Manila, Philippines">Manila, Philippines</option>
+            <option value="Seoul, South Korea">Seoul, South Korea</option>
+            <option value="Tokyo, Japan">Tokyo, Japan</option>
+            <option value="Bucharest, Romania">Bucharest, Romania</option>
+            <option value="Pyongyang, North Korea">Pyongyang, North Korea</option>
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label for="destination">To</label>
+          <select class="form-control"  id="destination" name="destination" required>
+            <option value="">Destination City</option>
+            <option value="Sofia, Bulgaria">Sofia, Bulgaria</option>
+            <option value="Dublin, Ireland">Dublin, Ireland</option>
+            <option value="Stockholm, Sweden">Stockholm, Sweden</option>
+            <option value="Oslo, Norway">Oslo, Norway</option>
+            <option value="Rio de Janeiro, Brazil">Rio de Janeiro, Brazil</option>
+            <option value="Manila, Philippines">Manila, Philippines</option>
+            <option value="Seoul, South Korea">Seoul, South Korea</option>
+            <option value="Tokyo, Japan">Tokyo, Japan</option>
+            <option value="Bucharest, Romania">Bucharest, Romania</option>
+            <option value="Pyongyang, North Korea">Pyongyang, North Korea</option>
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label for="departureDate">Departure Date</label>
+          <input id="departureDate"   class="form-control" type="date" name="departureDate" placeholder="Departure Date"
+                 min="2020-11-28" max="2021-12-31" required/>
+        </div>
+
+          <div class="form-group">
+              <label for="departureTime">Departure Time</label>
+              <input id="departureTime" class="form-control" type="time" name="departureTime" placeholder="Departure Time" required/>
+          </div>
+
+
+          <div class="form-group">
+            <label for="arrivalDate">Arrival Date</label>
+            <input id="arrivalDate"  class="form-control" type="date" name="arrivalDate" placeholder="Arrival Date"
+                   min="2020-11-28" max="2021-12-31" required/>
+          </div>
+
+          <div class="form-group">
+              <label for="arrivalTime">Arrival Time</label>
+              <input id="arrivalTime" class="form-control" type="time" name="arrivalTime" placeholder="Arrival Time" required/>
+          </div>
+
+
+          <div class="container" th:if="error != null">
+            <div class="row">
+              <p class="error" th:text="${error}"></p>
+            </div>
+          </div>
+
+        <button type="submit" class="btn btn-primary">Register Flight</button>
+      </form>
+    </div>
+
+  <div th:replace="fragments/footer :: footer"></div>
+</body>
+</html>

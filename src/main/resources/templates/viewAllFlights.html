@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+  <title>Flights</title>
+
+  <div th:replace="fragments/header :: header-data"></div>
+</head>
+
+<body>
+
+  <nav th:replace="fragments/header :: navigation-bar"></nav>
+
+  <div>
+    <a href="/registerFlight">Create a Flight</a>
+  </div>
+  <div class="container">
+    <div class="row">
+      <div class="col-8">
+        <div th:each="entry: ${sessionUser.getRoles()}">
+          <div th:if="${entry.name} == 'ADMIN'">
+            <div class="col-lg-12 align-self-center">
+              <table class="table table-hover table-fixed">
+                <thead>
+                <tr>
+                  <th>Flight ID</th>
+                  <th>Source</th>
+                  <th>Destination</th>
+                  <th>Departing</th>
+                  <th>Arriving</th>
+                  <th>Update</th>
+                  <th>Delete</th>
+                </tr>
+                </thead>
+                <tbody>
+                  <tr th:each="flight : ${flights}">
+                    <td th:text="${flight.flightID}"></td>
+                    <td th:text="${flight.source}"></td>
+                    <td th:text="${flight.destination}"></td>
+                    <td th:text="${flight.departure_date_time}"></td>
+                    <td th:text="${flight.arrivalDateTime}"></td>
+                    <td><a th:href="@{/updateFlight(id=${flight.flightID})}">Update</a></td>
+                    <td><a th:href="@{/deleteFlight(id=${flight.flightID})}" th:method="delete">Delete</a></td>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</body>
+</html>

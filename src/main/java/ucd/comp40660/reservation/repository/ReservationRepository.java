@@ -21,6 +21,7 @@ public interface ReservationRepository extends JpaRepository<Reservation, Long> 
     List <Reservation> findAllByUserAndCancelledIsFalse(User user);
     Reservation findByUserAndFlightAndCancelledIsTrue(User user, Flight flight);
     Reservation findOneByEmailAndId(String email, Long id);
+    Reservation findByGuestAndFlight(Guest guest, Flight flight);
 
     boolean existsByUserAndFlight(User user, Flight flight);
 //    public findFirstByUser(User user);

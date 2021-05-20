@@ -6,7 +6,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Controller;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.ui.Model;
+import org.springframework.web.bind.WebDataBinder;
 import org.springframework.web.bind.annotation.*;
 import ucd.comp40660.flight.exception.FlightNotFoundException;
 import ucd.comp40660.flight.model.Flight;
@@ -23,15 +25,22 @@ import ucd.comp40660.user.repository.PassengerRepository;
 import ucd.comp40660.user.repository.UserRepository;
 import ucd.comp40660.validator.UserValidator;
 
+import javax.persistence.Transient;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.security.Principal;
+import java.sql.Time;
+import java.sql.Timestamp;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Date;
+
 
 
 @Controller
@@ -78,16 +87,90 @@ public class FlightController {
     }
 
     //    Get all flights
+//    @PreAuthorize("hasAuthority('ADMIN')")
     @GetMapping("/flights")
-    @ResponseBody
-    public List<Flight> getAllFlights() {
-        StringBuilder userRoles = new StringBuilder();
-        for (Role role : userSession.getUser().getRoles()) {
-            userRoles.append(role.getName());
+    public String getAllFlights(HttpServletRequest req, Model model) {
+        User sessionUser = null;
+
+        Principal userDetails = req.getUserPrincipal();
+        if (userDetails != null) {
+            sessionUser = userRepository.findByUsername(userDetails.getName());
+            model.addAttribute("sessionUser", sessionUser);
         }
 
-        LOGGER.info("Called getAllFlights() by user <" + userSession.getUser().getUsername() + "> with the role of <" + userRoles + ">");
-        return flightRepository.findAll();
+        LOGGER.info("%s", "Called getAllFlights() by user <" + sessionUser.getUsername() + "> with the role of <" + sessionUser.getRoles() + ">");
+        List<Flight> flights =  flightRepository.findAll();
+        model.addAttribute("flights", flights);
+        model.addAttribute("sessionUser", sessionUser);
+
+
+
+        return "viewAllFlights.html";
+    }
+
+    @GetMapping("/registerFlight")
+    public String registerFlight(Model model, HttpServletRequest req){
+        User sessionUser = null;
+
+        Principal userDetails = req.getUserPrincipal();
+        if (userDetails != null) {
+            sessionUser = userRepository.findByUsername(userDetails.getName());
+            model.addAttribute("sessionUser", sessionUser);
+        }
+
+        return "/createFlight.html";
+
+    }
+
+    @PostMapping("/registerFlight")
+    public void registerFlight(Model model, HttpServletRequest req, HttpServletResponse response,
+                               String source, String destination,  String departureDate, String departureTime,
+                               String arrivalDate, String arrivalTime) throws IOException, ParseException {
+
+        LOGGER.info(String.format("VALUES!!!: %s, %s, %s, %s, %s, %s", source, destination, departureDate, departureTime,
+                                                                        arrivalDate, arrivalTime));
+
+
+        User sessionUser = null;
+
+        Principal userDetails = req.getUserPrincipal();
+        if (userDetails != null) {
+            sessionUser = userRepository.findByUsername(userDetails.getName());
+            model.addAttribute("sessionUser", sessionUser);
+        }
+
+        SimpleDateFormat hm = new SimpleDateFormat("HH:mm");
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
+        SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd HH:mm");
+
+        Date dep = df.parse(departureDate + " " + departureTime);
+        Date arr = df.parse(arrivalDate + " " + arrivalTime);
+        Date dt = hm.parse(departureTime);
+        Date at = hm.parse(arrivalTime);
+        Date dd = sdf.parse(departureDate);
+        Date ad = sdf.parse(arrivalDate);
+
+        LOGGER.info(String.format("Attempting to concatenate dates and times"));
+        LOGGER.info(String.format("dep & arr %s, %s", dep.getTime() , arr.getTime() ));
+        LOGGER.info(String.format("dt & at: %s, %s", dt.getTime(), at.getTime()));
+        LOGGER.info(String.format("dd & ad: %s, dt time: %s", dd.getTime() , ad.getTime() ));
+
+        Date departure = new Date(dd.getTime() + dt.getTime());
+        Date arrival = new Date(ad.getTime() + at.getTime());
+
+        LOGGER.info(String.format("Attempting to create Flight object"));
+
+        Flight flight = new Flight(source, destination, dep, arr);
+        flight.setReservations(null);
+
+        List<Flight> flights = flightRepository.findAll();
+        model.addAttribute("flights", flights);
+
+        LOGGER.info(String.format("Attempting to save Flight object"));
+
+        flightRepository.saveAndFlush(flight);
+
+        response.sendRedirect("/");
     }
 
     //    Get a single flight
@@ -106,17 +189,33 @@ public class FlightController {
                 .orElseThrow(() -> new FlightNotFoundException(flightID));
     }
 
+    @GetMapping("/updateFlight")
+    public String updateFlight(@ModelAttribute(value = "id") String flightID, Model model, HttpServletRequest req){
+        User sessionUser = null;
+
+        Principal userDetails = req.getUserPrincipal();
+        if (userDetails != null) {
+            sessionUser = userRepository.findByUsername(userDetails.getName());
+            model.addAttribute("sessionUser", sessionUser);
+        }
+        model.addAttribute("FLIGHTID", flightID);
+
+        return "/updateFlight.html";
+
+    }
+
+
     //    Update flight details
-    @PutMapping("/flights/{id}")
-    @ResponseBody
-    public Flight updateFlight(@PathVariable(value = "id") Long flightID, @Valid @RequestBody Flight flightDetails) throws FlightNotFoundException {
+    @GetMapping("/updateFlightInfo")
+    public void updateFlightInfo(@RequestParam(value = "FLIGHTID") Long flightID, String source, String destination,  String departureDate, String departureTime,
+                               String arrivalDate, String arrivalTime, HttpServletResponse response, HttpServletRequest req) throws FlightNotFoundException, ParseException, IOException {
         Flight flight = flightRepository.findById(flightID)
                 .orElseThrow(() -> new FlightNotFoundException(flightID));
 
-        flight.setSource(flightDetails.getSource());
-        flight.setDestination(flightDetails.getDestination());
-        flight.setArrivalDateTime(flightDetails.getArrivalDateTime());
-        flight.setDeparture_date_time(flightDetails.getDeparture_date_time());
+        SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd HH:mm");
+
+        Date dep = df.parse(departureDate + " " + departureTime);
+        Date arr = df.parse(arrivalDate + " " + arrivalTime);
 
         StringBuilder userRoles = new StringBuilder();
         for (Role role : userSession.getUser().getRoles()) {
@@ -124,14 +223,23 @@ public class FlightController {
         }
 
         LOGGER.info("Called updateFlight() with id <" + flightID + "> by user <" + userSession.getUser().getUsername() + "> with the role of <" + userRoles + ">");
+        flight.setSource(source);
+        flight.setDestination(destination);
+        flight.setArrivalDateTime(arr);
+        flight.setDeparture_date_time(dep);
 
-        return flightRepository.save(flight);
+        LOGGER.info("%s", "Called updateFlight() with id <" + flightID );
+
+        flightRepository.saveAndFlush(flight);
+
+        response.sendRedirect("/flights");
     }
 
     //    Delete a flight record
-    @DeleteMapping("/flights/{id}")
-    @ResponseBody
-    public ResponseEntity<?> deleteFlight(@PathVariable(value = "id") Long flightID) throws FlightNotFoundException {
+    @GetMapping(value = "/deleteFlight")
+    public void deleteFlight(@RequestParam(value = "id") Long flightID, HttpServletResponse response) throws FlightNotFoundException, IOException {
+        LOGGER.info("Flight ID: " + flightID);
+
         Flight flight = flightRepository.findById(flightID)
                 .orElseThrow(() -> new FlightNotFoundException(flightID));
 
@@ -144,11 +252,10 @@ public class FlightController {
 
         LOGGER.info("Called deleteFlight() with id <" + flightID + "> by user <" + userSession.getUser().getUsername() + "> with the role of <" + userRoles + ">");
 
-        return ResponseEntity.ok().build();
+        response.sendRedirect("/flights");
     }
 
     @PostMapping("/processFlightSearch")
-
     public void processFlightSearch(String departure, String destinationInput, int passengers, String outboundDate,
                                     Model model, HttpServletResponse response, HttpServletRequest req) throws IOException {
 
@@ -172,7 +279,7 @@ public class FlightController {
     }
 
     @PreAuthorize("hasAuthority('ADMIN')")
-    @PostMapping("/adminProcessFlightSearch")
+    @PostMapping("/adminProcessUserFlightSearch")
     public void adminProcessFlightSearch(String departure, String destinationInput, int passengers, String outboundDate, String username,
                                          Model model, HttpServletResponse response, HttpServletRequest req) throws IOException {
         User sessionUser = null;
@@ -192,6 +299,32 @@ public class FlightController {
 
         userSession.setUser(userRepository.findByUsername(username));
         model.addAttribute("user", userRepository.findByUsername(username));
+
+        response.sendRedirect("/flightSearchResults");
+    }
+
+    @PreAuthorize("hasAuthority('ADMIN')")
+    @PostMapping("/adminProcessGuestFlightSearch")
+    public void adminProcessGuestFlightSearch(String departure, String destinationInput, int passengers, String outboundDate, String username,
+                                         Model model, HttpServletResponse response, HttpServletRequest req) throws IOException {
+        User sessionUser = null;
+
+        Principal userDetails = req.getUserPrincipal();
+        if (userDetails != null) {
+            sessionUser = userRepository.findByUsername(userDetails.getName());
+            model.addAttribute("sessionUser", sessionUser);
+        }
+
+
+        numberOfPassengers = passengers;
+        flightSearch.setDeparture(departure);
+        flightSearch.setDestinationInput(destinationInput);
+        flightSearch.setPassengers(passengers);
+        flightSearch.setOutboundDate(outboundDate);
+
+        //TODO Better define Guest User object than hardcoded name.
+        userSession.setUser(userRepository.findByUsername("testGuest"));
+        model.addAttribute("user", userRepository.findByUsername("testguest"));
 
         response.sendRedirect("/flightSearchResults");
     }
@@ -304,7 +437,7 @@ public class FlightController {
 
         if (numberOfPassengers > 1) {
             return "passengerDetails.html";
-        } else if (user == null) {
+        } else if (isGuest(user)) {
             return "bookingDetails.html";
         } else {
             model.addAttribute("cards", user.getCredit_cards());
@@ -364,7 +497,25 @@ public class FlightController {
 
     @PostMapping("/processGuestPersonalDetails")
     public String processGuestPersonalDetails(String name, String surname, String email, String phoneNumber,
-                                              String address, Model model) {
+                                              String address, Model model, HttpServletRequest req) {
+
+        User sessionUser = null;
+
+        Principal userDetails = req.getUserPrincipal();
+        if (userDetails != null) {
+            sessionUser = userRepository.findByUsername(userDetails.getName());
+            model.addAttribute("sessionUser", sessionUser);
+        }
+
+        User user = null;
+        if(isAdmin(sessionUser)){
+            user = userSession.getUser();
+        }
+        else{
+            user = sessionUser;
+        }
+        model.addAttribute("user", user);
+
 
         guest.setName(name);
         guest.setSurname(surname);
@@ -372,7 +523,6 @@ public class FlightController {
         guest.setPhone(phoneNumber);
         guest.setAddress(address);
 
-        model.addAttribute("user", userSession.getUser());
 
         return "/displayPaymentPage";
     }
@@ -397,6 +547,7 @@ public class FlightController {
         return "displayPaymentPage.html";
     }
 
+//    @PreAuthorize("hasAuthority('MEMBER') or hasAuthority('ADMIN')")
     @PostMapping("/processMemberPayment")
     public String processMemberPayment(Model model, CreditCard card, HttpServletRequest req) {
 
@@ -424,17 +575,19 @@ public class FlightController {
         userRepository.flush();
         reservation.setUser(user);
 
-        Flight flight = flightRepository.findFlightByFlightID(temporaryFlightReference);
-        if (reservationRepository.existsByUserAndFlight(user, flight)) {
-            model.addAttribute("user", user);
-            model.addAttribute("error", "Flight already booked by Member, new booking cancelled.\n");
-            return "index.html";
-        } else {
-            reservation.setFlight(flight);
-            flight.getReservations().add(reservation);
-            flightRepository.saveAndFlush(flight);
-            reservationRepository.saveAndFlush(reservation);
-            reservation.setCredit_card(card);
+
+      Flight flight = flightRepository.findFlightByFlightID(temporaryFlightReference);
+      if (reservationRepository.existsByUserAndFlight(user, flight)) {
+          model.addAttribute("user", user);
+          model.addAttribute("error", "Flight already booked by Member, new booking cancelled.\n");
+          return "index.html";
+      } else {
+          reservation.setFlight(flight);
+          reservation.setEmail(user.getEmail());
+          flight.getReservations().add(reservation);
+          flightRepository.saveAndFlush(flight);
+          reservationRepository.saveAndFlush(reservation);
+          reservation.setCredit_card(card);
 
             model.addAttribute("user", user);
             model.addAttribute("reservation", reservation);
@@ -447,8 +600,26 @@ public class FlightController {
 
 
     @PostMapping("/processGuestPayment")
-    public void processGuestPayment(String cardholder_name, String card_number, String card_type, int expiration_month,
-                                    int expiration_year, String security_code, HttpServletResponse response) throws IOException {
+    public String processGuestPayment(String cardholder_name, String card_number, String card_type, int expiration_month,
+                                    int expiration_year, String security_code,
+                                    HttpServletResponse response, HttpServletRequest req, Model model) throws IOException {
+
+        User sessionUser = null;
+
+        Principal userDetails = req.getUserPrincipal();
+        if (userDetails != null) {
+            sessionUser = userRepository.findByUsername(userDetails.getName());
+            model.addAttribute("sessionUser", sessionUser);
+        }
+
+        User user = null;
+        if(isAdmin(sessionUser)){
+            user = userSession.getUser();
+        }
+        else{
+            user = sessionUser;
+        }
+        model.addAttribute("user", user);
 
         Reservation reservation = new Reservation();
 
@@ -470,16 +641,39 @@ public class FlightController {
         guest.getReservations().add(reservation);
 
         guestRepository.save(guest);
+
         guest = new Guest();
 
-        response.sendRedirect("/displayReservationId");
+        model.addAttribute("reservation", reservation);
+        model.addAttribute("flight", flightRepository.findFlightByFlightID(temporaryFlightReference));
+//        response.sendRedirect("/displayReservationId");
+        return "displayReservation.html";
+
     }
 
     @GetMapping("/displayReservationId")
-    public String displayReservationId(Model model) {
+    public String displayReservationId(Model model, HttpServletRequest req) {
+        User sessionUser = null;
+
+        Principal userDetails = req.getUserPrincipal();
+        if (userDetails != null) {
+            sessionUser = userRepository.findByUsername(userDetails.getName());
+            model.addAttribute("sessionUser", sessionUser);
+        }
+
+        User user = null;
+        if(isAdmin(sessionUser)){
+            user = userSession.getUser();
+        }
+        else{
+            user = sessionUser;
+        }
+        model.addAttribute("sessionUser",sessionUser);
+        model.addAttribute("user", user);
+
         List<Reservation> guestReservationId = new ArrayList<>();
         List<Guest> guestList = guestRepository.findAll();
-//        LOGGER.info("%s", guestList.get(1).getPassengers().size());
+//        log.info(allGuests.get(1).getPassengers().size());
 
         List<Reservation> reservationList = reservationRepository.findAll();
 
@@ -519,7 +713,24 @@ public class FlightController {
     }
 
     @GetMapping("/getGuestReservations")
-    public String getGuestReservations(Model model) {
+    public String getGuestReservations(Model model, HttpServletRequest req) {
+        User sessionUser = null;
+
+        Principal userDetails = req.getUserPrincipal();
+        if (userDetails != null) {
+            sessionUser = userRepository.findByUsername(userDetails.getName());
+            model.addAttribute("sessionUser", sessionUser);
+        }
+
+        User user = null;
+        if(isAdmin(sessionUser)){
+            user = userSession.getUser();
+        }
+        else{
+            user = sessionUser;
+        }
+        model.addAttribute("user", user);
+
 
         Flight flight = flightRepository.findFlightByFlightID(temporaryFlightReference);
         Guest guest = guestRepository.findTopByOrderByIdDesc();
@@ -555,5 +766,17 @@ public class FlightController {
         }
         return isAdmin;
     }
+
+    private boolean isGuest(User sessionUser) {
+        boolean isGuest = false;
+        Iterator<Role> roleIterator = sessionUser.getRoles().iterator();
+        while(roleIterator.hasNext()){
+            if(roleIterator.next().getName().equals("GUEST")){
+                isGuest = true;
+            }
+        }
+        return isGuest;
+    }
+
 
 }
