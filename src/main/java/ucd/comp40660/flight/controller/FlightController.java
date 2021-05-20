@@ -8,6 +8,7 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Controller;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.ui.Model;
+import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.WebDataBinder;
 import org.springframework.web.bind.annotation.*;
 import ucd.comp40660.flight.exception.FlightNotFoundException;
@@ -235,9 +236,42 @@ public class FlightController {
         response.sendRedirect("/flights");
     }
 
+//    //    Delete a flight record
+//    @DeleteMapping(value = "/deleteFlight")
+//    public void deleteFlight(@RequestParam(value = "id") Long flightID, HttpServletResponse response) throws FlightNotFoundException, IOException {
+//        LOGGER.info("Flight ID: " + flightID);
+//
+//        Flight flight = flightRepository.findById(flightID)
+//                .orElseThrow(() -> new FlightNotFoundException(flightID));
+//
+//        flightRepository.delete(flight);
+//
+//        StringBuilder userRoles = new StringBuilder();
+//        for (Role role : userSession.getUser().getRoles()) {
+//            userRoles.append(role.getName());
+//        }
+//
+//        LOGGER.info("Called deleteFlight() with id <" + flightID + "> by user <" + userSession.getUser().getUsername() + "> with the role of <" + userRoles + ">");
+//
+//        response.sendRedirect("/flights");
+//    }
+
+
     //    Delete a flight record
-    @GetMapping(value = "/deleteFlight")
-    public void deleteFlight(@RequestParam(value = "id") Long flightID, HttpServletResponse response) throws FlightNotFoundException, IOException {
+    @PostMapping(value = "/deleteFlight")
+    public void deleteFlight( @RequestParam Long flightID, Model model, HttpServletRequest req ,HttpServletResponse response) throws FlightNotFoundException, IOException {
+        System.out.println("here:"+ flightID );
+
+        User sessionUser = null;
+
+        Principal userDetails = req.getUserPrincipal();
+        if (userDetails != null) {
+            sessionUser = userRepository.findByUsername(userDetails.getName());
+            model.addAttribute("sessionUser", sessionUser);
+        }
+
+
+//        Long flightID = flightNew.getFlightID();
         LOGGER.info("Flight ID: " + flightID);
 
         Flight flight = flightRepository.findById(flightID)
@@ -245,12 +279,17 @@ public class FlightController {
 
         flightRepository.delete(flight);
 
-        StringBuilder userRoles = new StringBuilder();
-        for (Role role : userSession.getUser().getRoles()) {
-            userRoles.append(role.getName());
-        }
+//        StringBuilder userRoles = new StringBuilder();
+//        for (Role role : sessionUser.getRoles()) {
+//            userRoles.append(role.getName());
+//        }
 
-        LOGGER.info("Called deleteFlight() with id <" + flightID + "> by user <" + userSession.getUser().getUsername() + "> with the role of <" + userRoles + ">");
+
+        LOGGER.info("Called deleteFlight() with id <" + flightID + "> by user <" + sessionUser.getUsername() + "> with the role of <" + sessionUser.getRoles() + ">");
+
+        List<Flight> flights = flightRepository.findAll();
+        model.addAttribute("flights", flights);
+        model.addAttribute("sessionUser", sessionUser );
 
         response.sendRedirect("/flights");
     }
