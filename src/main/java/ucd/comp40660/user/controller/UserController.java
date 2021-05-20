@@ -30,6 +30,7 @@ import ucd.comp40660.validator.UserValidator;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
+import java.io.IOException;
 import java.security.Principal;
 import java.sql.SQLIntegrityConstraintViolationException;
 import java.util.ArrayList;
@@ -71,9 +72,15 @@ public class UserController {
 
 
     @GetMapping("/")
-    public String index(Model model, HttpServletRequest req) {
+    public String index(Model model, HttpServletRequest req, HttpServletResponse response) throws IOException {
         Principal userDetails = req.getUserPrincipal();
         if (userDetails != null) {
+            User sessionUser = userRepository.findByUsername(userDetails.getName());
+            model.addAttribute("sessionUser", sessionUser);
+        }
+        else{
+            securityService.guestLogin();
+            userDetails = req.getUserPrincipal();
             User sessionUser = userRepository.findByUsername(userDetails.getName());
             model.addAttribute("sessionUser", sessionUser);
         }

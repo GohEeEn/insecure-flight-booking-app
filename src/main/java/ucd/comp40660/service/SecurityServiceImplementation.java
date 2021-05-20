@@ -49,4 +49,19 @@ public class SecurityServiceImplementation implements SecurityService {
         }
 
     }
+
+    @Override
+    public void guestLogin() {
+        UserDetails userDetails = userDetailsService.loadUserByUsername("testguest");
+        UsernamePasswordAuthenticationToken usernamePasswordAuthenticationToken = new UsernamePasswordAuthenticationToken(userDetails, "password1234", userDetails.getAuthorities());
+
+        authenticationManager.authenticate(usernamePasswordAuthenticationToken);
+
+        if(usernamePasswordAuthenticationToken.isAuthenticated()){
+            SecurityContextHolder.getContext().setAuthentication(usernamePasswordAuthenticationToken);
+            LOGGER.info(String.format("Auto Login as Guest %s", "testguest", userDetails.getAuthorities()));
+        }
+
+    }
+
 }
