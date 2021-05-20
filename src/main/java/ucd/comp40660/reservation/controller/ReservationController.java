@@ -425,8 +425,8 @@ public class ReservationController {
         response.sendRedirect("/reservations");
     }
 
-    @GetMapping("/deleteReservation")
-    public void updateReservationInfo(@RequestParam(value="id") Long reservationID, HttpServletResponse response)
+    @PostMapping("/deleteReservation")
+    public void updateReservationInfo(@RequestParam Long reservationID, HttpServletResponse response)
                                                                             throws ReservationNotFoundException, IOException{
 
         Reservation reservation = reservationRepository.findById(reservationID)
