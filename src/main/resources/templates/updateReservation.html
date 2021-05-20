@@ -13,7 +13,7 @@
 
   <h2>Update Reservation Details</h2>
 
-  <form th:action="@{/updateReservationInfo}" method="GET">
+  <form th:action="@{/updateReservationInfo}" method="post">
     <div>
       <input type="hidden" id="reservationID" name="reservationID" th:value="${reservationID}">
     </div>

@@ -49,7 +49,15 @@
                   <td>No</td>
                   <td th:text="${reservation.user.username}"></td>
                 </div>
-                <td><a th:href="@{/updateReservation(id=${reservation.id})}">Update</a></td>
+<!--                <td><a th:href="@{/updateReservation(id=${reservation.id})}">Update</a></td>-->
+
+                <td>
+                  <form th:action="@{/updateReservation}" th:object="${reservation}" method="post">
+                    <input type="hidden" name="reservationID" th:value="${reservation.id}">
+                    <button type="submit" class="btn btn-link">Update</button>
+                  </form>
+                </td>
+
 <!--                <td><a th:href="@{/deleteReservation(id=${reservation.id})}" th:method="delete">Delete</a></td>-->
                 <td>
                   <form th:action="@{/deleteReservation}" th:object="${reservation}" method="post">
