@@ -151,6 +151,32 @@ public class UserController {
         return "index.html";
     }
 
+//    //    Delete a registration record
+//    @PreAuthorize("#username == authentication.name or hasAuthority('ADMIN')")
+//    @DeleteMapping("/delete/{username}")
+//    public String deleteRegistration(@PathVariable(value = "username") String username, HttpServletRequest req) throws UserNotFoundException {
+//        Principal userDetails = req.getUserPrincipal();
+//        User sessionUser = userRepository.findByUsername(userDetails.getName());
+//        User user = userRepository.findByUsername(username);
+//
+////        User user = userRepository.findById(registrationID)
+////                .orElseThrow(() -> new UserNotFoundException(registrationID));
+//
+//        LOGGER.info("Successfully deleted user registration for user <" + username + "> by admin <" + userSession.getUser().getUsername() + ">");
+//
+//        userRepository.delete(user);
+//
+//        if (sessionUser.getUsername().equals(user.getUsername())) {
+//            userSession.setUser(null);
+//        }
+//
+//        return "index.html";
+//    }
+
+
+
+
+
     @GetMapping("/register")
     public String register(Model model, @ModelAttribute("userForm") User userForm, HttpServletResponse response) throws Exception {
         if (userSession.isLoginFailed()) {

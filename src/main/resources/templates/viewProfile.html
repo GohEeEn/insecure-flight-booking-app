@@ -51,8 +51,21 @@
 <!--                <a href="/viewCreditCards" class="btn btn-outline-primary">View Credit Cards</a>-->
                 <a th:href="@{/viewCreditCards/{username}(username=${user.getUsername})}" class="btn btn-outline-primary">View Credit Cards</a>
                 <a href="/editPassword" class="btn btn-secondary">Change Password</a>
-                <a th:href="@{/delete/{id}(id=${user.getRegistrationID()})}" class="btn btn-danger">Delete</a>
+<!--                <a th:href="@{/delete/{id}(id=${user.getUsername()})}" class="btn btn-danger">Delete</a>-->
+
+                                <a th:href="@{/delete/{id}(id=${user.getRegistrationID()})}" class="btn btn-danger">Delete</a>
+<!--                <a href="/delete" class="btn btn-danger">Delete1</a>-->
+<!--                <a href="@{/delete}" class="btn btn-danger">Delete1</a>-->
             </form>
+
+<!--            <form action="#" th:action="@{/delete/{id}(id=${user.getUsername()})}" method="delete">-->
+
+<!--                <button type="submit">Delete link</button>-->
+
+<!--&lt;!&ndash;                    <input type="password" name="password" value=""&ndash;&gt;-->
+<!--&lt;!&ndash;                           id="password" class="form-control"&ndash;&gt;-->
+<!--&lt;!&ndash;                           placeholder="Enter Password" required/>&ndash;&gt;-->
+<!--            </form>-->
 
         </div>
 
