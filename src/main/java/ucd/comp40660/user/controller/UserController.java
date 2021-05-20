@@ -338,11 +338,29 @@ public class UserController {
         return "editProfile.html";
     }
 
-    @PostMapping("/editProfile")
-    public String editProfile(String newName, String newSurname, String newPhone, String newEmail, String newAddress, String newCreditCardDetails,
-                              String newUsername, String password, Model model) throws Exception {
+    @PreAuthorize("#username == authentication.name or hasAuthority('ADMIN')")
+    @PostMapping("/editProfile/{username}")
+    public String editProfile(@PathVariable(value = "username") String username, String newName, String newSurname, String newPhone, String newEmail, String newAddress, String newCreditCardDetails,
+                              String newUsername, String password,
+                              HttpServletRequest req, Model model) throws Exception {
 
-        User user = userSession.getUser();
+        User sessionUser = null;
+
+        Principal userDetails = req.getUserPrincipal();
+        if (userDetails != null) {
+            sessionUser = userRepository.findByUsername(userDetails.getName());
+            model.addAttribute("sessionUser", sessionUser);
+        }
+
+        //Determine if booking as admin
+        User user = null;
+        if(isAdmin(sessionUser)){
+            user = userRepository.findByUsername(username);
+        }
+        else{
+            user = sessionUser;
+        }
+        model.addAttribute("user", user);
 
         StringBuilder userRoles = new StringBuilder();
         for (Role role : user.getRoles()) {
