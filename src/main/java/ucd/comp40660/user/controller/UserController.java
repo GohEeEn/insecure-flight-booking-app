@@ -145,7 +145,7 @@ public class UserController {
 
     //    Delete a registration record
     @PreAuthorize("#username == authentication.name or hasAuthority('ADMIN')")
-    @GetMapping("/delete/{username}")
+    @GetMapping("/user/delete/{username}")
     public String deleteRegistration(@PathVariable(value = "username") String username, HttpServletRequest req) throws UserNotFoundException {
         Principal userDetails = req.getUserPrincipal();
         User sessionUser = userRepository.findByUsername(userDetails.getName());
@@ -154,13 +154,15 @@ public class UserController {
 //        User user = userRepository.findById(registrationID)
 //                .orElseThrow(() -> new UserNotFoundException(registrationID));
 
-        LOGGER.info("Successfully deleted user registration for user <" + username + "> by admin <" + userSession.getUser().getUsername() + ">");
-
         userRepository.delete(user);
+
+        LOGGER.info("Successfully deleted user registration for user <" + username + "> by admin <" + userSession.getUser().getUsername() + ">");
 
         if (sessionUser.getUsername().equals(user.getUsername())) {
             userSession.setUser(null);
         }
+
+        //TODO Possible Session management after account deletion?
 
         return "index.html";
     }
@@ -288,11 +290,24 @@ public class UserController {
 //        }
 //    }
 
-    @GetMapping("/viewProfile")
-    public String viewProfile(Model model, HttpServletRequest req) {
-        Principal userDetails = req.getUserPrincipal();
-        User user = userRepository.findByUsername(userDetails.getName());
+    @PreAuthorize("#username == authentication.name or hasAuthority('ADMIN')")
+    @GetMapping("/viewProfile/{username}")
+    public String viewProfile(@PathVariable(value = "username") String username, Model model, HttpServletRequest req) {
+        User user = null;
+        User sessionUser = null;
 
+        StringBuilder userRoles = new StringBuilder();
+        for (Role role : userRepository.findByUsername(username).getRoles()) {
+            userRoles.append(role.getName());
+        }
+
+        Principal userDetails = req.getUserPrincipal();
+        if (userDetails != null) {
+            sessionUser = userRepository.findByUsername(userDetails.getName());
+            model.addAttribute("sessionUser", sessionUser);
+        }
+
+        user = userRepository.findByUsername(username);
         model.addAttribute("user", user);
         return "viewProfile.html";
     }

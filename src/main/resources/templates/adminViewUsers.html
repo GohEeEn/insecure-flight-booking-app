@@ -21,6 +21,7 @@
                     <th>Username</th>
                     <th>E-mail</th>
                     <th>Reservations</th>
+                    <th>Profile</th>
                 </tr>
                 </thead>
                 <tbody>
@@ -29,6 +30,8 @@
                     <td th:text="${user.getUsername()} "></td>
                     <td th:text="${user.getEmail()} "></td>
                     <td> <a th:href="@{/getUserReservations/{username}(username = ${user.getUsername()})}" class="btn btn-danger">View Reservations</a></td>
+                    <td> <a th:href="@{/viewProfile/{username}(username = ${user.getUsername()})}" class="btn btn-danger">View Profile</a></td>
+
                 </tr>
                 </tbody>
             </table>

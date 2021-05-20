@@ -113,7 +113,7 @@
                                 &nbsp;Setting
                             </h6>
 
-                            <a class="dropdown-item" href="/viewProfile">
+                            <a class="dropdown-item" th:href="@{/viewProfile/{username}(username = ${sessionUser.getUsername()})}">
                                 <i class="fa fa-user-circle" aria-hidden="true"></i>
                                 &nbsp;Profile
                             </a>
