@@ -14,48 +14,61 @@
 
 			<h3>Thank For Booking with Secure Airways</h3>
 
-			<table th:if="${user != null}" class="table">
-				<thead>
-					<tr>
-						<th>Reservation ID</th>
-						<th>Name</th>
-						<th>Departure</th>
-						<th>Destination</th>
-						<th>Departure Date</th>
-						<th>Arrival Date</th>
-					</tr>
-				</thead>
-				<tbody>
-					<tr>
-						<td><span th:text="${reservation.id}" ></span></td>
-						<td><span th:text="${user.name}" ></span></td>
+			<div th:each="entry: ${user.getRoles()}">
+				<table th:if="${entry.name} == 'MEMBER'" class=table>
+<!--				<table th:if="${user != null}" class="table">-->
+					<thead>
+						<tr>
+							<th>Reservation ID</th>
+							<th>Name</th>
+							<th>Departure</th>
+							<th>Destination</th>
+							<th>Departure Date</th>
+							<th>Arrival Date</th>
+						</tr>
+					</thead>
+					<tbody>
+						<tr>
+							<td><span th:text="${reservation.id}" ></span></td>
+							<td><span th:text="${user.name}" ></span></td>
+							<td><span th:text="${flight.source}" ></span></td>
+							<td><span th:text="${flight.destination}" ></span></td>
+							<td><span th:text="${flight.departure_date_time}" ></span></td>
+							<td><span th:text="${flight.arrivalDateTime}" ></span></td>
+						</tr>
+					</tbody>
+<!--				</table>-->
+				</table>
+
+
+				<table th:if="${entry.name} == 'GUEST'" class="table">
+					<caption style="color: red">
+						Note : Remember this reservation id and your registered email address to access it in future
+					</caption>
+
+					<thead>
+						<tr>
+							<th>#</th>
+							<th>Reservation ID</th>\
+							<th>E-mail</th>
+							<th>Departure</th>
+							<th>Destination</th>
+							<th>Departure Date</th>
+							<th>Arrival Date</th>
+
+						</tr>
+					</thead>
+					<tbody>
+						<td><span th:text="${reservation.id}"></span></td>
+						<td><span th:text="${reservation.email}"></span></td>
 						<td><span th:text="${flight.source}" ></span></td>
 						<td><span th:text="${flight.destination}" ></span></td>
 						<td><span th:text="${flight.departure_date_time}" ></span></td>
 						<td><span th:text="${flight.arrivalDateTime}" ></span></td>
-					</tr>
-				</tbody>
-			</table>
 
-			<table th:if="${user == null}" class="table">
-				<caption style="color: red">
-					Note : Remember this reservation id and your registered email address to access it in future
-				</caption>
-
-				<thead>
-					<tr>
-						<th>#</th>
-						<th>Reservation ID</th>
-					</tr>
-				</thead>
-				<tbody>
-					<tr th:each="guestReservationId : ${guestReservationIds}">
-						<td></td>
-						<td th:text="${guestReservationId.id}"></td>
-					</tr>
-				</tbody>
-			</table>
-
+					</tbody>
+				</table>
+			</div>
 			<div class="row">
 				<form action="/home" class="inline" method="post">
 					<button type="submit" class="btn btn-primary btn-lg">Home</button>

@@ -117,7 +117,7 @@ public class User {
         super();
     }
 
-    public User(String name, String surname, String username, String phone, String email, String address, String password, List<Reservation> reservations) {
+    public User(String name, String surname, String username, String phone, String email, String address, String password, String passwordConfirm, List<Reservation> reservations) {
         this.name = name;
         this.surname = surname;
         this.username = username;
@@ -126,6 +126,7 @@ public class User {
         this.email = email;
         this.address = address;
         this.password = password;
+        this.passwordConfirm = passwordConfirm;
         this.reservations = reservations;
     }
 }

@@ -2,6 +2,11 @@ package ucd.comp40660.user.controller;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.web.authentication.WebAuthenticationDetails;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Controller;
@@ -14,6 +19,8 @@ import ucd.comp40660.service.UserService;
 import ucd.comp40660.user.UserSession;
 import ucd.comp40660.user.exception.UserNotFoundException;
 import ucd.comp40660.user.model.Role;
+import ucd.comp40660.user.model.CreditCard;
+import ucd.comp40660.user.model.Role;
 import ucd.comp40660.user.model.User;
 import ucd.comp40660.user.repository.CreditCardRepository;
 import ucd.comp40660.user.repository.UserRepository;
@@ -23,6 +30,9 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
 import java.security.Principal;
+import java.sql.SQLIntegrityConstraintViolationException;
+import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 
 
@@ -52,6 +62,9 @@ public class UserController {
     @Autowired
     UserService userService;
 
+    @Autowired
+    protected AuthenticationManager authenticationManager;
+
 
     @GetMapping("/")
     public String index(Model model, HttpServletRequest req) {
@@ -63,6 +76,7 @@ public class UserController {
 
         return "index.html";
     }
+
 
     //    Get all registrations
     @PreAuthorize("hasAuthority('ADMIN')")
@@ -131,7 +145,7 @@ public class UserController {
 
     //    Delete a registration record
     @PreAuthorize("#username == authentication.name or hasAuthority('ADMIN')")
-    @GetMapping("/delete/{username}")
+    @GetMapping("/user/delete/{username}")
     public String deleteRegistration(@PathVariable(value = "username") String username, HttpServletRequest req) throws UserNotFoundException {
         Principal userDetails = req.getUserPrincipal();
         User sessionUser = userRepository.findByUsername(userDetails.getName());
@@ -140,13 +154,15 @@ public class UserController {
 //        User user = userRepository.findById(registrationID)
 //                .orElseThrow(() -> new UserNotFoundException(registrationID));
 
-        LOGGER.info("Successfully deleted user registration for user <" + username + "> by admin <" + userSession.getUser().getUsername() + ">");
-
         userRepository.delete(user);
+
+        LOGGER.info("Successfully deleted user registration for user <" + username + "> by admin <" + userSession.getUser().getUsername() + ">");
 
         if (sessionUser.getUsername().equals(user.getUsername())) {
             userSession.setUser(null);
         }
+
+        //TODO Possible Session management after account deletion?
 
         return "index.html";
     }
@@ -238,6 +254,32 @@ public class UserController {
         return "index.html";
     }
 
+    @GetMapping("/guestRegister")
+    public String guestRegister(Model model, HttpServletResponse response) throws Exception {
+        if (userSession.isLoginFailed()) {
+            model.addAttribute("error", "Unable to create account, passwords do not match");
+            userSession.setLoginFailed(false);
+        }
+        if (userSession.getUser() != null) {
+            response.sendRedirect("/logout");
+        }
+        return "guestRegister.html";
+    }
+
+    @PostMapping("/guestRegister")
+    public String guestRegister(Model model, @ModelAttribute("userForm") User userForm, BindingResult bindingResult){
+        userValidator.validate(userForm, bindingResult);
+
+        if(bindingResult.hasErrors()){
+            model.addAttribute("error", bindingResult.getAllErrors().toString());
+            return "guestRegister.html";
+        }
+
+        userService.guestSave(userForm);
+
+        return "index.html";
+    }
+
 
 //    @PostMapping("/register")
 //    public String createUser(String name, String surname, String username, String phone, String address, String email,
@@ -274,18 +316,51 @@ public class UserController {
 //        }
 //    }
 
-    @GetMapping("/viewProfile")
-    public String viewProfile(Model model, HttpServletRequest req) {
-        Principal userDetails = req.getUserPrincipal();
-        User user = userRepository.findByUsername(userDetails.getName());
+    @PreAuthorize("#username == authentication.name or hasAuthority('ADMIN')")
+    @GetMapping("/viewProfile/{username}")
+    public String viewProfile(@PathVariable(value = "username") String username, Model model, HttpServletRequest req) {
+        User user = null;
+        User sessionUser = null;
 
+        StringBuilder userRoles = new StringBuilder();
+        for (Role role : userRepository.findByUsername(username).getRoles()) {
+            userRoles.append(role.getName());
+        }
+
+        Principal userDetails = req.getUserPrincipal();
+        if (userDetails != null) {
+            sessionUser = userRepository.findByUsername(userDetails.getName());
+            model.addAttribute("sessionUser", sessionUser);
+        }
+
+        user = userRepository.findByUsername(username);
         model.addAttribute("user", user);
         return "viewProfile.html";
     }
 
-    @GetMapping("/editProfile")
-    public String loadEditProfile(Model model) {
-        model.addAttribute("user", userSession.getUser());
+    @PreAuthorize("#username == authentication.name or hasAuthority('ADMIN')")
+    @GetMapping("/editProfile/{username}")
+    public String loadEditProfile(@PathVariable(value = "username") String username, Model model, HttpServletRequest req) {
+
+        User sessionUser = null;
+
+        Principal userDetails = req.getUserPrincipal();
+        if (userDetails != null) {
+            sessionUser = userRepository.findByUsername(userDetails.getName());
+            model.addAttribute("sessionUser", sessionUser);
+        }
+
+        //Determine if booking as admin
+        User user = null;
+        if(isAdmin(sessionUser)){
+            user = userSession.getUser();
+        }
+        else{
+            user = userRepository.findByUsername(username);
+        }
+        model.addAttribute("user", user);
+
+//        model.addAttribute("user", userSession.getUser());
         return "editProfile.html";
     }
 
@@ -405,4 +480,27 @@ public class UserController {
 
         return "editPassword.html";
     }
+
+    private boolean isAdmin(User sessionUser) {
+        boolean isAdmin = false;
+        Iterator<Role> roleIterator = sessionUser.getRoles().iterator();
+        while(roleIterator.hasNext()){
+            if(roleIterator.next().getName().equals("ADMIN")){
+                isAdmin = true;
+            }
+        }
+        return isAdmin;
+    }
+
+    private boolean isGuest(User sessionUser) {
+        boolean isGuest = false;
+        Iterator<Role> roleIterator = sessionUser.getRoles().iterator();
+        while(roleIterator.hasNext()){
+            if(roleIterator.next().getName().equals("GUEST")){
+                isGuest = true;
+            }
+        }
+        return isGuest;
+    }
+
 }
