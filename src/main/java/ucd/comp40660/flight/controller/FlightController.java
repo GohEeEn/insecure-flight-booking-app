@@ -190,8 +190,8 @@ public class FlightController {
                 .orElseThrow(() -> new FlightNotFoundException(flightID));
     }
 
-    @GetMapping("/updateFlight")
-    public String updateFlight(@ModelAttribute(value = "id") String flightID, Model model, HttpServletRequest req){
+    @PostMapping("/updateFlight")
+    public String updateFlight(@RequestParam Long flightID, Model model, HttpServletRequest req){
         User sessionUser = null;
 
         Principal userDetails = req.getUserPrincipal();
@@ -207,29 +207,38 @@ public class FlightController {
 
 
     //    Update flight details
-    @GetMapping("/updateFlightInfo")
-    public void updateFlightInfo(@RequestParam(value = "FLIGHTID") Long flightID, String source, String destination,  String departureDate, String departureTime,
-                               String arrivalDate, String arrivalTime, HttpServletResponse response, HttpServletRequest req) throws FlightNotFoundException, ParseException, IOException {
-        Flight flight = flightRepository.findById(flightID)
-                .orElseThrow(() -> new FlightNotFoundException(flightID));
+    @PostMapping("/updateFlightInfo")
+    public void updateFlightInfo(@RequestParam Long FLIGHTID, String source, String destination,  String departureDate, String departureTime,
+                               String arrivalDate, String arrivalTime, HttpServletResponse response, HttpServletRequest req, Model model) throws FlightNotFoundException, ParseException, IOException {
+        Flight flight = flightRepository.findById(FLIGHTID)
+                .orElseThrow(() -> new FlightNotFoundException(FLIGHTID));
 
         SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd HH:mm");
 
         Date dep = df.parse(departureDate + " " + departureTime);
         Date arr = df.parse(arrivalDate + " " + arrivalTime);
 
-        StringBuilder userRoles = new StringBuilder();
-        for (Role role : userSession.getUser().getRoles()) {
-            userRoles.append(role.getName());
+//        StringBuilder userRoles = new StringBuilder();
+//        for (Role role : userSession.getUser().getRoles()) {
+//            userRoles.append(role.getName());
+//        }
+
+        User sessionUser = null;
+
+        Principal userDetails = req.getUserPrincipal();
+        if (userDetails != null) {
+            sessionUser = userRepository.findByUsername(userDetails.getName());
+            model.addAttribute("sessionUser", sessionUser);
         }
 
-        LOGGER.info("Called updateFlight() with id <" + flightID + "> by user <" + userSession.getUser().getUsername() + "> with the role of <" + userRoles + ">");
+
+        LOGGER.info("Called updateFlight() with id <" + FLIGHTID + "> by user <" + sessionUser.getUsername() + "> with the role of <" + sessionUser.getRoles() + ">");
         flight.setSource(source);
         flight.setDestination(destination);
         flight.setArrivalDateTime(arr);
         flight.setDeparture_date_time(dep);
 
-        LOGGER.info("%s", "Called updateFlight() with id <" + flightID );
+        LOGGER.info("%s", "Called updateFlight() with id <" + FLIGHTID );
 
         flightRepository.saveAndFlush(flight);
 
