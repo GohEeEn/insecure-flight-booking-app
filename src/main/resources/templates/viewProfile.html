@@ -46,7 +46,7 @@
                 <input id="address" class="form-control" name="address" th:value="${user.getAddress()}" readonly/>
             </div>
 
-            <form method="GET" action="/editProfile">
+            <form method="GET" th:action="@{/editProfile/{username}(username=${user.getUsername()})}">
                 <button type="submit" class="btn btn-primary">Edit Profile</button>
 <!--                <a href="/viewCreditCards" class="btn btn-outline-primary">View Credit Cards</a>-->
                 <a th:href="@{/viewCreditCards/{username}(username=${user.getUsername})}" class="btn btn-outline-primary">View Credit Cards</a>

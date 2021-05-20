@@ -312,8 +312,9 @@ public class UserController {
         return "viewProfile.html";
     }
 
-    @GetMapping("/editProfile")
-    public String loadEditProfile(Model model, HttpServletRequest req) {
+    @PreAuthorize("#username == authentication.name or hasAuthority('ADMIN')")
+    @GetMapping("/editProfile/{username}")
+    public String loadEditProfile(@PathVariable(value = "username") String username, Model model, HttpServletRequest req) {
 
         User sessionUser = null;
 
@@ -329,7 +330,7 @@ public class UserController {
             user = userSession.getUser();
         }
         else{
-            user = sessionUser;
+            user = userRepository.findByUsername(username);
         }
         model.addAttribute("user", user);
 
