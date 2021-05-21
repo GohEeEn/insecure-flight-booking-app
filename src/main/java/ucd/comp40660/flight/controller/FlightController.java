@@ -218,10 +218,7 @@ public class FlightController {
         Date dep = df.parse(departureDate + " " + departureTime);
         Date arr = df.parse(arrivalDate + " " + arrivalTime);
 
-//        StringBuilder userRoles = new StringBuilder();
-//        for (Role role : userSession.getUser().getRoles()) {
-//            userRoles.append(role.getName());
-//        }
+
 
         User sessionUser = null;
 
@@ -231,14 +228,22 @@ public class FlightController {
             model.addAttribute("sessionUser", sessionUser);
         }
 
+        StringBuilder userRoles = new StringBuilder();
+        for (Role role : sessionUser.getRoles()) {
+            userRoles.append(role.getName());
+        }
 
-        LOGGER.info("Called updateFlight() with id <" + FLIGHTID + "> by user <" + sessionUser.getUsername() + "> with the role of <" + sessionUser.getRoles() + ">");
+
+//        LOGGER.info("Called updateFlight() with id <" + FLIGHTID + "> by user <" + sessionUser.getUsername() + "> with the role of <" + sessionUser.getRoles() + ">");
+        LOGGER.info("Called updateFlight() with id <" + FLIGHTID + "> by user <" + sessionUser.getUsername() + "> with the role of <" + userRoles + ">");
+
+
         flight.setSource(source);
         flight.setDestination(destination);
         flight.setArrivalDateTime(arr);
         flight.setDeparture_date_time(dep);
 
-        LOGGER.info("%s", "Called updateFlight() with id <" + FLIGHTID );
+        LOGGER.info("Called updateFlight() with id <" + FLIGHTID );
 
         flightRepository.saveAndFlush(flight);
 
@@ -288,13 +293,13 @@ public class FlightController {
 
         flightRepository.delete(flight);
 
-//        StringBuilder userRoles = new StringBuilder();
-//        for (Role role : sessionUser.getRoles()) {
-//            userRoles.append(role.getName());
-//        }
+        StringBuilder userRoles = new StringBuilder();
+        for (Role role : sessionUser.getRoles()) {
+            userRoles.append(role.getName());
+        }
 
 
-        LOGGER.info("Called deleteFlight() with id <" + flightID + "> by user <" + sessionUser.getUsername() + "> with the role of <" + sessionUser.getRoles() + ">");
+        LOGGER.info("Called deleteFlight() with id <" + flightID + "> by user <" + sessionUser.getUsername() + "> with the role of <" + userRoles + ">");
 
         List<Flight> flights = flightRepository.findAll();
         model.addAttribute("flights", flights);
