@@ -31,7 +31,6 @@
                     <td th:text="${user.getEmail()} "></td>
                     <td> <a th:href="@{/getUserReservations/{username}(username = ${user.getUsername()})}" class="btn btn-danger">View Reservations</a></td>
                     <td> <a th:href="@{/viewProfile/{username}(username = ${user.getUsername()})}" class="btn btn-danger">View Profile</a></td>
-
                 </tr>
                 </tbody>
             </table>

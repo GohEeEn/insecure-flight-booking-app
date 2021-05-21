@@ -7,4 +7,8 @@ import org.springframework.web.bind.annotation.ModelAttribute;
 
 public interface SecurityService {
     String findLoggedInUsername();
+
+    void autoLogin(String username, String password);
+
+    void guestLogin();
 }

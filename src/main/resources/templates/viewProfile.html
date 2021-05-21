@@ -52,10 +52,12 @@
                 <button type="submit" class="btn btn-primary">Edit Profile</button>
 <!--                <a href="/viewCreditCards" class="btn btn-outline-primary">View Credit Cards</a>-->
                 <a th:href="@{/viewCreditCards/{username}(username=${user.getUsername})}" class="btn btn-outline-primary">View Credit Cards</a>
+
                 <a href="/editPassword" class="btn btn-secondary">Change Password</a>
 <!--                <a th:href="@{/user/delete/{id}(id=${user.getUsername()})}" class="btn btn-danger">Delete</a>-->
 
 <!--                <a th:href="@{/user/delete}" class="btn btn-danger">Delete</a>-->
+
 
             </form>
 <!--            </div>-->
