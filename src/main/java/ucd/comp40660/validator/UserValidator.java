@@ -51,9 +51,8 @@ public class UserValidator implements Validator {
             errors.rejectValue("passwordConfirm", "Diff.userForm.passwordConfirm");
     }
 
-    public void validatePassword(String password, Errors errors) {
-        if (!isValid(password, PASSWORD_REGEX))
-            errors.rejectValue("passwordConfirm", "Diff.userForm.newPassword");
+    public boolean isPasswordValid(String password) {
+        return isValid(password, PASSWORD_REGEX);
     }
 
     private boolean isEmailValid(String email){
