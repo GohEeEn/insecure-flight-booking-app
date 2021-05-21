@@ -9,10 +9,14 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.stereotype.Service;
+import ucd.comp40660.reservation.controller.ReservationController;
 
 
 @Service
 public class SecurityServiceImplementation implements SecurityService {
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(SecurityServiceImplementation.class);
+
     @Autowired
     private AuthenticationManager authenticationManager;
 
@@ -31,4 +35,33 @@ public class SecurityServiceImplementation implements SecurityService {
 
         return null;
     }
+
+    @Override
+    public void autoLogin(String username, String password) {
+        UserDetails userDetails = userDetailsService.loadUserByUsername(username);
+        UsernamePasswordAuthenticationToken usernamePasswordAuthenticationToken = new UsernamePasswordAuthenticationToken(userDetails, password, userDetails.getAuthorities());
+
+        authenticationManager.authenticate(usernamePasswordAuthenticationToken);
+
+        if(usernamePasswordAuthenticationToken.isAuthenticated()){
+            SecurityContextHolder.getContext().setAuthentication(usernamePasswordAuthenticationToken);
+            LOGGER.info(String.format("Auto Login as newly registered User %s, with authority %s", username, userDetails.getAuthorities()));
+        }
+
+    }
+
+    @Override
+    public void guestLogin() {
+        UserDetails userDetails = userDetailsService.loadUserByUsername("testguest");
+        UsernamePasswordAuthenticationToken usernamePasswordAuthenticationToken = new UsernamePasswordAuthenticationToken(userDetails, "password1234", userDetails.getAuthorities());
+
+        authenticationManager.authenticate(usernamePasswordAuthenticationToken);
+
+        if(usernamePasswordAuthenticationToken.isAuthenticated()){
+            SecurityContextHolder.getContext().setAuthentication(usernamePasswordAuthenticationToken);
+            LOGGER.info(String.format("Auto Login as Guest %s", "testguest", userDetails.getAuthorities()));
+        }
+
+    }
+
 }
