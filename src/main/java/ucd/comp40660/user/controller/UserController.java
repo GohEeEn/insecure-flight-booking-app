@@ -12,6 +12,7 @@ import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 import ucd.comp40660.flight.repository.FlightRepository;
 import ucd.comp40660.reservation.repository.ReservationRepository;
+import ucd.comp40660.service.SecurityService;
 import ucd.comp40660.service.UserService;
 import ucd.comp40660.user.UserSession;
 import ucd.comp40660.user.exception.UserNotFoundException;
@@ -24,6 +25,7 @@ import ucd.comp40660.validator.UserValidator;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
+import java.io.IOException;
 import java.security.Principal;
 import java.util.Iterator;
 import java.util.List;
@@ -58,11 +60,20 @@ public class UserController {
     @Autowired
     protected AuthenticationManager authenticationManager;
 
+    @Autowired
+    SecurityService securityService;
+
 
     @GetMapping("/")
-    public String index(Model model, HttpServletRequest req) {
+    public String index(Model model, HttpServletRequest req, HttpServletResponse response) throws IOException {
         Principal userDetails = req.getUserPrincipal();
         if (userDetails != null) {
+            User sessionUser = userRepository.findByUsername(userDetails.getName());
+            model.addAttribute("sessionUser", sessionUser);
+        }
+        else{
+            securityService.guestLogin();
+            userDetails = req.getUserPrincipal();
             User sessionUser = userRepository.findByUsername(userDetails.getName());
             model.addAttribute("sessionUser", sessionUser);
         }
@@ -173,7 +184,8 @@ public class UserController {
     }
 
     @PostMapping("/register")
-    public String register(@Valid @ModelAttribute("userForm") User userForm, BindingResult bindingResult) {
+    public String register(@Valid @ModelAttribute("userForm") User userForm, BindingResult bindingResult,
+                           Model model, HttpServletRequest req) {
         userValidator.validate(userForm, bindingResult);
 
         StringBuilder userRoles = new StringBuilder();
@@ -189,6 +201,11 @@ public class UserController {
 
         LOGGER.info("New user registered with username <" + userForm.getUsername() + "> with the role of <" + userRoles + ">");
         userService.save(userForm);
+        securityService.autoLogin(userForm.getUsername(), userForm.getPasswordConfirm());
+
+        Principal userDetails = req.getUserPrincipal();
+        User sessionUser = userRepository.findByUsername(userDetails.getName());
+        model.addAttribute("sessionUser", sessionUser);
 
         return "index.html";
     }
@@ -206,7 +223,8 @@ public class UserController {
     }
 
     @PostMapping("/adminRegister")
-    public String adminRegister(@Valid @ModelAttribute("userForm") User userForm, BindingResult bindingResult) {
+    public String adminRegister(@Valid @ModelAttribute("userForm") User userForm, BindingResult bindingResult,
+                                Model model, HttpServletRequest req) {
         userValidator.validate(userForm, bindingResult);
 
         if (bindingResult.hasErrors()) {
@@ -216,6 +234,12 @@ public class UserController {
 
         LOGGER.warn("New admin registered with username <" + userForm.getUsername() + ">");
         userService.adminSave(userForm);
+        securityService.autoLogin(userForm.getUsername(), userForm.getPasswordConfirm());
+
+        Principal userDetails = req.getUserPrincipal();
+        User sessionUser = userRepository.findByUsername(userDetails.getName());
+        model.addAttribute("sessionUser", sessionUser);
+
 
         return "index.html";
     }
@@ -233,7 +257,8 @@ public class UserController {
     }
 
     @PostMapping("/guestRegister")
-    public String guestRegister(Model model, @ModelAttribute("userForm") User userForm, BindingResult bindingResult){
+    public String guestRegister(Model model, @ModelAttribute("userForm") User userForm,
+                                BindingResult bindingResult, HttpServletRequest req){
         userValidator.validate(userForm, bindingResult);
 
         if(bindingResult.hasErrors()){
@@ -242,6 +267,12 @@ public class UserController {
         }
 
         userService.guestSave(userForm);
+        securityService.autoLogin(userForm.getUsername(), userForm.getPasswordConfirm());
+
+        Principal userDetails = req.getUserPrincipal();
+        User sessionUser = userRepository.findByUsername(userDetails.getName());
+        model.addAttribute("sessionUser", sessionUser);
+
 
         return "index.html";
     }
