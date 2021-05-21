@@ -1,6 +1,8 @@
 package ucd.comp40660.filter;
 
 import com.auth0.jwt.JWT;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -32,6 +34,9 @@ public class JWTAuthenticationFilter  extends UsernamePasswordAuthenticationFilt
     @Autowired
     private UserDetailsService userDetailsService;
 
+    private static final Logger LOGGER = LoggerFactory.getLogger(JWTAuthenticationFilter.class);
+
+
     public JWTAuthenticationFilter(AuthenticationManager authenticationManager){
         this.authenticationManager = authenticationManager;
     }
@@ -45,6 +50,7 @@ public class JWTAuthenticationFilter  extends UsernamePasswordAuthenticationFilt
         UserDetails userDetails = userDetailsService.loadUserByUsername(request.getParameter("username"));
         UsernamePasswordAuthenticationToken usernamePasswordAuthenticationToken =
                 new UsernamePasswordAuthenticationToken(userDetails, request.getParameter("password"), userDetails.getAuthorities());
+
         return authenticationManager.authenticate(usernamePasswordAuthenticationToken);
     }
 
@@ -61,6 +67,8 @@ public class JWTAuthenticationFilter  extends UsernamePasswordAuthenticationFilt
         response.addHeader(HEADER_STRING, TOKEN_PREFIX + token);
 
         addCookie(token, response);
+
+        LOGGER.info("User <" + ((ACUserDetails) auth.getPrincipal()).getUsername() + "> with authority <" + ((ACUserDetails) auth.getPrincipal()).getAuthorities() + "> logged in successfully.");
 
         new DefaultRedirectStrategy().sendRedirect(request, response, "/");
 

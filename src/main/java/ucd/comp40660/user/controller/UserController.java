@@ -226,20 +226,20 @@ public class UserController {
                            Model model, HttpServletRequest req) {
         userValidator.validate(userForm, bindingResult);
 
-        StringBuilder userRoles = new StringBuilder();
-        for (Role role : userForm.getRoles()) {
-            userRoles.append(role.getName());
-        }
-
         if (bindingResult.hasErrors()) {
 
-            LOGGER.warn("Unable to register user with username <" + userForm.getUsername() + "> with the role of <" + userRoles + ">");
+            LOGGER.warn("Unable to register user with username <" + userForm.getUsername() + ">");
             return "register.html";
         }
 
-        LOGGER.info("New user registered with username <" + userForm.getUsername() + "> with the role of <" + userRoles + ">");
         userService.save(userForm);
         securityService.autoLogin(userForm.getUsername(), userForm.getPasswordConfirm());
+
+        StringBuilder userRoles = new StringBuilder();
+        for (Role role : userRepository.findByUsername(userForm.getUsername()).getRoles()) {
+            userRoles.append(role.getName());
+        }
+        LOGGER.info("New user registered with username <" + userForm.getUsername() + "> with authority <" + userRoles + ">");
 
         Principal userDetails = req.getUserPrincipal();
         User sessionUser = userRepository.findByUsername(userDetails.getName());
@@ -311,6 +311,7 @@ public class UserController {
         User sessionUser = userRepository.findByUsername(userDetails.getName());
         model.addAttribute("sessionUser", sessionUser);
 
+        LOGGER.info("New guest registered with the username <" + userForm.getUsername() + ">");
 
         return "index.html";
     }
