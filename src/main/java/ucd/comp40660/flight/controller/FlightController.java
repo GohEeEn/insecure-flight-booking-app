@@ -8,6 +8,7 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Controller;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.ui.Model;
+import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.WebDataBinder;
 import org.springframework.web.bind.annotation.*;
 import ucd.comp40660.flight.exception.FlightNotFoundException;
@@ -23,6 +24,7 @@ import ucd.comp40660.user.repository.CreditCardRepository;
 import ucd.comp40660.user.repository.GuestRepository;
 import ucd.comp40660.user.repository.PassengerRepository;
 import ucd.comp40660.user.repository.UserRepository;
+import ucd.comp40660.validator.PassengerValidator;
 import ucd.comp40660.validator.UserValidator;
 
 import javax.persistence.Transient;
@@ -76,6 +78,9 @@ public class FlightController {
 
     @Autowired
     UserService userService;
+
+    @Autowired
+    PassengerValidator passengerValidator;
 
 
     Long temporaryFlightReference;
@@ -413,7 +418,7 @@ public class FlightController {
 
 
     @GetMapping("/displayBookingPage")
-    public String guestBooking(Model model, HttpServletRequest req) {
+    public String guestBooking(Model model, @Valid @ModelAttribute("passengerForm") Passenger passengerForm, HttpServletRequest req) {
 
         User sessionUser = null;
 
@@ -445,24 +450,17 @@ public class FlightController {
         }
     }
 
+    //TODO Validator implementation
     @PostMapping("/processOtherPassengerDetails")
-    public void processOtherPassengerDetails(String name, String surname, String email, String phoneNumber, String address,
-                                             HttpServletResponse response, HttpServletRequest req) throws IOException {
-
-        Passenger passenger = new Passenger();
-
-        passenger.setName(name);
-        passenger.setSurname(surname);
-        passenger.setPhone(phoneNumber);
-        passenger.setAddress(address);
-        passenger.setEmail(email);
+    public String processOtherPassengerDetails(@Valid @ModelAttribute("passengerForm") Passenger passengerForm, Model model,
+                                             HttpServletResponse response, HttpServletRequest req, BindingResult bindingResult) throws IOException {
 
         User sessionUser = null;
 
         Principal userDetails = req.getUserPrincipal();
         if (userDetails != null) {
             sessionUser = userRepository.findByUsername(userDetails.getName());
-//            model.addAttribute("sessionUser", sessionUser);
+            model.addAttribute("sessionUser", sessionUser);
         }
 
         User user = null;
@@ -471,6 +469,20 @@ public class FlightController {
         } else {
             user = sessionUser;
         }
+
+        passengerValidator.validate(passengerForm, bindingResult);
+
+        if(bindingResult.hasErrors()){
+            return "passengerDetails.html";
+        }
+        Passenger passenger = new Passenger();
+
+        passenger.setName(passenger.getName());
+        passenger.setSurname(passenger.getSurname());
+        passenger.setPhone(passenger.getPhone());
+        passenger.setAddress(passenger.getAddress());
+        passenger.setEmail(passenger.getEmail());
+
 
 
 //        User user = userSession.getUser();
@@ -491,10 +503,18 @@ public class FlightController {
         }
 
         numberOfPassengers -= 1;
-        response.sendRedirect("/displayBookingPage");
+        if (numberOfPassengers > 1) {
+            return "passengerDetails.html";
+        } else if (isGuest(user)) {
+            return "bookingDetails.html";
+        } else {
+            model.addAttribute("cards", user.getCredit_cards());
+            return "displayPaymentPage.html";
+        }
 
     }
 
+    //TODO Validator implemetnation
     @PostMapping("/processGuestPersonalDetails")
     public String processGuestPersonalDetails(String name, String surname, String email, String phoneNumber,
                                               String address, Model model, HttpServletRequest req) {

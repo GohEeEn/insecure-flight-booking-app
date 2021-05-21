@@ -1,6 +1,5 @@
 function creditCardNumberValidator(card_number){
 
-    console.log("In function");
     let number_validity = document.getElementById("number_validity");
     const numberRegEx = /^[0-9]{16}$/;
 
@@ -13,7 +12,6 @@ function creditCardNumberValidator(card_number){
         number_validity.style.color = "red";
         return false;
         }
-
 }
 
 function monthValidator(expiration_month){
@@ -38,7 +36,6 @@ function yearValidator(expiration_year){
 
     if (expiration_year.value.match(yearRegex)){
         year_validity.innerHTML = '';
-        year_validity.style.color = "red";
         return true;
     }
     else{

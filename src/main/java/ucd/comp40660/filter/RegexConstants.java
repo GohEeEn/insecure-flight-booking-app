@@ -27,4 +27,12 @@ public final class RegexConstants {
     public static final String MONTH_REGEX = "^[1-9]$|^[1][0-2]$";
     public static final String YEAR_REGEX = "^[2][0][2][1-9]$";
     public static final String CVV_REGEX = "^[0-9]{3}$";
+
+    //Guest && Passenger additional regexes for Flight Booking
+
+    // Sourcr : https://owasp.org/www-community/OWASP_Validation_Regex_Repository -> PERSON NAME
+    public static final String FLIGHT_NAME_REGEX = "^[a-zA-Z]+(([',. -][a-zA-Z ])?[a-zA-Z]*)*$";
+    public static final String ADDRESS_REGEX = "[A-Za-z0-9 ,.-]$";
+    public static final String EMAIL_REGEX = "^[a-zA-Z0-9_+&*-]+(?:\\.[a-zA-Z0-9_+&*-]+)*@(?:[a-zA-Z0-9-]+\\.)+[a-zA-Z]{2,7}$";
+    public static final String PHONE_REGEX = "^[0-9]{3}[-][0-9]{3}[-][0-9]{4}$";
 }

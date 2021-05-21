@@ -154,7 +154,7 @@ public class CardController {
     }
 
     @GetMapping("/registerCard")
-    public String registerCardView(Model model, @ModelAttribute("cardForm") CreditCard cardForm, HttpServletRequest req) {
+    public String registerCardView(Model model, @Valid @ModelAttribute("cardForm") CreditCard cardForm, HttpServletRequest req) {
         User user = null;
 
 

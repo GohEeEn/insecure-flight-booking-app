@@ -36,7 +36,8 @@
 
             <div class="form-group">
                 <label for="card_number">CARD NUMBER</label>
-                <input type="text" class="form-control" id="card_number" name="card_number" placeholder="Credit Card Number" th:field="*{card_number}" oninput="creditCardNumberValidator(document.card_form.card_number)" onkeydown="clearCardErrors()" required>
+                <input type="text" class="form-control" id="card_number" name="card_number" placeholder="Credit Card Number" th:field="*{card_number}"
+                       oninput="creditCardNumberValidator(document.card_form.card_number)" onkeydown="clearCardErrors()" required>
                 <label for="number_validity"><span color="red" id="number_validity"></span></label>
                 <span class="error" th:if="${#fields.hasErrors('card_number')}" th:errors="*{card_number}"></span>
             </div>
