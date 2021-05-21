@@ -6,7 +6,7 @@ public final class RegexConstants {
         throw new IllegalStateException("Utility class");
     }
 
-    public static final String NAME_REGEX = "([A-Za-z]*).{2,32}";
+    public static final String NAME_REGEX = "([A-Za-z]*){2,32}";
 
     /**
      * (?=.*[a-z])   The string must contain at least 1 lowercase alphabetical character
@@ -21,4 +21,10 @@ public final class RegexConstants {
      * Reference : https://owasp.org/www-community/OWASP_Validation_Regex_Repository
      */
     public static final String CREDIT_CARD_REGEX = "((4\\d{3})|(5[1-5]\\d{2})|(6011)|(7\\d{3}))-?\\d{4}-?\\d{4}-?\\d{4}|3[4,7]\\d{13}";
+
+    //Credit Card regexes
+    public static final String SIMPLE_CREDIT_CARD_REGEX = "^[0-9]{16}$";
+    public static final String MONTH_REGEX = "^[1-9]$|^[1][0-2]$";
+    public static final String YEAR_REGEX = "^[2][0][2][1-9]$";
+    public static final String CVV_REGEX = "^[0-9]{3}$";
 }

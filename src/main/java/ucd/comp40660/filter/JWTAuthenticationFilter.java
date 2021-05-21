@@ -24,13 +24,16 @@ import static com.auth0.jwt.algorithms.Algorithm.HMAC512;
 import static ucd.comp40660.filter.SecurityConstants.*;
 
 
-public class JWTAuthenticationFilter  extends UsernamePasswordAuthenticationFilter {
+public class JWTAuthenticationFilter extends UsernamePasswordAuthenticationFilter {
 
     @Autowired
     private AuthenticationManager authenticationManager;
 
     @Autowired
     private UserDetailsService userDetailsService;
+
+    @Autowired
+    private JWTAuthenticationFilter jwtAuthenticationFilter;
 
     public JWTAuthenticationFilter(AuthenticationManager authenticationManager){
         this.authenticationManager = authenticationManager;

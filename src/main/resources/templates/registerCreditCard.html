@@ -1,56 +1,75 @@
 <!DOCTYPE html>
 <html lang="en" xmlns:th="http://www.thymeleaf.org">
 <head>
-    <title>Edit Profile</title>
+    <title>Register New Card</title>
 
     <div th:replace="fragments/header :: header-data"></div>
+
 </head>
 <body>
+
 
     <nav th:replace="fragments/header :: navigation-bar"></nav>
 
     <div class="container">
-        <form action="/addMemberCreditCard" method="post" >
+        <form name="card_form" action="/addMemberCreditCard" method="post" th:object="${cardForm}">
             <div class="form-group">
                 <label for="cardholder_name">CARDHOLDER NAME</label>
                 <input type="text" class="form-control" id="cardholder_name" name="cardholder_name" required>
+                <span class="error" th:if="${#fields.hasErrors('cardholder_name')}" th:errors="*{cardholder_name}"></span>
             </div>
 
             <div class="row">
                 <div class="col">
                     <div class="form-group">
-                        <label for="formSelect1">CREDIT/DEBIT CARD</label>
-                        <select class="form-control" id="formSelect1" name="card_type" required>
+                        <label for="type">CREDIT/DEBIT CARD</label>
+                        <select class="form-control" id="type" name="type" required>
                             <option value="">Choose ...</option>
                             <option value="Visa Debit">Visa Debit</option>
                             <option value="Visa Electron">Visa Electron</option>
                         </select>
                     </div>
+                    <span class="error" th:if="${#fields.hasErrors('type')}" th:errors="*{type}"></span>
+
                 </div>
             </div>
 
             <div class="form-group">
                 <label for="card_number">CARD NUMBER</label>
-                <input type="text" class="form-control" id="card_number" name="card_number" required>
+                <input type="text" class="form-control" id="card_number" name="card_number" placeholder="Credit Card Number" th:field="*{card_number}" oninput="creditCardNumberValidator(document.card_form.card_number)" onkeydown="clearCardErrors()" required>
+                <label for="number_validity"><span color="red" id="number_validity"></span></label>
+                <span class="error" th:if="${#fields.hasErrors('card_number')}" th:errors="*{card_number}"></span>
             </div>
 
             <div class="form-row">
                 <div class="form-group col-md-6">
                     <label for="expiration_month">EXPIRES</label>
                     <input type="number" class="form-control" id="expiration_month"
-                           placeholder="Month" name="expiration_month" min="1" max="12" required>
+                           placeholder="Month" name="expiration_month" min="1" max="12"
+                           onkeyup="monthValidator(document.card_form.expiration_month)" onkeydown="clearErrors()" required>
+                    <label for="month_validity"><span color="red" id="month_validity"></span></label>
+                    <span class="error" th:if="${#fields.hasErrors('month_validity')}" th:errors="*{month_validity}"></span>
+
                 </div>
                 <div class="form-group col-md-6">
                     <label for="expiration_year">.</label>
                     <input type="number" class="form-control" id="expiration_year" placeholder="Year"
-                           name="expiration_year" min="2021" max="2050" required>
+                           name="expiration_year" min="2021" max="2029"
+                           onkeyup="yearValidator(document.card_form.expiration_year)" onkeydown="clearErrors()" required>
+                    <label for="year_validity"><span color="red" id="year_validity"></span></label>
+                    <span class="error" th:if="${#fields.hasErrors('year_validity')}" th:errors="*{year_validity}"></span>
+
                 </div>
             </div>
 
             <div class="form-row">
                 <div class="form-group col-md-6">
                     <label for="security_code">SECURITY CODE</label>
-                    <input type="text" class="form-control" id="security_code" name="security_code" required>
+                    <input type="text" class="form-control" id="security_code" name="security_code"
+                           onkeyup="cvvValidator(document.card_form.security_code)" onkeydown="clearErrors()" required>
+                    <label for="security_code_validity"><span color="red" id="security_code_validity"></span></label>
+                    <span class="error" th:if="${#fields.hasErrors('security_code')}" th:errors="*{security_code}"></span>
+
                 </div>
             </div>
 
