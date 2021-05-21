@@ -15,6 +15,7 @@ import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 import ucd.comp40660.flight.repository.FlightRepository;
 import ucd.comp40660.reservation.repository.ReservationRepository;
+import ucd.comp40660.service.SecurityService;
 import ucd.comp40660.service.UserService;
 import ucd.comp40660.user.UserSession;
 import ucd.comp40660.user.exception.UserNotFoundException;
@@ -66,11 +67,20 @@ public class UserController {
     @Autowired
     protected AuthenticationManager authenticationManager;
 
+    @Autowired
+    SecurityService securityService;
+
 
     @GetMapping("/")
-    public String index(Model model, HttpServletRequest req) {
+    public String index(Model model, HttpServletRequest req, HttpServletResponse response) throws IOException {
         Principal userDetails = req.getUserPrincipal();
         if (userDetails != null) {
+            User sessionUser = userRepository.findByUsername(userDetails.getName());
+            model.addAttribute("sessionUser", sessionUser);
+        }
+        else{
+            securityService.guestLogin();
+            userDetails = req.getUserPrincipal();
             User sessionUser = userRepository.findByUsername(userDetails.getName());
             model.addAttribute("sessionUser", sessionUser);
         }
@@ -212,7 +222,8 @@ public class UserController {
 
 
     @PostMapping("/register")
-    public String register(@Valid @ModelAttribute("userForm") User userForm, BindingResult bindingResult) {
+    public String register(@Valid @ModelAttribute("userForm") User userForm, BindingResult bindingResult,
+                           Model model, HttpServletRequest req) {
         userValidator.validate(userForm, bindingResult);
 
         StringBuilder userRoles = new StringBuilder();
@@ -228,6 +239,11 @@ public class UserController {
 
         LOGGER.info("New user registered with username <" + userForm.getUsername() + "> with the role of <" + userRoles + ">");
         userService.save(userForm);
+        securityService.autoLogin(userForm.getUsername(), userForm.getPasswordConfirm());
+
+        Principal userDetails = req.getUserPrincipal();
+        User sessionUser = userRepository.findByUsername(userDetails.getName());
+        model.addAttribute("sessionUser", sessionUser);
 
         return "index.html";
     }
@@ -245,7 +261,8 @@ public class UserController {
     }
 
     @PostMapping("/adminRegister")
-    public String adminRegister(@Valid @ModelAttribute("userForm") User userForm, BindingResult bindingResult) {
+    public String adminRegister(@Valid @ModelAttribute("userForm") User userForm, BindingResult bindingResult,
+                                Model model, HttpServletRequest req) {
         userValidator.validate(userForm, bindingResult);
 
         if (bindingResult.hasErrors()) {
@@ -255,6 +272,12 @@ public class UserController {
 
         LOGGER.warn("New admin registered with username <" + userForm.getUsername() + ">");
         userService.adminSave(userForm);
+        securityService.autoLogin(userForm.getUsername(), userForm.getPasswordConfirm());
+
+        Principal userDetails = req.getUserPrincipal();
+        User sessionUser = userRepository.findByUsername(userDetails.getName());
+        model.addAttribute("sessionUser", sessionUser);
+
 
         return "index.html";
     }
@@ -272,7 +295,8 @@ public class UserController {
     }
 
     @PostMapping("/guestRegister")
-    public String guestRegister(Model model, @ModelAttribute("userForm") User userForm, BindingResult bindingResult){
+    public String guestRegister(Model model, @ModelAttribute("userForm") User userForm,
+                                BindingResult bindingResult, HttpServletRequest req){
         userValidator.validate(userForm, bindingResult);
 
         if(bindingResult.hasErrors()){
@@ -281,6 +305,12 @@ public class UserController {
         }
 
         userService.guestSave(userForm);
+        securityService.autoLogin(userForm.getUsername(), userForm.getPasswordConfirm());
+
+        Principal userDetails = req.getUserPrincipal();
+        User sessionUser = userRepository.findByUsername(userDetails.getName());
+        model.addAttribute("sessionUser", sessionUser);
+
 
         return "index.html";
     }
@@ -358,10 +388,10 @@ public class UserController {
         //Determine if booking as admin
         User user = null;
         if(isAdmin(sessionUser)){
-            user = userSession.getUser();
+            user = userRepository.findByUsername(username);
         }
         else{
-            user = userRepository.findByUsername(username);
+            user = sessionUser;
         }
         model.addAttribute("user", user);
 
@@ -369,11 +399,29 @@ public class UserController {
         return "editProfile.html";
     }
 
-    @PostMapping("/editProfile")
-    public String editProfile(String newName, String newSurname, String newPhone, String newEmail, String newAddress, String newCreditCardDetails,
-                              String newUsername, String password, Model model) throws Exception {
+    @PreAuthorize("#username == authentication.name or hasAuthority('ADMIN')")
+    @PostMapping("/editProfile/{username}")
+    public String editProfile(@PathVariable(value = "username") String username, String newName, String newSurname, String newPhone, String newEmail, String newAddress, String newCreditCardDetails,
+                              String newUsername, String password,
+                              HttpServletRequest req, Model model) throws Exception {
 
-        User user = userSession.getUser();
+        User sessionUser = null;
+
+        Principal userDetails = req.getUserPrincipal();
+        if (userDetails != null) {
+            sessionUser = userRepository.findByUsername(userDetails.getName());
+            model.addAttribute("sessionUser", sessionUser);
+        }
+
+        //Determine if booking as admin
+        User user = null;
+        if(isAdmin(sessionUser)){
+            user = userRepository.findByUsername(username);
+        }
+        else{
+            user = sessionUser;
+        }
+        model.addAttribute("user", user);
 
         StringBuilder userRoles = new StringBuilder();
         for (Role role : user.getRoles()) {
@@ -439,18 +487,54 @@ public class UserController {
         }
     }
 
-    @GetMapping("/editPassword")
-    public String changePassword(Model model) {
-        model.addAttribute("user", userSession.getUser());
+    @PreAuthorize("#username == authentication.name or hasAuthority('ADMIN')")
+    @GetMapping("/editPassword/{username}")
+    public String changePassword(@PathVariable(value = "username") String username, Model model, HttpServletRequest req) {
+
+        User sessionUser = null;
+
+        Principal userDetails = req.getUserPrincipal();
+        if (userDetails != null) {
+            sessionUser = userRepository.findByUsername(userDetails.getName());
+            model.addAttribute("sessionUser", sessionUser);
+        }
+
+        //Determine if booking as admin
+        User user = null;
+        if(isAdmin(sessionUser)){
+            user = userRepository.findByUsername(username);
+        }
+        else{
+            user = sessionUser;
+        }
+        model.addAttribute("user", user);
+
         return "editPassword.html";
     }
 
-
+//    @PreAuthorize("#username == authentication.name or hasAuthority('ADMIN')")
     @PostMapping("/editPassword")
-    public String editPassword(String password, String newPassword, String newPasswordDuplicate, HttpServletResponse response, Model model)
+    public String editPassword(String username, String password, String newPassword, String newPasswordDuplicate,
+                               HttpServletResponse response, HttpServletRequest req, Model model)
             throws Exception {
 
-        User user = userSession.getUser();
+        User sessionUser = null;
+
+        Principal userDetails = req.getUserPrincipal();
+        if (userDetails != null) {
+            sessionUser = userRepository.findByUsername(userDetails.getName());
+            model.addAttribute("sessionUser", sessionUser);
+        }
+
+        //Determine if booking as admin
+        User user = null;
+        if(isAdmin(sessionUser)){
+            user = userRepository.findByUsername(username);
+        }
+        else{
+            user = sessionUser;
+        }
+        model.addAttribute("user", user);
 
         StringBuilder userRoles = new StringBuilder();
         for (Role role : user.getRoles()) {
