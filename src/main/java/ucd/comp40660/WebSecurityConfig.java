@@ -30,7 +30,7 @@ import static ucd.comp40660.filter.SecurityConstants.COOKIE_NAME;
 @EnableWebSecurity
 @EnableEncryptableProperties
 @EnableGlobalMethodSecurity(securedEnabled = true, prePostEnabled = true)
-public class WebSecurityConfig extends WebSecurityConfigurerAdapter{
+public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
     @Qualifier("userDetailsServiceImplementation")
     @Autowired
     private UserDetailsService userDetailsService;
@@ -39,17 +39,17 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter{
 
     @Override
     @Bean
-    public AuthenticationManager authenticationManagerBean() throws Exception{
+    public AuthenticationManager authenticationManagerBean() throws Exception {
         return super.authenticationManagerBean();
     }
 
     @Override
-    protected void configure(AuthenticationManagerBuilder auth) throws Exception{
+    protected void configure(AuthenticationManagerBuilder auth) throws Exception {
         auth.authenticationProvider(authenticationProvider());
     }
 
     @Bean
-    public DaoAuthenticationProvider authenticationProvider(){
+    public DaoAuthenticationProvider authenticationProvider() {
         DaoAuthenticationProvider authProvider = new DaoAuthenticationProvider();
         authProvider.setUserDetailsService(userDetailsService);
         bCryptPasswordEncoder = new BCryptPasswordEncoder(12);
@@ -57,13 +57,18 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter{
         return authProvider;
     }
 
-    public WebSecurityConfig(UserDetailsServiceImplementation userDetailsService, BCryptPasswordEncoder bCryptPasswordEncoder){
+    public WebSecurityConfig(UserDetailsServiceImplementation userDetailsService, BCryptPasswordEncoder bCryptPasswordEncoder) {
         this.userDetailsService = userDetailsService;
         this.bCryptPasswordEncoder = bCryptPasswordEncoder;
     }
 
     @Override
-    protected void configure(HttpSecurity http) throws Exception{
+    protected void configure(HttpSecurity http) throws Exception {
+
+
+        http.authorizeRequests().antMatchers("/h2-console/**").permitAll()
+                .and().csrf().ignoringAntMatchers("/h2-console/**")
+                .and().headers().frameOptions().sameOrigin();
 
         // Enable Cross Origin RequestS (cors) and disable Spring Boot CSRF protection
         // CSRF protection is automatically enabled by Spring Security to create a stateful session, while we are using stateless session here
@@ -72,7 +77,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter{
 //                .requiresChannel().anyRequest().requiresSecure()  // Require HTTPS Requests
 //                .and()
                 .authorizeRequests()
-                .antMatchers("/error","/resources/**","/img/**", "/css/**","/js/**", "/login","/register","/").permitAll()
+                .antMatchers("/error", "/resources/**", "/img/**", "/css/**", "/js/**", "/login", "/register", "/").permitAll()
                 .antMatchers("/user").access("hasAnyAuthority('ADMIN','USER')")
                 .antMatchers("/user/delete/").access("hasAnyAuthority('ADMIN','USER')")
                 .antMatchers("/editProfile").access("hasAuthority('USER')")
