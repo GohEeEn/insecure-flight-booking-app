@@ -49,17 +49,19 @@ public class JWTAuthorisationFilter extends BasicAuthenticationFilter {
                 }
             }
         }
-            if (token == null) {
-                filterChain.doFilter(request, response);
-                return;
-            }
 
-            UsernamePasswordAuthenticationToken authentication = getAuthentication(request, token);
-
-            SecurityContextHolder.getContext().setAuthentication(authentication);
+        if (token == null) {
             filterChain.doFilter(request, response);
-
+            return;
         }
+
+        UsernamePasswordAuthenticationToken authentication = getAuthentication(request, token);
+
+        SecurityContextHolder.getContext().setAuthentication(authentication);
+        filterChain.doFilter(request, response);
+
+    }
+
     private UsernamePasswordAuthenticationToken getAuthentication(HttpServletRequest request, String token) {
         if(token != null){
             String username = JWT.require(Algorithm.HMAC512(SECRET.getBytes()))
