@@ -24,6 +24,7 @@ import ucd.comp40660.user.repository.CreditCardRepository;
 import ucd.comp40660.user.repository.GuestRepository;
 import ucd.comp40660.user.repository.PassengerRepository;
 import ucd.comp40660.user.repository.UserRepository;
+import ucd.comp40660.validator.GuestValidator;
 import ucd.comp40660.validator.PassengerValidator;
 import ucd.comp40660.validator.UserValidator;
 
@@ -81,6 +82,9 @@ public class FlightController {
 
     @Autowired
     PassengerValidator passengerValidator;
+
+    @Autowired
+    GuestValidator guestValidator;
 
 
     Long temporaryFlightReference;
@@ -450,7 +454,6 @@ public class FlightController {
         }
     }
 
-    //TODO Validator implementation
     @PostMapping("/processOtherPassengerDetails")
     public String processOtherPassengerDetails(@Valid @ModelAttribute("passengerForm") Passenger passengerForm, Model model,
                                              HttpServletResponse response, HttpServletRequest req, BindingResult bindingResult) throws IOException {
@@ -516,8 +519,8 @@ public class FlightController {
 
     //TODO Validator implemetnation
     @PostMapping("/processGuestPersonalDetails")
-    public String processGuestPersonalDetails(String name, String surname, String email, String phoneNumber,
-                                              String address, Model model, HttpServletRequest req) {
+    public String processGuestPersonalDetails(@Valid @ModelAttribute("passengerForm") Guest passengerForm, Model model,
+                                              HttpServletResponse response, HttpServletRequest req, BindingResult bindingResult) {
 
         User sessionUser = null;
 
@@ -536,12 +539,19 @@ public class FlightController {
         }
         model.addAttribute("user", user);
 
+        guestValidator.validate(passengerForm, bindingResult);
 
-        guest.setName(name);
-        guest.setSurname(surname);
-        guest.setEmail(email);
-        guest.setPhone(phoneNumber);
-        guest.setAddress(address);
+        if(bindingResult.hasErrors()){
+            return "bookingDetails.html";
+        }
+
+
+
+        guest.setName(passengerForm.getName());
+        guest.setSurname(passengerForm.getSurname());
+        guest.setEmail(passengerForm.getEmail());
+        guest.setPhone(passengerForm.getPhone());
+        guest.setAddress(passengerForm.getAddress());
 
 
         return "/displayPaymentPage";
