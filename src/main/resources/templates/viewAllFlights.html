@@ -38,8 +38,24 @@
                     <td th:text="${flight.destination}"></td>
                     <td th:text="${flight.departure_date_time}"></td>
                     <td th:text="${flight.arrivalDateTime}"></td>
-                    <td><a th:href="@{/updateFlight(id=${flight.flightID})}">Update</a></td>
-                    <td><a th:href="@{/deleteFlight(id=${flight.flightID})}" th:method="delete">Delete</a></td>
+
+<!--                    <td><a th:href="@{/updateFlight(id=${flight.flightID})}">Update</a></td>-->
+                    <td>
+                      <form th:action="@{/updateFlight}" th:object="${flight}" method="post">
+                        <input type="hidden" name="flightID" th:value="${flight.flightID}">
+                        <button type="submit" class="btn btn-link">Update</button>
+                      </form>
+                    </td>
+
+<!--                    <td><a th:href="@{/deleteFlight(id=${flight.flightID})}" th:method="delete">Delete</a></td>-->
+                    <td>
+                    <form th:action="@{/deleteFlight}" th:object="${flight}" method="post">
+                      <input type="hidden" name="flightID" th:value="${flight.flightID}">
+                      <button type="submit" class="btn btn-link">Delete</button>
+                    </form>
+                    </td>
+
+                  </tr>
                 </tbody>
               </table>
             </div>
