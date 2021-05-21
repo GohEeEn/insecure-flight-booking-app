@@ -156,7 +156,8 @@ public class UserController {
 
         userRepository.delete(user);
 
-        LOGGER.info("Successfully deleted user registration for user <" + username + "> by admin <" + userSession.getUser().getUsername() + ">");
+//        LOGGER.info("Successfully deleted user registration for user <" + username + "> by admin <" + userSession.getUser().getUsername() + ">");
+
 
         if (sessionUser.getUsername().equals(user.getUsername())) {
             userSession.setUser(null);
