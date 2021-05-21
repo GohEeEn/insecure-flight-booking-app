@@ -29,6 +29,7 @@ import ucd.comp40660.validator.UserValidator;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
+import java.io.IOException;
 import java.security.Principal;
 import java.sql.SQLIntegrityConstraintViolationException;
 import java.util.ArrayList;
@@ -146,7 +147,7 @@ public class UserController {
     //    Delete a registration record
     @PreAuthorize("#username == authentication.name or hasAuthority('ADMIN')")
     @PostMapping("/user/delete")
-    public String deleteRegistration(@RequestParam String username, HttpServletRequest req) throws UserNotFoundException {
+    public void deleteRegistration(@RequestParam String username, HttpServletRequest req, HttpServletResponse response) throws UserNotFoundException, IOException {
         Principal userDetails = req.getUserPrincipal();
         User sessionUser = userRepository.findByUsername(userDetails.getName());
         User user = userRepository.findByUsername(username);
@@ -156,6 +157,7 @@ public class UserController {
 
         userRepository.delete(user);
 
+        //TODO
 //        LOGGER.info("Successfully deleted user registration for user <" + username + "> by admin <" + userSession.getUser().getUsername() + ">");
 
 
@@ -165,7 +167,9 @@ public class UserController {
 
         //TODO Possible Session management after account deletion?
 
-        return "index.html";
+//        return "index.html";
+        response.sendRedirect("/login");
+
     }
 
 //    //    Delete a registration record
