@@ -1,3 +1,0 @@
-2021-05-21 16:44:57 jdbc[13]: exception
-org.h2.jdbc.JdbcSQLSyntaxErrorException: Syntax error in SQL statement "ROLES[*]"; expected "ROLLBACK, REVOKE, RUNSCRIPT, RELEASE"; SQL statement:
-ROLES [42001-200]

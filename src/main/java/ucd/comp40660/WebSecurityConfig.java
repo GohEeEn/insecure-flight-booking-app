@@ -65,7 +65,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
     @Override
     protected void configure(HttpSecurity http) throws Exception {
 
-
+//      enable h2 access via the h2-console
         http.authorizeRequests().antMatchers("/h2-console/**").permitAll()
                 .and().csrf().ignoringAntMatchers("/h2-console/**")
                 .and().headers().frameOptions().sameOrigin();
