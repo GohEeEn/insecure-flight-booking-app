@@ -45,15 +45,29 @@
                 <label for="address">Address</label>
                 <input id="address" class="form-control" name="address" th:value="${user.getAddress()}" readonly/>
             </div>
+            <div id="button-container">
 
-            <form method="GET" th:action="@{/editProfile/{username}(username=${user.getUsername()})}">
+<!--            <div class="edit-button">-->
+            <form method="GET" th:action="@{/editProfile/{username}(username=${user.getUsername()})}" class="horizontal-button">
                 <button type="submit" class="btn btn-primary">Edit Profile</button>
 <!--                <a href="/viewCreditCards" class="btn btn-outline-primary">View Credit Cards</a>-->
                 <a th:href="@{/viewCreditCards/{username}(username=${user.getUsername})}" class="btn btn-outline-primary">View Credit Cards</a>
                 <a href="/editPassword" class="btn btn-secondary">Change Password</a>
-                <a th:href="@{/user/delete/{id}(id=${user.getUsername()})}" class="btn btn-danger">Delete</a>
-            </form>
+<!--                <a th:href="@{/user/delete/{id}(id=${user.getUsername()})}" class="btn btn-danger">Delete</a>-->
 
+<!--                <a th:href="@{/user/delete}" class="btn btn-danger">Delete</a>-->
+
+            </form>
+<!--            </div>-->
+
+<!--            <div class="delete-button">-->
+                <form th:action="@{/user/delete}" method="post" class="horizontal-button">
+                    <input type="hidden" id="username" name="username" th:value="${user.getUsername()}">
+                    <button type="submit" class="btn btn-danger">Delete</button>
+                </form>
+<!--            </div>-->
+
+            </div>
         </div>
 
         <div th:replace="fragments/footer :: footer"></div>

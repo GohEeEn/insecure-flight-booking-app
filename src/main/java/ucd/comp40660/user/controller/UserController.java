@@ -100,7 +100,7 @@ public class UserController {
         model.addAttribute("users", users);
 
         return "adminViewUsers.html";
-    }
+     }
 
     //    Get a single registration by id
 //    the id can be changed to any other attribute
@@ -145,8 +145,8 @@ public class UserController {
 
     //    Delete a registration record
     @PreAuthorize("#username == authentication.name or hasAuthority('ADMIN')")
-    @GetMapping("/user/delete/{username}")
-    public String deleteRegistration(@PathVariable(value = "username") String username, HttpServletRequest req) throws UserNotFoundException {
+    @PostMapping("/user/delete")
+    public String deleteRegistration(@RequestParam String username, HttpServletRequest req) throws UserNotFoundException {
         Principal userDetails = req.getUserPrincipal();
         User sessionUser = userRepository.findByUsername(userDetails.getName());
         User user = userRepository.findByUsername(username);
