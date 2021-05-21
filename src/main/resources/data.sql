@@ -11,7 +11,7 @@
 -- ('Seoul, South Korea', 'Dublin, Ireland', '2021-08-05 20:30:00', '2021-08-05 00:30:00'),
 -- ('Pyongyang, North Korea', 'Dublin, Ireland', '2021-08-05 20:30:00', '2021-08-05 00:30:00'),
 -- ('Tokyo, Japan', 'Dublin, Ireland', '2021-08-05 20:30:00', '2021-08-05 00:30:00'),
---  ('Sofia, Bulgaria', 'Dublin, Ireland', '2021-08-01 20:30:00', '2021-08-02 00:30:00'),
+-- ('Sofia, Bulgaria', 'Dublin, Ireland', '2021-08-01 20:30:00', '2021-08-02 00:30:00'),
 -- ('Sofia, Bulgaria', 'Dublin, Ireland', '2021-08-03 20:30:00', '2021-08-04 00:30:00'),
 -- ('Sofia, Bulgaria', 'Dublin, Ireland', '2021-08-12 20:30:00', '2021-08-13 00:30:00'),
 -- ('Stockholm, Sweden', 'Dublin, Ireland', '2021-08-12 11:30:00', '2021-08-12 13:30:00'),
@@ -46,7 +46,7 @@
 -- ('Tokyo, Japan', 'Dublin, Ireland', '2021-08-26 20:30:00', '2021-08-27 00:30:00'),
 -- ('Sofia, Bulgaria', 'Dublin, Ireland', '2021-08-25 20:30:00', '2021-08-26 00:30:00'),
 -- ('Sofia, Bulgaria', 'Dublin, Ireland', '2021-08-24 20:30:00', '2021-08-25 00:30:00');
---
+
 -- ALTER TABLE application.credit_cards MODIFY id bigint NOT NULL AUTO_INCREMENT;
 --
 -- ALTER TABLE application.reservations MODIFY id bigint NOT NULL AUTO_INCREMENT;
@@ -71,7 +71,7 @@
 --
 -- INSERT INTO roles(id, name) VALUES
 -- (1, 'GUEST'), (2, 'MEMBER'), (3, 'ADMIN');
---
+
 -- ALTER TABLE application.guests MODIFY id bigint NOT NULL AUTO_INCREMENT;
 --
 -- INSERT INTO guests(name, surname, phone, email, address) VALUES
