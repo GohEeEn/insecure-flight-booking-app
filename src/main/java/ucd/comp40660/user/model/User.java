@@ -36,9 +36,6 @@ public class User {
     @Pattern(regexp = NAME_REGEX)
     private String surname;
 
-//    @NotBlank(message = "Role improperly initialised.")
-//    private String role;
-
     @Column(unique = true)
     @NotBlank(message = "Username field must not be empty.")
     @Size(min = 4, max = 32, message = "Invalid username")
@@ -89,6 +86,9 @@ public class User {
     )
     private Set<Role> roles = new HashSet<>();
 
+    @Column(name = "account_non_locked")
+    private boolean accountNonLocked;
+
     public Set<Role> getRoles() {
         return this.roles;
     }
@@ -105,8 +105,12 @@ public class User {
         this.passwordConfirm = passwordConfirm;
     }
 
-    public String getUsername(){
-        return this.username;
+    public boolean getAccountNonLocked() {
+        return this.accountNonLocked;
+    }
+
+    public void setAccountNonLocked(boolean accountNonLocked) {
+        this.accountNonLocked = accountNonLocked;
     }
 
     public List<CreditCard> getCredit_cards(){
@@ -121,13 +125,13 @@ public class User {
         this.name = name;
         this.surname = surname;
         this.username = username;
-//        this.role = role;
         this.phone = phone;
         this.email = email;
         this.address = address;
         this.password = password;
         this.passwordConfirm = passwordConfirm;
         this.reservations = reservations;
+        this.accountNonLocked = true;
     }
 }
 
