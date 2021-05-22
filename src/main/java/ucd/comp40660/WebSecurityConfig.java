@@ -1,6 +1,8 @@
 package ucd.comp40660;
 
 import com.ulisesbocchio.jasyptspringboot.annotation.EnableEncryptableProperties;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Bean;
@@ -13,15 +15,22 @@ import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
 import org.springframework.security.config.http.SessionCreationPolicy;
+import org.springframework.security.core.Authentication;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.web.authentication.logout.LogoutSuccessHandler;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
+import org.springframework.web.util.UrlPathHelper;
 import ucd.comp40660.filter.JWTAuthenticationFilter;
 import ucd.comp40660.filter.JWTAuthorisationFilter;
 import ucd.comp40660.service.UserDetailsServiceImplementation;
 
+import javax.servlet.ServletException;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import java.io.IOException;
 import java.util.Arrays;
 
 import static ucd.comp40660.filter.SecurityConstants.COOKIE_NAME;
@@ -36,6 +45,8 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
     private UserDetailsService userDetailsService;
 
     private BCryptPasswordEncoder bCryptPasswordEncoder;
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(WebSecurityConfig.class);
 
     @Override
     @Bean
@@ -92,6 +103,17 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
                 .successForwardUrl("/")
                 .and()
                 .logout()
+                .logoutSuccessHandler(new LogoutSuccessHandler() {
+                    @Override
+                    public void onLogoutSuccess(HttpServletRequest httpServletRequest, HttpServletResponse httpServletResponse, Authentication authentication) throws IOException, ServletException {
+                        LOGGER.info("User logged out successfully.");
+
+                        UrlPathHelper helper = new UrlPathHelper();
+                        String context = helper.getContextPath(httpServletRequest);
+
+                        httpServletResponse.sendRedirect(context + "/login");
+                    }
+                })
                 .logoutUrl("/logout")           // Specify URL for logout
                 .deleteCookies(COOKIE_NAME)     // Delete the cookie containing the JWT after logout
                 .permitAll()
