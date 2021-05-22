@@ -24,6 +24,7 @@ import ucd.comp40660.user.repository.CreditCardRepository;
 import ucd.comp40660.user.repository.GuestRepository;
 import ucd.comp40660.user.repository.PassengerRepository;
 import ucd.comp40660.user.repository.UserRepository;
+import ucd.comp40660.validator.CreditCardValidator;
 import ucd.comp40660.validator.GuestValidator;
 import ucd.comp40660.validator.PassengerValidator;
 import ucd.comp40660.validator.UserValidator;
@@ -79,6 +80,9 @@ public class FlightController {
 
     @Autowired
     UserService userService;
+
+    @Autowired
+    CreditCardValidator creditCardValidator;
 
     @Autowired
     PassengerValidator passengerValidator;
@@ -422,7 +426,8 @@ public class FlightController {
 
 
     @GetMapping("/displayBookingPage")
-    public String guestBooking(Model model, @Valid @ModelAttribute("passengerForm") Passenger passengerForm, HttpServletRequest req) {
+    public String guestBooking(Model model, @Valid @ModelAttribute("passengerForm") Passenger passengerForm,
+                               @Valid @ModelAttribute("cardForm") CreditCard cardForm, HttpServletRequest req) {
 
         User sessionUser = null;
 
@@ -455,8 +460,10 @@ public class FlightController {
     }
 
     @PostMapping("/processOtherPassengerDetails")
-    public String processOtherPassengerDetails(@Valid @ModelAttribute("passengerForm") Passenger passengerForm, Model model,
-                                             HttpServletResponse response, HttpServletRequest req, BindingResult bindingResult) throws IOException {
+    public String processOtherPassengerDetails(@Valid @ModelAttribute("passengerForm") Passenger passengerForm,
+                                               @Valid @ModelAttribute("cardForm") CreditCard cardForm, Model model,
+                                             HttpServletResponse response, HttpServletRequest req,
+                                               BindingResult bindingResult) throws IOException {
 
         User sessionUser = null;
 
@@ -520,6 +527,7 @@ public class FlightController {
     //TODO Validator implemetnation
     @PostMapping("/processGuestPersonalDetails")
     public String processGuestPersonalDetails(@Valid @ModelAttribute("passengerForm") Guest passengerForm, Model model,
+                                              @Valid @ModelAttribute("cardForm") CreditCard cardForm,
                                               HttpServletResponse response, HttpServletRequest req, BindingResult bindingResult) {
 
         User sessionUser = null;
@@ -558,7 +566,9 @@ public class FlightController {
     }
 
     @GetMapping("/displayPaymentPage")
-    public String displayPaymentPage(Model model, HttpServletRequest req) {
+    public String displayPaymentPage(@Valid @ModelAttribute("passengerForm") Guest passengerForm, Model model,
+                                     @Valid @ModelAttribute("cardForm") CreditCard cardForm,
+                                     HttpServletRequest req) {
 
         User user = null;
 
@@ -630,8 +640,8 @@ public class FlightController {
 
 
     @PostMapping("/processGuestPayment")
-    public String processGuestPayment(String cardholder_name, String card_number, String card_type, int expiration_month,
-                                    int expiration_year, String security_code,
+    public String processGuestPayment(@Valid @ModelAttribute("cardForm") CreditCard cardForm,
+                                      @Valid @ModelAttribute("passengerForm") Guest passengerForm, BindingResult bindingResult,
                                     HttpServletResponse response, HttpServletRequest req, Model model) throws IOException {
 
         User sessionUser = null;
@@ -651,9 +661,18 @@ public class FlightController {
         }
         model.addAttribute("user", user);
 
+        creditCardValidator.validate(cardForm, bindingResult);
+
+        if(bindingResult.hasErrors()){
+            return "bookingDetails.html";
+        }
+
+
         Reservation reservation = new Reservation();
 
-        CreditCard card = new CreditCard(cardholder_name, card_number, card_type, expiration_month, expiration_year, security_code);
+        CreditCard card = new CreditCard(cardForm.getCardholder_name(), cardForm.getCard_number(),
+                cardForm.getType(), cardForm.getExpiration_month(), cardForm.getExpiration_year(), cardForm.getSecurity_code());
+
         creditCardRepository.saveAndFlush(card);
 
         guestRepository.save(guest);

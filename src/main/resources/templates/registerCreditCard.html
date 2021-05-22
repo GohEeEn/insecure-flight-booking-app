@@ -49,7 +49,7 @@
                            placeholder="Month" name="expiration_month" min="1" max="12"
                            onkeyup="monthValidator(document.card_form.expiration_month)" onkeydown="clearErrors()" required>
                     <label for="month_validity"><span color="red" id="month_validity"></span></label>
-                    <span class="error" th:if="${#fields.hasErrors('month_validity')}" th:errors="*{month_validity}"></span>
+                    <span class="error" th:if="${#fields.hasErrors('expiration_month')}" th:errors="*{expiration_month}"></span>
 
                 </div>
                 <div class="form-group col-md-6">
@@ -58,7 +58,7 @@
                            name="expiration_year" min="2021" max="2029"
                            onkeyup="yearValidator(document.card_form.expiration_year)" onkeydown="clearErrors()" required>
                     <label for="year_validity"><span color="red" id="year_validity"></span></label>
-                    <span class="error" th:if="${#fields.hasErrors('year_validity')}" th:errors="*{year_validity}"></span>
+                    <span class="error" th:if="${#fields.hasErrors('expiration_year')}" th:errors="*{expiration_year}"></span>
 
                 </div>
             </div>
