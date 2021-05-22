@@ -14,5 +14,4 @@ public class FilterUtil {
                 WebApplicationContextUtils.getWebApplicationContext(servletContext);
         return webApplicationContext.getBean(UserDetailsService.class);
     }
-
 }

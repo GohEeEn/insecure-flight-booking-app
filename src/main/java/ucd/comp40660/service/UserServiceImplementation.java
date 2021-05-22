@@ -1,29 +1,31 @@
 package ucd.comp40660.service;
 
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.stereotype.Service;
 import ucd.comp40660.user.model.ConfirmationToken;
 import ucd.comp40660.user.model.Role;
 import ucd.comp40660.user.model.User;
 import ucd.comp40660.user.repository.ConfirmationTokenRepository;
-import ucd.comp40660.user.repository.UserRepository;
 import ucd.comp40660.user.repository.RoleRepository;
-
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
-import org.springframework.stereotype.Service;
+import ucd.comp40660.user.repository.UserRepository;
 
 import java.util.Date;
 import java.util.HashSet;
-import java.util.Optional;
 import java.util.Set;
 
 @Service
 public class UserServiceImplementation implements UserService {
+
     @Autowired
     private UserRepository userRepository;
+
     @Autowired
     private ConfirmationTokenRepository confirmationTokenRepository;
+
     @Autowired
     private RoleRepository roleRepository;
+
     @Autowired
     private BCryptPasswordEncoder bCryptPasswordEncoder;
 
@@ -31,6 +33,7 @@ public class UserServiceImplementation implements UserService {
     public void save(User user) {
         bCryptPasswordEncoder = new BCryptPasswordEncoder(12);
         user.setPassword(bCryptPasswordEncoder.encode(user.getPassword()));
+        user.setAccountNonLocked(true);
         Role userRole = roleRepository.findByName("MEMBER");
         Set<Role> roleSet = new HashSet<Role>();
         roleSet.add(userRole);
@@ -42,6 +45,7 @@ public class UserServiceImplementation implements UserService {
     public void adminSave(User user) {
         bCryptPasswordEncoder = new BCryptPasswordEncoder(12);
         user.setPassword(bCryptPasswordEncoder.encode(user.getPassword()));
+        user.setAccountNonLocked(true);
         Role userRole = roleRepository.findByName("ADMIN");
         Set<Role> roleSet = new HashSet<Role>();
         roleSet.add(userRole);
@@ -53,6 +57,7 @@ public class UserServiceImplementation implements UserService {
     public void guestSave(User user){
         bCryptPasswordEncoder = new BCryptPasswordEncoder(12);
         user.setPassword(bCryptPasswordEncoder.encode(user.getPassword()));
+        user.setAccountNonLocked(true);
         Role userRole = roleRepository.findByName("GUEST");
         Set<Role> roleSet = new HashSet<Role>();
         roleSet.add(userRole);

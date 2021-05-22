@@ -2,13 +2,10 @@ package ucd.comp40660.user.controller;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.security.authentication.AuthenticationManager;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.web.authentication.WebAuthenticationDetails;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
@@ -20,8 +17,6 @@ import ucd.comp40660.service.UserService;
 import ucd.comp40660.user.UserSession;
 import ucd.comp40660.user.exception.UserNotFoundException;
 import ucd.comp40660.user.model.Role;
-import ucd.comp40660.user.model.CreditCard;
-import ucd.comp40660.user.model.Role;
 import ucd.comp40660.user.model.User;
 import ucd.comp40660.user.repository.CreditCardRepository;
 import ucd.comp40660.user.repository.UserRepository;
@@ -32,8 +27,6 @@ import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
 import java.io.IOException;
 import java.security.Principal;
-import java.sql.SQLIntegrityConstraintViolationException;
-import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
@@ -220,7 +213,6 @@ public class UserController {
         return "register.html";
     }
 
-
     @PostMapping("/register")
     public String register(@Valid @ModelAttribute("userForm") User userForm, BindingResult bindingResult,
                            Model model, HttpServletRequest req) {
@@ -317,42 +309,6 @@ public class UserController {
         return "index.html";
     }
 
-
-//    @PostMapping("/register")
-//    public String createUser(String name, String surname, String username, String phone, String address, String email,
-//                             String password, String passwordDuplicate, Model model) throws SQLIntegrityConstraintViolationException, IOException {
-//
-//        if (userRepository.existsByUsername(username)) {
-//            System.out.println("\n\nDUPLICATE USERNAME DETECTED\n\n");
-//            model.addAttribute("error", "Username already exists.");
-//            return "register.html";
-//        } else if (userRepository.existsByEmail(email)) {
-//            model.addAttribute("error", "E-mail address already in use.");
-//            return "register.html";
-//        } else if (userRepository.existsByPhone(phone)) {
-//            model.addAttribute("error", "Phone number already in use.");
-//            return "register.html";
-//        } else {
-//            if (password.equals(passwordDuplicate)) {
-//                User user = new User();
-//                user.setName(name);
-//                user.setSurname(surname);
-//                user.setUsername(username);
-//                user.setPhone(phone);
-//                user.setAddress(address);
-//                user.setEmail(email);
-//                user.setRole("MEMBER");
-//                user.setPassword(password);
-//                userRepository.save(user);
-//                userSession.setUser(user);
-//                return "index.html";
-//            } else {
-//                userSession.setLoginFailed(true);
-//                return "register.html";
-//            }
-//        }
-//    }
-
     @PreAuthorize("#username == authentication.name or hasAuthority('ADMIN')")
     @GetMapping("/viewProfile/{username}")
     public String viewProfile(@PathVariable(value = "username") String username, Model model, HttpServletRequest req) {
@@ -403,8 +359,8 @@ public class UserController {
 
     @PreAuthorize("#username == authentication.name or hasAuthority('ADMIN')")
     @PostMapping("/editProfile/{username}")
-    public String editProfile(@PathVariable(value = "username") String username, String newName, String newSurname, String newPhone, String newEmail, String newAddress, String newCreditCardDetails,
-                              String newUsername, String password,
+    public String editProfile(@PathVariable(value = "username") String username, String newName, String newSurname,
+                              String newPhone, String newEmail, String newAddress, String newUsername, String password,
                               HttpServletRequest req, Model model) throws Exception {
 
         User sessionUser = null;
@@ -517,7 +473,7 @@ public class UserController {
 //    @PreAuthorize("#username == authentication.name or hasAuthority('ADMIN')")
     @PostMapping("/editPassword")
     public String editPassword(String username, String password, String newPassword, String newPasswordDuplicate,
-                               HttpServletResponse response, HttpServletRequest req, Model model)
+                               HttpServletRequest req, Model model)
             throws Exception {
 
         User sessionUser = null;
@@ -543,27 +499,38 @@ public class UserController {
             userRoles.append(role.getName());
         }
 
-        if (password.equals(user.getPassword())) {
+        BCryptPasswordEncoder bCryptPasswordEncoder = new BCryptPasswordEncoder(12);
 
-            if (newPassword.equals(newPasswordDuplicate) && (!(newPassword.isEmpty()))) {
-                user.setPassword(newPassword);
+        // Check if the current password matches given current password input
+        if (bCryptPasswordEncoder.matches(password, user.getPassword())) {
+
+            // Check if the new password matches the passwordConfirm
+            if (newPassword.equals(newPasswordDuplicate)) {
+
+                // Check if the new password matches the policy pattern
+                if(userValidator.isPasswordValid(newPassword)) {
+
+                    user.setPassword(newPassword);
+                    userRepository.save(user);
+                    model.addAttribute("user", userSession.getUser());
+
+                    LOGGER.info("Password successfully changed by user <" + user.getUsername() + ">");
+
+                    return "viewProfile.html";
+
+                } else {
+                    model.addAttribute("error", "\nInvalid password, update denied.");
+                    LOGGER.warn("Password change rejected due to invalid password by user <" + user.getUsername() + ">");
+                }
+
             } else {
                 model.addAttribute("error", "\nNew Password entries do not match, update denied.");
                 model.addAttribute("user", userSession.getUser());
                 LOGGER.warn("Password change rejected due to new password mismatch for user <" + user.getUsername() + "> with role of <" + userRoles + ">");
-
-                return "editPassword.html";
             }
 
-            userRepository.save(user);
-            model.addAttribute("user", userSession.getUser());
-
-            LOGGER.info("Password successfully changed by user <" + user.getUsername() + ">");
-
-            return "viewProfile.html";
-
         } else {
-            System.out.println("\n\nPASSWORD FOUND TO BE INCORRECT\n\n");
+            System.out.println("\n\nPASSWORD FOUND TO BE INCORRECT, given : " + password + ", actual : " + user.getPassword() + "\n\n");
             model.addAttribute("user", userSession.getUser());
             model.addAttribute("error", "\nIncorrect Password, alterations denied.");
             LOGGER.warn("Incorrectly entered password for user <" + user.getUsername() + "> with role of <" + userRoles + ">");
