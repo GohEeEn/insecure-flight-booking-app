@@ -5,9 +5,14 @@ import org.slf4j.LoggerFactory;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.validation.BindingResult;
 import ucd.comp40660.service.EncryptionService;
 import ucd.comp40660.user.UserSession;
 import org.springframework.stereotype.Controller;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.*;
+import org.springframework.ui.Model;
+
 import ucd.comp40660.user.exception.CreditCardNotFoundException;
 import ucd.comp40660.user.exception.UserNotFoundException;
 import ucd.comp40660.user.model.CreditCard;
@@ -16,9 +21,8 @@ import ucd.comp40660.user.model.User;
 import ucd.comp40660.user.repository.CreditCardRepository;
 import ucd.comp40660.user.repository.GuestRepository;
 import ucd.comp40660.user.repository.UserRepository;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.*;
-import org.springframework.ui.Model;
+import ucd.comp40660.validator.CreditCardValidator;
+
 
 
 import javax.servlet.http.HttpServletRequest;
@@ -47,6 +51,9 @@ public class CardController {
     @Autowired
     CreditCardRepository creditCardRepository;
 
+    @Autowired
+    CreditCardValidator creditCardValidator;
+
 //    @GetMapping("/cards")
 //    @ResponseBody
 //    public List<CreditCard> getCreditCards() {
@@ -55,27 +62,42 @@ public class CardController {
 
 
     @PostMapping("/addMemberCreditCard")
-    public String addMemberCreditCard(String cardholder_name, String card_number, String card_type,
-                                      int expiration_month, int expiration_year, String security_code, Model model, HttpServletRequest req) {
-        User user = null;
+    public String addMemberCreditCard(@Valid @ModelAttribute("cardForm") CreditCard cardForm,
+                                      Model model, HttpServletRequest req, BindingResult bindingResult) {
 
-        // encrypt card_number and security_code before saving it in the database
-        String encryptedCardholderName = EncryptionService.encrypt(cardholder_name);
-        String encryptedCardNumber = EncryptionService.encrypt(card_number);
-        String encryptedCardType = EncryptionService.encrypt(card_type);
-        String encryptedSecurityCode = EncryptionService.encrypt(security_code);
+
+        User user = null;
+        User sessionUser = null;
 
         Principal userDetails = req.getUserPrincipal();
         if (userDetails != null) {
-            user = userRepository.findByUsername(userDetails.getName());
-
-
-            model.addAttribute("user", user);
+        user = userRepository.findByUsername(userDetails.getName());
+        sessionUser = user;
         }
+
+        model.addAttribute("user", user);
+        model.addAttribute("sessionUser", sessionUser);
+
+        creditCardValidator.validate(cardForm, bindingResult);
+
+        if(bindingResult.hasErrors()){
+            return "registerCreditCard.html";
+        }
+
+
+
+        // encrypt card_number and security_code before saving it in the database
+        String encryptedCardholderName = EncryptionService.encrypt(cardForm.getCardholder_name());
+        String encryptedCardNumber = EncryptionService.encrypt(cardForm.getCard_number());
+        String encryptedCardType = EncryptionService.encrypt(cardForm.getType());
+        String encryptedSecurityCode = EncryptionService.encrypt(cardForm.getSecurity_code());
+
+
 
 //        User user = userSession.getUser();
         model.addAttribute("user", user);
-        CreditCard newCard = new CreditCard(encryptedCardholderName, encryptedCardNumber, encryptedCardType, expiration_month, expiration_year, encryptedSecurityCode);
+        CreditCard newCard = new CreditCard(encryptedCardholderName, encryptedCardNumber, encryptedCardType,
+                cardForm.getExpiration_month(), cardForm.getExpiration_year(), encryptedSecurityCode);
         if (user != null) {
             newCard.setUser(user);
             user.getCredit_cards().add(newCard);
@@ -132,14 +154,16 @@ public class CardController {
     }
 
     @GetMapping("/registerCard")
-    public String registerCardView(Model model, HttpServletRequest req) {
+    public String registerCardView(Model model, @Valid @ModelAttribute("cardForm") CreditCard cardForm, HttpServletRequest req) {
         User user = null;
 
 
         Principal userDetails = req.getUserPrincipal();
         if (userDetails != null) {
             user = userRepository.findByUsername(userDetails.getName());
+            User sessionUser = user;
             model.addAttribute("user", user);
+            model.addAttribute("sessionUser", sessionUser);
         }
 
 
@@ -148,7 +172,7 @@ public class CardController {
     }
 
     @GetMapping("/deleteCard/{id}")
-    public String deleteCard(@PathVariable(value = "id") Long id, Model model, HttpServletRequest req) throws CreditCardNotFoundException {
+    public void deleteCard(@PathVariable(value = "id") Long id, Model model, HttpServletRequest req, HttpServletResponse response) throws CreditCardNotFoundException, IOException {
         User user = null;
 
         Principal userDetails = req.getUserPrincipal();
@@ -171,7 +195,7 @@ public class CardController {
 
         LOGGER.info("Deleted credit card by user <" + user.getUsername() + "> with the role of <" + userRoles + ">");
 
-        return "viewCreditCards.html";
+        response.sendRedirect("/viewCreditCards/" + user.getUsername());
     }
 
 }
