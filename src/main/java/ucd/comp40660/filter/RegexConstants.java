@@ -6,7 +6,7 @@ public final class RegexConstants {
         throw new IllegalStateException("Utility class");
     }
 
-    public static final String NAME_REGEX = "([A-Za-z]*){2,32}";
+    public static final String NAME_REGEX = "^[A-Za-z]{2,32}$";
 
     /**
      * (?=.*[a-z])   The string must contain at least 1 lowercase alphabetical character
@@ -32,6 +32,7 @@ public final class RegexConstants {
 
     // Sourcr : https://owasp.org/www-community/OWASP_Validation_Regex_Repository -> PERSON NAME
     public static final String FLIGHT_NAME_REGEX = "^[a-zA-Z]+(([',. -][a-zA-Z ])?[a-zA-Z]*)*$";
+    public static final String USERNAME_REGEX = "^[a-zA-z0-9]{4,20}$";
     public static final String ADDRESS_REGEX = "^[a-zA-Z]+(([',. -][a-zA-Z ])?[a-zA-Z]*)*$";
     public static final String EMAIL_REGEX = "^[a-zA-Z0-9_+&*-]+(?:\\.[a-zA-Z0-9_+&*-]+)*@(?:[a-zA-Z0-9-]+\\.)+[a-zA-Z]{2,7}$";
     public static final String PHONE_REGEX = "^[0-9]{3}[-][0-9]{3}[-][0-9]{4}$";

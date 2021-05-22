@@ -283,7 +283,8 @@ public class UserController {
     }
 
     @GetMapping("/guestRegister")
-    public String guestRegister(Model model, HttpServletResponse response) throws Exception {
+    public String guestRegister(Model model, HttpServletResponse response,
+                                @Valid @ModelAttribute("userForm") User userForm) throws Exception {
         if (userSession.isLoginFailed()) {
             model.addAttribute("error", "Unable to create account, passwords do not match");
             userSession.setLoginFailed(false);
