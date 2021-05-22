@@ -20,14 +20,14 @@
                 <div class="form-group">
                     <label for="name">First Name</label>
                     <input id="name" class="form-control" type="text" name="name" placeholder="First Name" th:field="*{name}" onkeydown="clearErrors()" required/>
-                    <span class="error" th:if="${#fields.hasErrors('name')}" th:errors="*{name}"></span>
+                    <span class="error" th:if="${#fields.hasErrors('name')}" th:errors="*{name}" th:value="${user.name}"></span>
                 </div>
 
                 <div class="form-group">
                     <label for="surname">Surname: </label>
                     <input id="surname" class="form-control" type="text" name="surname" placeholder="Surname"
                            th:field="*{surname}" onkeydown="clearErrors()" required/>
-                    <span class="error" th:if="${#fields.hasErrors('surname')}" th:errors="*{surname}"></span>
+                    <span class="error" th:if="${#fields.hasErrors('surname')}" th:errors="*{surname}" th:value="${user.surname}"></span>
                 </div>
 
                 <div class="form-group">
@@ -41,14 +41,14 @@
                     <label for="phone">Phone: </label>
                     <input id="phone" class="form-control" type="text" name="phone" placeholder="Phone Number"
                            th:field="*{phone}" onkeydown="clearErrors()" required/>
-                    <span class="error" th:if="${#fields.hasErrors('phone')}" th:errors="*{phone}"></span>
+                    <span class="error" th:if="${#fields.hasErrors('phone')}" th:errors="*{phone}" th:value="${user.phone}"></span>
                 </div>
 
                 <div class="form-group">
                     <label for="email">E-mail: </label>
                     <input id="email" class="form-control" type="text" name="email" placeholder="E-mail Address"
                            th:field="*{email}" onkeydown="clearErrors()" required/>
-                    <span class="error" th:if="${#fields.hasErrors('email')}" th:errors="*{email}"></span>
+                    <span class="error" th:if="${#fields.hasErrors('email')}" th:errors="*{email}" th:value="${user.email}"></span>
                 </div>
 
                 <div class="form-group">

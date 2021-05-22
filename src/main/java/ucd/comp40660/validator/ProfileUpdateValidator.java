@@ -42,8 +42,7 @@ public class ProfileUpdateValidator implements Validator{
             errors.rejectValue("phone", "InvalidPhone");
 
 
-        if(!(user.getUsername().isEmpty()) && (userService.findByUsername(user.getUsername()) != null) ||
-                (!isValid(user.getUsername(), USERNAME_REGEX))){
+        if((user.getUsername().isEmpty()) || (!isValid(user.getUsername(), USERNAME_REGEX))){
             errors.rejectValue("username", "InvalidUsername");
         }
     }

@@ -18,18 +18,19 @@ import ucd.comp40660.flight.repository.FlightRepository;
 import ucd.comp40660.reservation.repository.ReservationRepository;
 import ucd.comp40660.service.EncryptionService;
 import ucd.comp40660.service.SecurityService;
+import ucd.comp40660.service.SecurityServiceImplementation;
 import ucd.comp40660.service.UserService;
 import ucd.comp40660.user.UserSession;
 import ucd.comp40660.user.exception.UserNotFoundException;
+import ucd.comp40660.user.model.*;
 import ucd.comp40660.user.model.Role;
-import ucd.comp40660.user.model.CreditCard;
-import ucd.comp40660.user.model.Role;
-import ucd.comp40660.user.model.User;
 import ucd.comp40660.user.repository.CreditCardRepository;
 import ucd.comp40660.user.repository.UserRepository;
+import ucd.comp40660.validator.PasswordValidator;
 import ucd.comp40660.validator.ProfileUpdateValidator;
 import ucd.comp40660.validator.UserValidator;
 
+import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
@@ -69,13 +70,16 @@ public class UserController {
     ProfileUpdateValidator profileUpdateValidator;
 
     @Autowired
+    PasswordValidator passwordValidator;
+
+    @Autowired
     UserService userService;
 
     @Autowired
     protected AuthenticationManager authenticationManager;
 
     @Autowired
-    SecurityService securityService;
+    SecurityServiceImplementation securityService;
 
     @Autowired
     BCryptPasswordEncoder bCryptPasswordEncoder;
@@ -234,7 +238,7 @@ public class UserController {
 
     @PostMapping("/register")
     public String register(@Valid @ModelAttribute("userForm") User userForm, BindingResult bindingResult,
-                           Model model, HttpServletRequest req) {
+                           Model model, HttpServletRequest req) throws ServletException {
         userValidator.validate(userForm, bindingResult);
 
         if (bindingResult.hasErrors()) {
@@ -243,8 +247,9 @@ public class UserController {
             return "register.html";
         }
 
+        String originalPassword = userForm.getPassword();
         userService.save(userForm);
-        securityService.autoLogin(userForm.getUsername(), userForm.getPasswordConfirm());
+        securityService.autoLogin(userForm.getUsername(), originalPassword, req);
 
         StringBuilder userRoles = new StringBuilder();
         for (Role role : userRepository.findByUsername(userForm.getUsername()).getRoles()) {
@@ -273,7 +278,7 @@ public class UserController {
 
     @PostMapping("/adminRegister")
     public String adminRegister(@Valid @ModelAttribute("userForm") User userForm, BindingResult bindingResult,
-                                Model model, HttpServletRequest req) {
+                                Model model, HttpServletRequest req) throws ServletException {
         userValidator.validate(userForm, bindingResult);
 
         if (bindingResult.hasErrors()) {
@@ -283,7 +288,8 @@ public class UserController {
 
         LOGGER.warn("New admin registered with username <" + userForm.getUsername() + ">");
         userService.adminSave(userForm);
-        securityService.autoLogin(userForm.getUsername(), userForm.getPasswordConfirm());
+        securityService.autoLogin(userForm.getUsername(), userForm.getPassword(), req);
+
 
         Principal userDetails = req.getUserPrincipal();
         User sessionUser = userRepository.findByUsername(userDetails.getName());
@@ -308,7 +314,7 @@ public class UserController {
 
     @PostMapping("/guestRegister")
     public String guestRegister(Model model, @ModelAttribute("userForm") User userForm,
-                                BindingResult bindingResult, HttpServletRequest req){
+                                BindingResult bindingResult, HttpServletRequest req) throws ServletException {
         userValidator.validate(userForm, bindingResult);
 
         if(bindingResult.hasErrors()){
@@ -317,7 +323,7 @@ public class UserController {
         }
 
         userService.guestSave(userForm);
-        securityService.autoLogin(userForm.getUsername(), userForm.getPasswordConfirm());
+        securityService.autoLogin(userForm.getUsername(), userForm.getPasswordConfirm(), req);
 
         Principal userDetails = req.getUserPrincipal();
         User sessionUser = userRepository.findByUsername(userDetails.getName());
@@ -416,6 +422,7 @@ public class UserController {
         return "editProfile.html";
     }
 
+
     @PreAuthorize("#username == authentication.name or hasAuthority('ADMIN')")
     @PostMapping("/editProfile/{username}")
     public String editProfile(@PathVariable("username") String username,
@@ -497,9 +504,14 @@ public class UserController {
                 user.setUsername(user.getUsername());
             }
 
-            userRepository.save(user);
+            userRepository.saveAndFlush(user);
 
-            securityService.autoLogin(userForm.getUsername(), userForm.getPasswordConfirm());
+            System.out.println("\nUSERNAME: " + userForm.getUsername() + " PASSWORD: " + userForm.getPasswordConfirm() + "\n");
+            securityService.autoLogin(userForm.getUsername(), userForm.getPasswordConfirm(), req);
+
+            userDetails = req.getUserPrincipal();
+            user = userRepository.findByUsername(userDetails.getName());
+            model.addAttribute("sessionUser", user);
             model.addAttribute("user", user);
 
 
@@ -514,9 +526,11 @@ public class UserController {
         }
     }
 
-    @PreAuthorize("#username == authentication.name or hasAuthority('ADMIN')")
+    @PreAuthorize("#username == authentication.name")
     @GetMapping("/editPassword/{username}")
-    public String changePassword(@PathVariable(value = "username") String username, Model model, HttpServletRequest req) {
+    public String changePassword(@PathVariable(value = "username") String username,
+                                 @Valid @ModelAttribute("passwordUpdateForm") PasswordUpdate passwordUpdateForm,
+                                 Model model, HttpServletRequest req) {
 
         User sessionUser = null;
 
@@ -539,9 +553,12 @@ public class UserController {
         return "editPassword.html";
     }
 
-//    @PreAuthorize("#username == authentication.name or hasAuthority('ADMIN')")
-    @PostMapping("/editPassword")
-    public String editPassword(String username, String password, String newPassword, String newPasswordDuplicate,
+
+    @PreAuthorize("#username == authentication.name")
+    @PostMapping("/editPassword/{username}")
+    public String editPassword(@PathVariable("username") String username,
+                               @Valid @ModelAttribute("passwordUpdateForm") PasswordUpdate passwordUpdateForm,
+                               BindingResult bindingResult,
                                HttpServletResponse response, HttpServletRequest req, Model model)
             throws Exception {
 
@@ -555,10 +572,9 @@ public class UserController {
 
         //Determine if booking as admin
         User user = null;
-        if(isAdmin(sessionUser)){
+        if (isAdmin(sessionUser)) {
             user = userRepository.findByUsername(username);
-        }
-        else{
+        } else {
             user = sessionUser;
         }
         model.addAttribute("user", user);
@@ -568,35 +584,43 @@ public class UserController {
             userRoles.append(role.getName());
         }
 
-        if (password.equals(user.getPassword())) {
-
-            if (newPassword.equals(newPasswordDuplicate) && (!(newPassword.isEmpty()))) {
-                user.setPassword(newPassword);
-            } else {
-                model.addAttribute("error", "\nNew Password entries do not match, update denied.");
-                model.addAttribute("user", userSession.getUser());
-                LOGGER.warn("Password change rejected due to new password mismatch for user <" + user.getUsername() + "> with role of <" + userRoles + ">");
-
-                return "editPassword.html";
-            }
+        System.out.println("\n\nCURRENT: " + passwordUpdateForm.getCurrentPassword());
+        System.out.println("NEW: " + passwordUpdateForm.getNewPassword());
+        System.out.println("CONFIRM: " + passwordUpdateForm.getPasswordConfirm() + "\n\n");
 
 
-            userRepository.save(user);
-            model.addAttribute("user", userSession.getUser());
+        passwordValidator.validate(passwordUpdateForm, bindingResult);
 
+        if(bindingResult.hasErrors()){
+            return "editPassword.html";
+        }
+
+        bCryptPasswordEncoder = new BCryptPasswordEncoder(12);
+
+        if (bCryptPasswordEncoder.matches(passwordUpdateForm.getCurrentPassword(), user.getPassword()) &&
+                (passwordUpdateForm.getNewPassword().equals(passwordUpdateForm.getPasswordConfirm()))) {
+
+            //TODO create new hashed password here
+
+            user.setPassword(bCryptPasswordEncoder.encode(passwordUpdateForm.getNewPassword()));
+
+            userRepository.saveAndFlush(user);
             LOGGER.info("Password successfully changed by user <" + user.getUsername() + ">");
+            req.logout();
+            model.addAttribute("sessionUser", user);
+            model.addAttribute("user", user);
 
             return "viewProfile.html";
 
         } else {
-            System.out.println("\n\nPASSWORD FOUND TO BE INCORRECT\n\n");
-            model.addAttribute("user", userSession.getUser());
-            model.addAttribute("error", "\nIncorrect Password, alterations denied.");
-            LOGGER.warn("Incorrectly entered password for user <" + user.getUsername() + "> with role of <" + userRoles + ">");
-        }
+                    model.addAttribute("error", "\nNew Password entries do not match, update denied.");
+                    model.addAttribute("user", userSession.getUser());
+                    LOGGER.warn("Password change rejected due to new password mismatch for user <" + user.getUsername() + "> with role of <" + userRoles + ">");
 
-        return "editPassword.html";
+                    return "editPassword.html";
+        }
     }
+
 
     private boolean isAdmin(User sessionUser) {
         boolean isAdmin = false;
