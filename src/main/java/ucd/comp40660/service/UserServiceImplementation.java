@@ -55,6 +55,7 @@ public class UserServiceImplementation implements UserService {
 
     @Override
     public void guestSave(User user){
+        bCryptPasswordEncoder = new BCryptPasswordEncoder(12);
         user.setPassword(bCryptPasswordEncoder.encode(user.getPassword()));
         user.setAccountNonLocked(true);
         Role userRole = roleRepository.findByName("GUEST");

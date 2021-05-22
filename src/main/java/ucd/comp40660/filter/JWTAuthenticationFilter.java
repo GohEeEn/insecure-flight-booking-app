@@ -1,5 +1,7 @@
 package ucd.comp40660.filter;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -31,9 +33,12 @@ public class JWTAuthenticationFilter extends UsernamePasswordAuthenticationFilte
     @Autowired
     private final LoginFailureHandler loginFailureHandler;
 
+    private static final Logger LOGGER = LoggerFactory.getLogger(JWTAuthenticationFilter.class);
+
     public JWTAuthenticationFilter(AuthenticationManager authenticationManager,
                                    LoginSuccessfulHandler loginSuccessfulHandler,
                                    LoginFailureHandler loginFailureHandler){
+
         this.authenticationManager = authenticationManager;
         this.loginSuccessfulHandler = loginSuccessfulHandler;
         this.loginFailureHandler = loginFailureHandler;

@@ -11,8 +11,7 @@ import ucd.comp40660.user.model.User;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import static ucd.comp40660.filter.RegexConstants.NAME_REGEX;
-import static ucd.comp40660.filter.RegexConstants.PASSWORD_REGEX;
+import static ucd.comp40660.filter.RegexConstants.*;
 
 @Component
 public class UserValidator implements Validator {
@@ -45,10 +44,14 @@ public class UserValidator implements Validator {
         if ((!user.getPasswordConfirm().equals(user.getPassword())) ||
             (!isValid(user.getPassword(), PASSWORD_REGEX)) ||
             (user.getUsername().length() < 4 || user.getUsername().length() > 32) ||
-            (!isUserValid(user.getUsername())) ||
-            (userService.findByUsername(user.getUsername()) != null)
+            (!isUserValid(user.getUsername()))
         )
             errors.rejectValue("passwordConfirm", "Diff.userForm.passwordConfirm");
+
+        if((userService.findByUsername(user.getUsername()) != null) ||
+                (!isValid(user.getUsername(), USERNAME_REGEX))){
+            errors.rejectValue("username", "InvalidUsername");
+        }
     }
 
     public boolean isPasswordValid(String password) {
