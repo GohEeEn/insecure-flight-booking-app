@@ -16,10 +16,7 @@ public class CustomLogoutHandler implements LogoutHandler {
 
     @Override
     public void logout(HttpServletRequest request, HttpServletResponse response, Authentication authentication) {
-        User authUser = (User) authentication.getPrincipal();
 
-//        LOGGER.info("User <" + authUser.getUsername() + "> logged out successfully");
         LOGGER.info("User logged out successfully");
-
     }
 }

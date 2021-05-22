@@ -76,7 +76,12 @@ public class ReservationController {
             model.addAttribute("sessionUser", sessionUser);
         }
 
-        LOGGER.info("%s", "Get list of reservations called by <" +  sessionUser.getUsername() + "> with the role of <" + sessionUser.getRoles() + ">");
+        StringBuilder userRoles = new StringBuilder();
+        for (Role role : userRepository.findByUsername(sessionUser.getUsername()).getRoles()) {
+            userRoles.append(role.getName());
+        }
+
+        LOGGER.info("Get list of reservations called by <" +  sessionUser.getUsername() + "> with the role of <" + userRoles + ">");
         List<Reservation> reservations = reservationRepository.findAll();
         model.addAttribute("reservations", reservations);
 
@@ -277,6 +282,11 @@ public class ReservationController {
 //            LOGGER.info("%s", "List all users called by <" + sessionUser.getUsername() + "> with the role of <" + sessionUser.getRoles() + ">");
         }
 
+        StringBuilder userRoles = new StringBuilder();
+        for (Role role : userRepository.findByUsername(sessionUser.getUsername()).getRoles()) {
+            userRoles.append(role.getName());
+        }
+
         user = sessionUser;
         model.addAttribute("user", user);
 
@@ -289,7 +299,7 @@ public class ReservationController {
         LOGGER.info("Attempting to get Guest Info");
 
         Guest guest = guestRepository.findByEmail(email);
-        LOGGER.info("Flight ID: '%s', Guest: '%s %s' %s", flight.getFlightID(), guest.getName(), guest.getSurname(), guest.getEmail());
+        LOGGER.info(String.format("Flight ID: '%s', Guest: '%s %s %s'"), flight.getFlightID(), guest.getName(), guest.getSurname(), guest.getEmail());
 
 
         Reservation reservation = reservationRepository.findByGuestAndFlight(guest, flight);
@@ -299,7 +309,7 @@ public class ReservationController {
         flightRepository.saveAndFlush(flight);
 
         assert sessionUser != null;
-        LOGGER.info("%s", "Reservation cancelled with flight id = <" + flightID + "> by user <" + sessionUser.getUsername() + "> with the role of <" + sessionUser.getRoles() + ">");
+        LOGGER.info("Reservation cancelled with flight id = <" + flightID + "> by user <" + sessionUser.getUsername() + "> with the role of <" + userRoles + ">");
 
         response.sendRedirect("/");
 
