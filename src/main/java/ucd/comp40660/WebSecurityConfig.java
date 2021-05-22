@@ -23,10 +23,7 @@ import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 import org.springframework.web.util.UrlPathHelper;
-import ucd.comp40660.filter.JWTAuthenticationFilter;
-import ucd.comp40660.filter.JWTAuthorisationFilter;
-import ucd.comp40660.filter.LoginFailureHandler;
-import ucd.comp40660.filter.LoginSuccessfulHandler;
+import ucd.comp40660.filter.*;
 import ucd.comp40660.service.UserDetailsServiceImplementation;
 
 import javax.servlet.ServletException;
@@ -41,7 +38,7 @@ import static ucd.comp40660.filter.SecurityConstants.COOKIE_NAME;
 @EnableWebSecurity
 @EnableEncryptableProperties
 @EnableGlobalMethodSecurity(securedEnabled = true, prePostEnabled = true)
-public class WebSecurityConfig extends WebSecurityConfigurerAdapter{
+public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 
     @Qualifier("userDetailsServiceImplementation")
     @Autowired
@@ -77,8 +74,13 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter{
         return authProvider;
     }
 
+    @Bean
+    public CustomLogoutHandler customLogoutHandler() {
+        return new CustomLogoutHandler();
+    }
+
     public WebSecurityConfig(UserDetailsServiceImplementation userDetailsService, BCryptPasswordEncoder bCryptPasswordEncoder,
-                             LoginSuccessfulHandler loginSuccessfulHandler, LoginFailureHandler loginFailureHandler){
+                             LoginSuccessfulHandler loginSuccessfulHandler, LoginFailureHandler loginFailureHandler) {
         this.userDetailsService = userDetailsService;
         this.bCryptPasswordEncoder = bCryptPasswordEncoder;
         this.loginFailureHandler = loginFailureHandler;
@@ -117,18 +119,8 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter{
 //                .successForwardUrl("/")
                 .and()
                 .logout()
-                .logoutSuccessHandler(new LogoutSuccessHandler() {
-                    @Override
-                    public void onLogoutSuccess(HttpServletRequest httpServletRequest, HttpServletResponse httpServletResponse, Authentication authentication) throws IOException, ServletException {
-                        LOGGER.info("User logged out successfully.");
-
-                        UrlPathHelper helper = new UrlPathHelper();
-                        String context = helper.getContextPath(httpServletRequest);
-
-                        httpServletResponse.sendRedirect(context + "/login");
-                    }
-                })
                 .logoutUrl("/logout")           // Specify URL for logout
+                .addLogoutHandler(customLogoutHandler())
                 .invalidateHttpSession(true)        // Invalidate the session after logout
                 .clearAuthentication(true)          // Invalidate the authentication after logout
                 .deleteCookies(COOKIE_NAME)     // Delete the cookie containing the JWT after logout
