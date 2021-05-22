@@ -1,5 +1,6 @@
 package ucd.comp40660.filter;
 
+import lombok.SneakyThrows;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -9,6 +10,7 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.stereotype.Component;
 
@@ -51,6 +53,7 @@ public class JWTAuthenticationFilter extends UsernamePasswordAuthenticationFilte
         super.setAuthenticationManager(authenticationManager);
     }
 
+    @SneakyThrows
     @Override
     public Authentication attemptAuthentication(HttpServletRequest request, HttpServletResponse response) throws AuthenticationException {
 
@@ -58,11 +61,19 @@ public class JWTAuthenticationFilter extends UsernamePasswordAuthenticationFilte
             userDetailsService = FilterUtil.loadUserDetailsService(request);
         }
 
-        UserDetails userDetails = userDetailsService.loadUserByUsername(request.getParameter("username"));
-        UsernamePasswordAuthenticationToken usernamePasswordAuthenticationToken =
-                new UsernamePasswordAuthenticationToken(userDetails, request.getParameter("password"), userDetails.getAuthorities());
+        String username = request.getParameter("username");
+        UserDetails userDetails = userDetailsService.loadUserByUsername(username);
 
-        return authenticationManager.authenticate(usernamePasswordAuthenticationToken);
+        if(userDetails == null)
+            unsuccessfulAuthentication(request, response, new UsernameNotFoundException("Username <" + username + "> not found"));
+        else {
+            UsernamePasswordAuthenticationToken usernamePasswordAuthenticationToken =
+                    new UsernamePasswordAuthenticationToken(userDetails, request.getParameter("password"), userDetails.getAuthorities());
+
+            return authenticationManager.authenticate(usernamePasswordAuthenticationToken);
+        }
+
+        return null;
     }
 
     @Override
