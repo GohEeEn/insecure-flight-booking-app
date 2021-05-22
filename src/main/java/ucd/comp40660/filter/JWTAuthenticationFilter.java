@@ -26,13 +26,16 @@ import static com.auth0.jwt.algorithms.Algorithm.HMAC512;
 import static ucd.comp40660.filter.SecurityConstants.*;
 
 
-public class JWTAuthenticationFilter  extends UsernamePasswordAuthenticationFilter {
+public class JWTAuthenticationFilter extends UsernamePasswordAuthenticationFilter {
 
     @Autowired
     private AuthenticationManager authenticationManager;
 
     @Autowired
     private UserDetailsService userDetailsService;
+
+    @Autowired
+    private JWTAuthenticationFilter jwtAuthenticationFilter;
 
     private static final Logger LOGGER = LoggerFactory.getLogger(JWTAuthenticationFilter.class);
 
@@ -50,7 +53,6 @@ public class JWTAuthenticationFilter  extends UsernamePasswordAuthenticationFilt
         UserDetails userDetails = userDetailsService.loadUserByUsername(request.getParameter("username"));
         UsernamePasswordAuthenticationToken usernamePasswordAuthenticationToken =
                 new UsernamePasswordAuthenticationToken(userDetails, request.getParameter("password"), userDetails.getAuthorities());
-
         return authenticationManager.authenticate(usernamePasswordAuthenticationToken);
     }
 

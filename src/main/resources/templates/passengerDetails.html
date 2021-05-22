@@ -2,7 +2,7 @@
 
 <html lang="en" xmlns:th="http://www.thymeleaf.org">
 	<head>
-		<title>Passenger Detail</title>
+		<title>Passenger Details</title>
 
 		<div th:replace="fragments/header :: header-data"></div>
 	</head>
@@ -15,30 +15,49 @@
 			<div class="row">
 				<div class="col-8">
 					<h4>Enter Other Passenger Details</h4>
-					<form action="/processOtherPassengerDetails" method="post">
+					<form name="passenger_form" action="/processOtherPassengerDetails" method="post" th:object="${passengerForm}">
 						 <div class="form-row">
 						    <div class="form-group col-md-6">
-						      <label for="firstName">FirstName</label>
-						      <input type="text" class="form-control" id="firstName" placeholder="name" name="name" required>
-						    </div>
+						      <label for="name">First Name</label>
+						      <input type="text" class="form-control" placeholder="First Name" id="name" name="name" th:field="*{name}"
+									 oninput="passengerForenameValidator(document.passenger_form.name)" onkeydown="clearPassengerErrors()" required>
+								<label for="forename_validity"><span color="red" id="forename_validity"></span></label>
+								<span class="error" th:if="${#fields.hasErrors('name')}" th:errors="*{name}"></span>
+							</div>
+
 						    <div class="form-group col-md-6">
-						      <label for="lastName">LastName</label>
-						      <input type="text" class="form-control" id="lastName" placeholder="surname" name="surname" required>
-						    </div>
+						      <label for="surname">Last Name</label>
+						      <input type="text" class="form-control" id="surname" placeholder="Surname" name="surname"
+									 onkeyup="passengerSurnameValidator(document.passenger_form.surname)" onkeydown="clearPassengerErrors()" required>
+								<label for="surname_validity"><span color="red" id="surname_validity"></span></label>
+								<span class="error" th:if="${#fields.hasErrors('surname')}" th:errors="*{surname}"></span>
+							</div>
+
 						 </div>
 						 <div class="form-group">
-						    <label for="inputAddress">Address</label>
-						    <input type="text" class="form-control" id="inputAddress" placeholder="1234 Main St" name="address" required>
+						    <label for="address">Address</label>
+						    <input type="text" class="form-control" id="address" placeholder="Enter Home Address" name="address"
+								   onkeyup="passengerAddressValidator(document.passenger_form.address)" onkeydown="clearPassengerErrors()" required>
+						 	<label for="address_validity"><span color="red" id="address_validity"></span></label>
+						 	<span class="error" th:if="${#fields.hasErrors('address')}" th:errors="*{address}"></span>
 						 </div>
+
 						 <div class="form-row">
 						    <div class="form-group col-md-6">
-						      <label for="inputEmail">Email</label>
-						      <input type="email" class="form-control" id="inputEmail" placeholder="email@example.com" name="email" required>
+						  		<label for="email">Email</label>
+						      	<input type="email" class="form-control" id="email" placeholder="E-mail Address" name="email"
+									 onkeyup="passengerEmailValidator(document.passenger_form.email)" onkeydown="clearPassengerErrors()" required>
+								<label for="email_validity"><span color="red" id="email_validity"></span></label>
+								<span class="error" th:if="${#fields.hasErrors('email')}" th:errors="*{email}"></span>
+
 						    </div>
 						    <div class="form-group col-md-6">
-						      <label for="inputPhoneNumber">Phone Number</label>
-						      <input type="tel" class="form-control" id="inputPhoneNumber" placeholder="123-456-7890" name="phoneNumber" pattern="[0-9]{3}-[0-9]{3}-[0-9]{4}" required>
-						      <small>Format:123-456-7890</small>
+						      <label for="phone">Phone Number</label>
+						      <input type="tel" class="form-control" id="phone" placeholder="123-456-7890" name="phone" pattern="[0-9]{3}-[0-9]{3}-[0-9]{4}"
+									 onkeyup="passengerPhoneValidator(document.passenger_form.phone)" onkeydown="clearPassengerErrors()" required>
+								<label for="phone_validity"><span color="red" id="phone_validity"></span></label>
+								<span class="error" th:if="${#fields.hasErrors('phone')}" th:errors="*{phone}"></span>
+								<small>Format:123-456-7890</small>
 						    </div>
 						 </div>
 
