@@ -6,6 +6,28 @@
         <title>Login</title>
 
         <div th:replace="fragments/header :: header-data"></div>
+
+        <style>
+            .error {
+                padding: 15px;
+                margin-bottom: 20px;
+                border: 1px solid transparent;
+                border-radius: 4px;
+                color: #a94442;
+                background-color: #f2dede;
+                border-color: #ebccd1;
+            }
+
+            .msg {
+                padding: 15px;
+                margin-bottom: 20px;
+                border: 1px solid transparent;
+                border-radius: 4px;
+                color: #31708f;
+                background-color: #d9edf7;
+                border-color: #bce8f1;
+            }
+        </style>
     </head>
 
     <body>
@@ -13,13 +35,15 @@
 
         <div class="container">
 
-            <h2>Login</h2>
-
-            <div class="container">
-                <div th:if="${param.error}">
-                    <p class="text-danger">[[${session.SPRING_SECURITY_LAST_EXCEPTION.message}]]</p>
-                </div>
+            <div class="container" th:if="${not #strings.isEmpty(error)}">
+              <p class="error" th:text="${error}"></p>
             </div>
+
+            <div class="container" th:if="${not #strings.isEmpty(msg)}">
+                <p class="msg" th:text="${msg}"></p>
+            </div>
+
+            <h2>Login</h2>
 
             <form method="POST" action="/login">
 
@@ -36,14 +60,6 @@
                 <div class="custom-control custom-checkbox mb-3">
                     <input type="checkbox" onclick="showPassword()" class="custom-control-input" id="viewPwd">
                     <label class="custom-control-label" for="viewPwd">Show Password</label>
-                </div>
-
-                <div class="container">
-                    <span th:if="error != null">
-                      <div class="row">
-                          <p class="error" th:text="${error}"></p>
-                      </div>
-                    </span>
                 </div>
 
                 <button type="submit" class="btn btn-primary">Login</button>

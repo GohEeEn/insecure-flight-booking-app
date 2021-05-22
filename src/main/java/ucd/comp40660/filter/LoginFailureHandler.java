@@ -22,10 +22,13 @@ import java.io.IOException;
 import java.util.Date;
 import java.util.Optional;
 
+import static java.lang.String.*;
+import static ucd.comp40660.filter.SecurityConstants.SPRING_SECURITY_LAST_EXCEPTION;
+
 @Component
 public class LoginFailureHandler implements AuthenticationFailureHandler {
 
-    private static final Logger logger = LoggerFactory.getLogger(AuthenticationFailureHandler.class);
+    private static final Logger logger = LoggerFactory.getLogger(LoginFailureHandler.class);
 
     @Autowired
     private AttemptsRepository attemptsRepository;
@@ -40,11 +43,11 @@ public class LoginFailureHandler implements AuthenticationFailureHandler {
     @Override
     public void onAuthenticationFailure(HttpServletRequest request, HttpServletResponse response, AuthenticationException failed) throws IOException, ServletException {
 
-        System.out.println("Handle authentication failed found");
+//        System.out.println("Handle authentication failed found");
         String username = request.getParameter("username");
 
         // Load the User object to check if this user exist
-        User user = userRepository.findByUsername("vincent");
+        User user = userRepository.findByUsername(username);
 
         // Case if this user does not exist
         if(user == null) throw new UsernameNotFoundException("User <" + username + "> does not exist");
@@ -59,25 +62,28 @@ public class LoginFailureHandler implements AuthenticationFailureHandler {
             if (userAttempts.isEmpty()) {
                 Attempts attempts = new Attempts(username, new Date());
                 attemptsRepository.save(attempts);
+                logger.warn(String.format("%d times of failed login attempts by <%s>", attempts.getAttempts(), username));
+                failed = new BadCredentialsException("Invalid credentials. Please try again");
             } else {
                 Attempts attempts = userAttempts.get();
                 attempts.setAttempts(attempts.getAttempts() + 1);
                 attempts.setLastModified(new Date());
                 attemptsRepository.save(attempts);
-                logger.warn("The " + attempts.getAttempts() + " times of failed login attempts by <" + username + ">");
+                logger.warn(String.format("%d times of failed login attempts by <%s>", attempts.getAttempts(), username));
 
                 if (attempts.getAttempts() + 1 > ATTEMPTS_LIMIT) {
                     user.setAccountNonLocked(false);
                     userRepository.save(user);
-                    logger.warn("Failed login attempts by <" + username + "> exceeds the consecutive limits, thus lock the account for 20 minutes");
+                    logger.warn(String.format("Failed login attempts by <%s> exceeds the consecutive limits, thus lock the account for 20 minutes", username));
                     failed = new LockedException("Too many invalid attempts. Your account will be locked for 20 minutes");
-                }
+                } else
+                    failed = new BadCredentialsException("Invalid credentials. Please try again");
             }
 
         } else if(failed instanceof LockedException) {
 
             if(userAttempts.isEmpty())
-                logger.error("New failed login case by <" + username + "> somehow lock the account");
+                logger.error(String.format("New failed login case by <%s> somehow lock the account", username));
 
             else {
 
@@ -85,7 +91,8 @@ public class LoginFailureHandler implements AuthenticationFailureHandler {
 
                 // Handle the locked case
                 if(attempts.getAttempts() < ATTEMPTS_LIMIT) {
-                    logger.error("Failed login attempts with " + attempts.getAttempts() + " times by <" + username + "> somehow lock the account");
+                    logger.error(String.format("Failed login attempts with %d times by <%s> somehow lock the account", attempts.getAttempts(), username));
+
                 } else {
 
                     // Case if the account is locked
@@ -95,16 +102,20 @@ public class LoginFailureHandler implements AuthenticationFailureHandler {
                         if(attempts.getLastModified().getTime() + LOCK_TIME_DURATION < new Date().getTime()) {
                             user.setAccountNonLocked(true);
                             userRepository.save(user);
-                            logger.warn("User account <" + username + "> has been unlocked, login attempt can be done now");
+                            logger.warn(format("User account <%s> has been unlocked, login attempt can be done now", username));
+                            failed = new LockedException("Your account has been unlocked, please try again to login");
                         } else {
-                            logger.warn("User account <" + username + "> is still locked, login attempt cannot be done now until 20 minutes later");
+                            logger.warn(format("User account <%s> is still locked, login attempt cannot be done now until 20 minutes later", username));
+                            failed = new LockedException("Your account is still locked, try again after 20 minutes");
                         }
                     }
                 }
             }
         }
 
-//        super.unsuccessfulAuthentication(request, response, failed);
+        request.getSession().setAttribute(SPRING_SECURITY_LAST_EXCEPTION, failed);
+//        System.out.println("Done authentication failed handling");
+
         new DefaultRedirectStrategy().sendRedirect(request, response, "/login?error=true");
     }
 }

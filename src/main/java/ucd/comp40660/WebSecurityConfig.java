@@ -21,6 +21,7 @@ import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 import ucd.comp40660.filter.JWTAuthenticationFilter;
 import ucd.comp40660.filter.JWTAuthorisationFilter;
 import ucd.comp40660.filter.LoginFailureHandler;
+import ucd.comp40660.filter.LoginSuccessfulHandler;
 import ucd.comp40660.service.UserDetailsServiceImplementation;
 
 import java.util.Arrays;
@@ -38,7 +39,10 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter{
     private UserDetailsService userDetailsService;
 
     @Autowired
-    private LoginFailureHandler loginFailureHandler;
+    private final LoginSuccessfulHandler loginSuccessfulHandler;
+
+    @Autowired
+    private final LoginFailureHandler loginFailureHandler;
 
     private BCryptPasswordEncoder bCryptPasswordEncoder;
 
@@ -62,10 +66,12 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter{
         return authProvider;
     }
 
-    public WebSecurityConfig(UserDetailsServiceImplementation userDetailsService, BCryptPasswordEncoder bCryptPasswordEncoder, LoginFailureHandler loginFailureHandler){
+    public WebSecurityConfig(UserDetailsServiceImplementation userDetailsService, BCryptPasswordEncoder bCryptPasswordEncoder,
+                             LoginSuccessfulHandler loginSuccessfulHandler, LoginFailureHandler loginFailureHandler){
         this.userDetailsService = userDetailsService;
         this.bCryptPasswordEncoder = bCryptPasswordEncoder;
         this.loginFailureHandler = loginFailureHandler;
+        this.loginSuccessfulHandler = loginSuccessfulHandler;
     }
 
     @Override
@@ -92,7 +98,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter{
                 .and()
                 .formLogin()
                 .defaultSuccessUrl("/", true)     // The landing page after a successful login
-                .successHandler()
+                .successHandler(loginSuccessfulHandler)
                 .failureUrl("/login?error=true")                        // Landing page after an unsuccessful login
                 .failureHandler(loginFailureHandler)
                 .loginPage("/login").permitAll()                        // Specify URL for login
@@ -107,7 +113,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter{
                 .permitAll()
                 .and()
                 // Filtering by intercepting incoming requests and execute predefined methods
-                .addFilter(new JWTAuthenticationFilter(authenticationManager()))    // filter support authentication
+                .addFilter(new JWTAuthenticationFilter(authenticationManager(), loginSuccessfulHandler, loginFailureHandler))    // filter support authentication
                 .addFilter(new JWTAuthorisationFilter(authenticationManager()))     // filter support authorization
                 // Enforce stateless sessions : this disables session creation 0on Spring Security
                 .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS);
