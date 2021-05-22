@@ -6,6 +6,7 @@ import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.web.authentication.WebAuthenticationDetails;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -15,6 +16,7 @@ import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 import ucd.comp40660.flight.repository.FlightRepository;
 import ucd.comp40660.reservation.repository.ReservationRepository;
+import ucd.comp40660.service.EncryptionService;
 import ucd.comp40660.service.SecurityService;
 import ucd.comp40660.service.UserService;
 import ucd.comp40660.user.UserSession;
@@ -25,6 +27,7 @@ import ucd.comp40660.user.model.Role;
 import ucd.comp40660.user.model.User;
 import ucd.comp40660.user.repository.CreditCardRepository;
 import ucd.comp40660.user.repository.UserRepository;
+import ucd.comp40660.validator.ProfileUpdateValidator;
 import ucd.comp40660.validator.UserValidator;
 
 import javax.servlet.http.HttpServletRequest;
@@ -36,6 +39,7 @@ import java.sql.SQLIntegrityConstraintViolationException;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Objects;
 
 
 @Controller
@@ -62,6 +66,9 @@ public class UserController {
     UserValidator userValidator;
 
     @Autowired
+    ProfileUpdateValidator profileUpdateValidator;
+
+    @Autowired
     UserService userService;
 
     @Autowired
@@ -69,6 +76,10 @@ public class UserController {
 
     @Autowired
     SecurityService securityService;
+
+    @Autowired
+    BCryptPasswordEncoder bCryptPasswordEncoder;
+
 
 
     @GetMapping("/")
@@ -377,13 +388,16 @@ public class UserController {
 
     @PreAuthorize("#username == authentication.name or hasAuthority('ADMIN')")
     @GetMapping("/editProfile/{username}")
-    public String loadEditProfile(@PathVariable(value = "username") String username, Model model, HttpServletRequest req) {
+    public String loadEditProfile(@PathVariable(value = "username") String username,
+                                  @ModelAttribute("userForm") User userForm,
+                                  Model model, HttpServletRequest req) {
 
         User sessionUser = null;
 
         Principal userDetails = req.getUserPrincipal();
         if (userDetails != null) {
             sessionUser = userRepository.findByUsername(userDetails.getName());
+            System.out.println("EDIT PROFILE USER: " + sessionUser.getUsername());
             model.addAttribute("sessionUser", sessionUser);
         }
 
@@ -396,6 +410,7 @@ public class UserController {
             user = sessionUser;
         }
         model.addAttribute("user", user);
+        System.out.println("USER ASSIGNED: " + user.getUsername());
 
 //        model.addAttribute("user", userSession.getUser());
         return "editProfile.html";
@@ -403,8 +418,8 @@ public class UserController {
 
     @PreAuthorize("#username == authentication.name or hasAuthority('ADMIN')")
     @PostMapping("/editProfile/{username}")
-    public String editProfile(@PathVariable(value = "username") String username, String newName, String newSurname, String newPhone, String newEmail, String newAddress, String newCreditCardDetails,
-                              String newUsername, String password,
+    public String editProfile(@PathVariable("username") String username,
+                              @Valid @ModelAttribute("userForm") User userForm, BindingResult bindingResult,
                               HttpServletRequest req, Model model) throws Exception {
 
         User sessionUser = null;
@@ -416,7 +431,8 @@ public class UserController {
         }
 
         //Determine if booking as admin
-        User user = null;
+        User user;
+
         if(isAdmin(sessionUser)){
             user = userRepository.findByUsername(username);
         }
@@ -430,42 +446,49 @@ public class UserController {
             userRoles.append(role.getName());
         }
 
+        profileUpdateValidator.validate(userForm, bindingResult);
+
+        if(bindingResult.hasErrors()){
+            return "editProfile.html";
+        }
+
         LOGGER.info("Profile edited by user <" + user.getUsername() + "> with the role of <" + userRoles + ">");
 
-        if (password.equals(user.getPassword())) {
+        bCryptPasswordEncoder = new BCryptPasswordEncoder(12);
 
-            if (!(newName.isEmpty())) {
-                user.setName(newName);
+        if(bCryptPasswordEncoder.matches(userForm.getPasswordConfirm(), user.getPassword())){
+
+            if (!(userForm.getName().isEmpty())) {
+                user.setName(userForm.getName());
             } else {
                 user.setName(user.getName());
             }
-            if (!(newSurname.isEmpty())) {
-                user.setSurname(newSurname);
+            if (!(userForm.getSurname().isEmpty())) {
+                user.setSurname(userForm.getSurname());
             } else {
                 user.setSurname(user.getSurname());
             }
-            if (!(newAddress.isEmpty())) {
-                user.setAddress(newAddress);
+            if (!(userForm.getAddress().isEmpty())) {
+                user.setAddress(userForm.getAddress());
             } else {
                 user.setAddress(user.getAddress());
             }
-            if (!(newEmail.isEmpty())) {
-                user.setEmail(newEmail);
+            if (!(userForm.getEmail().isEmpty())) {
+                user.setEmail(userForm.getEmail());
             } else {
                 user.setEmail(user.getEmail());
             }
-            if (!(newPhone.isEmpty())) {
-                user.setPhone(newPhone);
+            if (!(userForm.getPhone().isEmpty())) {
+                user.setPhone(userForm.getPhone());
             } else {
                 user.setPhone(user.getPhone());
             }
-            if (!(newUsername.isEmpty())) {
+            if (!(userForm.getUsername().isEmpty())) {
 
-                if (!user.getUsername().equals(newUsername) && userService.findByUsername(newUsername) == null)
-                    user.setUsername(newUsername);
+                if (!user.getUsername().equals(userForm.getUsername()) && userService.findByUsername(userForm.getUsername()) == null)
+                    user.setUsername(userForm.getUsername());
                 else {
-                    System.out.println("\n\nINVALID USERNAME <" + newUsername + "> \n\n");
-                    model.addAttribute("user", userSession.getUser());
+                    System.out.println("\n\nINVALID USERNAME <" + userForm.getUsername() + "> \n\n");
                     model.addAttribute("error", "\nInvalid Username, alterations denied.");
                     return "editProfile.html";
                 }
@@ -476,13 +499,15 @@ public class UserController {
 
             userRepository.save(user);
 
-            model.addAttribute("user", userSession.getUser());
+            securityService.autoLogin(userForm.getUsername(), userForm.getPasswordConfirm());
+            model.addAttribute("user", user);
+
+
 
             return "viewProfile.html";
 
         } else {
             System.out.println("\n\nPASSWORD FOUND TO BE INCORRECT\n\n");
-            model.addAttribute("user", userSession.getUser());
             model.addAttribute("error", "\nIncorrect Password, alterations denied.");
             LOGGER.warn("Unsuccessful attempt of profile edit for user <" + user.getUsername() + "> with the role of <" + userRoles + ">");
             return "editProfile.html";
@@ -554,6 +579,7 @@ public class UserController {
 
                 return "editPassword.html";
             }
+
 
             userRepository.save(user);
             model.addAttribute("user", userSession.getUser());

@@ -100,7 +100,7 @@ public class FlightController {
     }
 
     //    Get all flights
-//    @PreAuthorize("hasAuthority('ADMIN')")
+    @PreAuthorize("hasAuthority('ADMIN')")
     @GetMapping("/flights")
     public String getAllFlights(HttpServletRequest req, Model model) {
         User sessionUser = null;
