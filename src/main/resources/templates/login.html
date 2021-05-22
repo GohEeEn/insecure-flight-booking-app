@@ -15,6 +15,12 @@
 
             <h2>Login</h2>
 
+            <div class="container">
+                <div th:if="${param.error}">
+                    <p class="text-danger">[[${session.SPRING_SECURITY_LAST_EXCEPTION.message}]]</p>
+                </div>
+            </div>
+
             <form method="POST" action="/login">
 
                 <div class="form-group">
@@ -43,6 +49,7 @@
                 <button type="submit" class="btn btn-primary">Login</button>
                 <a href="/register" class="btn btn-link">Register</a>
             </form>
+
             <div>
                 <form method="POST" action="/login">
                     <input type="hidden" id="password" name="password" value="password1234">

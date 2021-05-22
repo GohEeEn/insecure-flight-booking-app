@@ -20,6 +20,7 @@ import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 import ucd.comp40660.filter.JWTAuthenticationFilter;
 import ucd.comp40660.filter.JWTAuthorisationFilter;
+import ucd.comp40660.filter.LoginFailureHandler;
 import ucd.comp40660.service.UserDetailsServiceImplementation;
 
 import java.util.Arrays;
@@ -30,10 +31,14 @@ import static ucd.comp40660.filter.SecurityConstants.COOKIE_NAME;
 @EnableWebSecurity
 @EnableEncryptableProperties
 @EnableGlobalMethodSecurity(securedEnabled = true, prePostEnabled = true)
-public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
+public class WebSecurityConfig extends WebSecurityConfigurerAdapter{
+
     @Qualifier("userDetailsServiceImplementation")
     @Autowired
     private UserDetailsService userDetailsService;
+
+    @Autowired
+    private LoginFailureHandler loginFailureHandler;
 
     private BCryptPasswordEncoder bCryptPasswordEncoder;
 
@@ -57,9 +62,10 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
         return authProvider;
     }
 
-    public WebSecurityConfig(UserDetailsServiceImplementation userDetailsService, BCryptPasswordEncoder bCryptPasswordEncoder) {
+    public WebSecurityConfig(UserDetailsServiceImplementation userDetailsService, BCryptPasswordEncoder bCryptPasswordEncoder, LoginFailureHandler loginFailureHandler){
         this.userDetailsService = userDetailsService;
         this.bCryptPasswordEncoder = bCryptPasswordEncoder;
+        this.loginFailureHandler = loginFailureHandler;
     }
 
     @Override
@@ -74,8 +80,8 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
         // CSRF protection is automatically enabled by Spring Security to create a stateful session, while we are using stateless session here
         // thus it has to be disabled here
         http.cors().and().csrf().disable()
-//                .requiresChannel().anyRequest().requiresSecure()  // Require HTTPS Requests
-//                .and()
+                .requiresChannel().anyRequest().requiresSecure()        // Require HTTPS Requests
+                .and()
                 .authorizeRequests()
                 .antMatchers("/error", "/resources/**", "/img/**", "/css/**", "/js/**", "/login", "/register", "/").permitAll()
                 .antMatchers("/user").access("hasAnyAuthority('ADMIN','USER')")
@@ -85,15 +91,19 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
                 .anyRequest().authenticated()   // Authenticate all requests, with exception URL regexes mentioned above
                 .and()
                 .formLogin()
-                .defaultSuccessUrl("/", true)
-                //.successHandler(authenticationSuccessHandler)
-                .loginPage("/login")            // Specify URL for login
-                .permitAll()
-                .successForwardUrl("/")
+                .defaultSuccessUrl("/", true)     // The landing page after a successful login
+                .successHandler()
+                .failureUrl("/login?error=true")                        // Landing page after an unsuccessful login
+                .failureHandler(loginFailureHandler)
+                .loginPage("/login").permitAll()                        // Specify URL for login
+//                .loginProcessingUrl("/")                              // URL to submit the username and password to
+//                .successForwardUrl("/")
                 .and()
                 .logout()
-                .logoutUrl("/logout")           // Specify URL for logout
-                .deleteCookies(COOKIE_NAME)     // Delete the cookie containing the JWT after logout
+                .logoutUrl("/logout")               // Specify URL for logout
+                .invalidateHttpSession(true)        // Invalidate the session after logout
+                .clearAuthentication(true)          // Invalidate the authentication after logout
+                .deleteCookies(COOKIE_NAME)         // Delete the cookie containing the JWT after logout
                 .permitAll()
                 .and()
                 // Filtering by intercepting incoming requests and execute predefined methods
