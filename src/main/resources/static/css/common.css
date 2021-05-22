@@ -131,3 +131,15 @@ footer#page-footer {
 .dotsyle {
     color: white;
 }
+
+
+#button-container {
+    display: inline-block;
+}
+
+.horizontal-button {
+    display: inline-block;
+}
+/*.edit-button*/
+
+/*.delete-button*/

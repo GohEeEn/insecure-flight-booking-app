@@ -13,7 +13,7 @@
 
   <h2>Update Flight Details</h2>
 
-  <form th:action="@{/updateFlightInfo}" method="GET">
+  <form th:action="@{/updateFlightInfo}" method="post">
 
     <div>
       <input type="hidden" id="FLIGHTID" name="FLIGHTID" th:value="${FLIGHTID}">

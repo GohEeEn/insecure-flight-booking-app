@@ -202,8 +202,8 @@ public class FlightController {
                 .orElseThrow(() -> new FlightNotFoundException(flightID));
     }
 
-    @GetMapping("/updateFlight")
-    public String updateFlight(@ModelAttribute(value = "id") String flightID, Model model, HttpServletRequest req){
+    @PostMapping("/updateFlight")
+    public String updateFlight(@RequestParam Long flightID, Model model, HttpServletRequest req){
         User sessionUser = null;
 
         Principal userDetails = req.getUserPrincipal();
@@ -219,38 +219,85 @@ public class FlightController {
 
 
     //    Update flight details
-    @GetMapping("/updateFlightInfo")
-    public void updateFlightInfo(@RequestParam(value = "FLIGHTID") Long flightID, String source, String destination,  String departureDate, String departureTime,
-                               String arrivalDate, String arrivalTime, HttpServletResponse response, HttpServletRequest req) throws FlightNotFoundException, ParseException, IOException {
-        Flight flight = flightRepository.findById(flightID)
-                .orElseThrow(() -> new FlightNotFoundException(flightID));
+    @PostMapping("/updateFlightInfo")
+    public void updateFlightInfo(@RequestParam Long FLIGHTID, String source, String destination,  String departureDate, String departureTime,
+                               String arrivalDate, String arrivalTime, HttpServletResponse response, HttpServletRequest req, Model model) throws FlightNotFoundException, ParseException, IOException {
+        Flight flight = flightRepository.findById(FLIGHTID)
+                .orElseThrow(() -> new FlightNotFoundException(FLIGHTID));
 
         SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd HH:mm");
 
         Date dep = df.parse(departureDate + " " + departureTime);
         Date arr = df.parse(arrivalDate + " " + arrivalTime);
 
+
+
+        User sessionUser = null;
+
+        Principal userDetails = req.getUserPrincipal();
+        if (userDetails != null) {
+            sessionUser = userRepository.findByUsername(userDetails.getName());
+            model.addAttribute("sessionUser", sessionUser);
+        }
+
         StringBuilder userRoles = new StringBuilder();
-        for (Role role : userSession.getUser().getRoles()) {
+        for (Role role : sessionUser.getRoles()) {
             userRoles.append(role.getName());
         }
 
-        LOGGER.info("Called updateFlight() with id <" + flightID + "> by user <" + userSession.getUser().getUsername() + "> with the role of <" + userRoles + ">");
+
+//        LOGGER.info("Called updateFlight() with id <" + FLIGHTID + "> by user <" + sessionUser.getUsername() + "> with the role of <" + sessionUser.getRoles() + ">");
+        LOGGER.info("Called updateFlight() with id <" + FLIGHTID + "> by user <" + sessionUser.getUsername() + "> with the role of <" + userRoles + ">");
+
+
         flight.setSource(source);
         flight.setDestination(destination);
         flight.setArrivalDateTime(arr);
         flight.setDeparture_date_time(dep);
 
-        LOGGER.info("%s", "Called updateFlight() with id <" + flightID );
+        LOGGER.info("Called updateFlight() with id <" + FLIGHTID );
 
         flightRepository.saveAndFlush(flight);
 
         response.sendRedirect("/flights");
     }
 
+//    //    Delete a flight record
+//    @DeleteMapping(value = "/deleteFlight")
+//    public void deleteFlight(@RequestParam(value = "id") Long flightID, HttpServletResponse response) throws FlightNotFoundException, IOException {
+//        LOGGER.info("Flight ID: " + flightID);
+//
+//        Flight flight = flightRepository.findById(flightID)
+//                .orElseThrow(() -> new FlightNotFoundException(flightID));
+//
+//        flightRepository.delete(flight);
+//
+//        StringBuilder userRoles = new StringBuilder();
+//        for (Role role : userSession.getUser().getRoles()) {
+//            userRoles.append(role.getName());
+//        }
+//
+//        LOGGER.info("Called deleteFlight() with id <" + flightID + "> by user <" + userSession.getUser().getUsername() + "> with the role of <" + userRoles + ">");
+//
+//        response.sendRedirect("/flights");
+//    }
+
+
     //    Delete a flight record
-    @GetMapping(value = "/deleteFlight")
-    public void deleteFlight(@RequestParam(value = "id") Long flightID, HttpServletResponse response) throws FlightNotFoundException, IOException {
+    @PostMapping(value = "/deleteFlight")
+    public void deleteFlight( @RequestParam Long flightID, Model model, HttpServletRequest req ,HttpServletResponse response) throws FlightNotFoundException, IOException {
+        System.out.println("here:"+ flightID );
+
+        User sessionUser = null;
+
+        Principal userDetails = req.getUserPrincipal();
+        if (userDetails != null) {
+            sessionUser = userRepository.findByUsername(userDetails.getName());
+            model.addAttribute("sessionUser", sessionUser);
+        }
+
+
+//        Long flightID = flightNew.getFlightID();
         LOGGER.info("Flight ID: " + flightID);
 
         Flight flight = flightRepository.findById(flightID)
@@ -259,11 +306,16 @@ public class FlightController {
         flightRepository.delete(flight);
 
         StringBuilder userRoles = new StringBuilder();
-        for (Role role : userSession.getUser().getRoles()) {
+        for (Role role : sessionUser.getRoles()) {
             userRoles.append(role.getName());
         }
 
-        LOGGER.info("Called deleteFlight() with id <" + flightID + "> by user <" + userSession.getUser().getUsername() + "> with the role of <" + userRoles + ">");
+
+        LOGGER.info("Called deleteFlight() with id <" + flightID + "> by user <" + sessionUser.getUsername() + "> with the role of <" + userRoles + ">");
+
+        List<Flight> flights = flightRepository.findAll();
+        model.addAttribute("flights", flights);
+        model.addAttribute("sessionUser", sessionUser );
 
         response.sendRedirect("/flights");
     }

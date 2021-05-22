@@ -367,8 +367,8 @@ public class ReservationController {
     }
 
 
-    @GetMapping("/updateReservation")
-    public String updateReservation(@ModelAttribute(value = "id") String reservationID, Model model, HttpServletRequest req){
+    @PostMapping("/updateReservation")
+    public String updateReservation(@RequestParam String reservationID, Model model, HttpServletRequest req){
         User sessionUser = null;
 
         Principal userDetails = req.getUserPrincipal();
@@ -385,8 +385,8 @@ public class ReservationController {
 
 
 
-    @GetMapping("/updateReservationInfo")
-    public void updateReservationInfo(@RequestParam(value="reservationID") Long reservationID, String userDetails,
+    @PostMapping("/updateReservationInfo")
+    public void updateReservationInfo(@RequestParam Long reservationID, String userDetails,
                                      String flightID, HttpServletResponse response) throws IOException {
 
         Long flID = Long.parseLong(flightID);
@@ -425,8 +425,8 @@ public class ReservationController {
         response.sendRedirect("/reservations");
     }
 
-    @GetMapping("/deleteReservation")
-    public void updateReservationInfo(@RequestParam(value="id") Long reservationID, HttpServletResponse response)
+    @PostMapping("/deleteReservation")
+    public void updateReservationInfo(@RequestParam Long reservationID, HttpServletResponse response)
                                                                             throws ReservationNotFoundException, IOException{
 
         Reservation reservation = reservationRepository.findById(reservationID)
