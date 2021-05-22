@@ -8,6 +8,7 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Controller;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.ui.Model;
+import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.WebDataBinder;
 import org.springframework.web.bind.annotation.*;
 import ucd.comp40660.flight.exception.FlightNotFoundException;
@@ -23,6 +24,9 @@ import ucd.comp40660.user.repository.CreditCardRepository;
 import ucd.comp40660.user.repository.GuestRepository;
 import ucd.comp40660.user.repository.PassengerRepository;
 import ucd.comp40660.user.repository.UserRepository;
+import ucd.comp40660.validator.CreditCardValidator;
+import ucd.comp40660.validator.GuestValidator;
+import ucd.comp40660.validator.PassengerValidator;
 import ucd.comp40660.validator.UserValidator;
 
 import javax.persistence.Transient;
@@ -76,6 +80,15 @@ public class FlightController {
 
     @Autowired
     UserService userService;
+
+    @Autowired
+    CreditCardValidator creditCardValidator;
+
+    @Autowired
+    PassengerValidator passengerValidator;
+
+    @Autowired
+    GuestValidator guestValidator;
 
 
     Long temporaryFlightReference;
@@ -189,8 +202,8 @@ public class FlightController {
                 .orElseThrow(() -> new FlightNotFoundException(flightID));
     }
 
-    @GetMapping("/updateFlight")
-    public String updateFlight(@ModelAttribute(value = "id") String flightID, Model model, HttpServletRequest req){
+    @PostMapping("/updateFlight")
+    public String updateFlight(@RequestParam Long flightID, Model model, HttpServletRequest req){
         User sessionUser = null;
 
         Principal userDetails = req.getUserPrincipal();
@@ -206,38 +219,85 @@ public class FlightController {
 
 
     //    Update flight details
-    @GetMapping("/updateFlightInfo")
-    public void updateFlightInfo(@RequestParam(value = "FLIGHTID") Long flightID, String source, String destination,  String departureDate, String departureTime,
-                               String arrivalDate, String arrivalTime, HttpServletResponse response, HttpServletRequest req) throws FlightNotFoundException, ParseException, IOException {
-        Flight flight = flightRepository.findById(flightID)
-                .orElseThrow(() -> new FlightNotFoundException(flightID));
+    @PostMapping("/updateFlightInfo")
+    public void updateFlightInfo(@RequestParam Long FLIGHTID, String source, String destination,  String departureDate, String departureTime,
+                               String arrivalDate, String arrivalTime, HttpServletResponse response, HttpServletRequest req, Model model) throws FlightNotFoundException, ParseException, IOException {
+        Flight flight = flightRepository.findById(FLIGHTID)
+                .orElseThrow(() -> new FlightNotFoundException(FLIGHTID));
 
         SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd HH:mm");
 
         Date dep = df.parse(departureDate + " " + departureTime);
         Date arr = df.parse(arrivalDate + " " + arrivalTime);
 
+
+
+        User sessionUser = null;
+
+        Principal userDetails = req.getUserPrincipal();
+        if (userDetails != null) {
+            sessionUser = userRepository.findByUsername(userDetails.getName());
+            model.addAttribute("sessionUser", sessionUser);
+        }
+
         StringBuilder userRoles = new StringBuilder();
-        for (Role role : userSession.getUser().getRoles()) {
+        for (Role role : sessionUser.getRoles()) {
             userRoles.append(role.getName());
         }
 
-        LOGGER.info("Called updateFlight() with id <" + flightID + "> by user <" + userSession.getUser().getUsername() + "> with the role of <" + userRoles + ">");
+
+//        LOGGER.info("Called updateFlight() with id <" + FLIGHTID + "> by user <" + sessionUser.getUsername() + "> with the role of <" + sessionUser.getRoles() + ">");
+        LOGGER.info("Called updateFlight() with id <" + FLIGHTID + "> by user <" + sessionUser.getUsername() + "> with the role of <" + userRoles + ">");
+
+
         flight.setSource(source);
         flight.setDestination(destination);
         flight.setArrivalDateTime(arr);
         flight.setDeparture_date_time(dep);
 
-        LOGGER.info("%s", "Called updateFlight() with id <" + flightID );
+        LOGGER.info("Called updateFlight() with id <" + FLIGHTID );
 
         flightRepository.saveAndFlush(flight);
 
         response.sendRedirect("/flights");
     }
 
+//    //    Delete a flight record
+//    @DeleteMapping(value = "/deleteFlight")
+//    public void deleteFlight(@RequestParam(value = "id") Long flightID, HttpServletResponse response) throws FlightNotFoundException, IOException {
+//        LOGGER.info("Flight ID: " + flightID);
+//
+//        Flight flight = flightRepository.findById(flightID)
+//                .orElseThrow(() -> new FlightNotFoundException(flightID));
+//
+//        flightRepository.delete(flight);
+//
+//        StringBuilder userRoles = new StringBuilder();
+//        for (Role role : userSession.getUser().getRoles()) {
+//            userRoles.append(role.getName());
+//        }
+//
+//        LOGGER.info("Called deleteFlight() with id <" + flightID + "> by user <" + userSession.getUser().getUsername() + "> with the role of <" + userRoles + ">");
+//
+//        response.sendRedirect("/flights");
+//    }
+
+
     //    Delete a flight record
-    @GetMapping(value = "/deleteFlight")
-    public void deleteFlight(@RequestParam(value = "id") Long flightID, HttpServletResponse response) throws FlightNotFoundException, IOException {
+    @PostMapping(value = "/deleteFlight")
+    public void deleteFlight( @RequestParam Long flightID, Model model, HttpServletRequest req ,HttpServletResponse response) throws FlightNotFoundException, IOException {
+        System.out.println("here:"+ flightID );
+
+        User sessionUser = null;
+
+        Principal userDetails = req.getUserPrincipal();
+        if (userDetails != null) {
+            sessionUser = userRepository.findByUsername(userDetails.getName());
+            model.addAttribute("sessionUser", sessionUser);
+        }
+
+
+//        Long flightID = flightNew.getFlightID();
         LOGGER.info("Flight ID: " + flightID);
 
         Flight flight = flightRepository.findById(flightID)
@@ -246,11 +306,16 @@ public class FlightController {
         flightRepository.delete(flight);
 
         StringBuilder userRoles = new StringBuilder();
-        for (Role role : userSession.getUser().getRoles()) {
+        for (Role role : sessionUser.getRoles()) {
             userRoles.append(role.getName());
         }
 
-        LOGGER.info("Called deleteFlight() with id <" + flightID + "> by user <" + userSession.getUser().getUsername() + "> with the role of <" + userRoles + ">");
+
+        LOGGER.info("Called deleteFlight() with id <" + flightID + "> by user <" + sessionUser.getUsername() + "> with the role of <" + userRoles + ">");
+
+        List<Flight> flights = flightRepository.findAll();
+        model.addAttribute("flights", flights);
+        model.addAttribute("sessionUser", sessionUser );
 
         response.sendRedirect("/flights");
     }
@@ -413,7 +478,8 @@ public class FlightController {
 
 
     @GetMapping("/displayBookingPage")
-    public String guestBooking(Model model, HttpServletRequest req) {
+    public String guestBooking(Model model, @Valid @ModelAttribute("passengerForm") Passenger passengerForm,
+                               @Valid @ModelAttribute("cardForm") CreditCard cardForm, HttpServletRequest req) {
 
         User sessionUser = null;
 
@@ -446,23 +512,17 @@ public class FlightController {
     }
 
     @PostMapping("/processOtherPassengerDetails")
-    public void processOtherPassengerDetails(String name, String surname, String email, String phoneNumber, String address,
-                                             HttpServletResponse response, HttpServletRequest req) throws IOException {
-
-        Passenger passenger = new Passenger();
-
-        passenger.setName(name);
-        passenger.setSurname(surname);
-        passenger.setPhone(phoneNumber);
-        passenger.setAddress(address);
-        passenger.setEmail(email);
+    public String processOtherPassengerDetails(@Valid @ModelAttribute("passengerForm") Passenger passengerForm,
+                                               @Valid @ModelAttribute("cardForm") CreditCard cardForm, Model model,
+                                             HttpServletResponse response, HttpServletRequest req,
+                                               BindingResult bindingResult) throws IOException {
 
         User sessionUser = null;
 
         Principal userDetails = req.getUserPrincipal();
         if (userDetails != null) {
             sessionUser = userRepository.findByUsername(userDetails.getName());
-//            model.addAttribute("sessionUser", sessionUser);
+            model.addAttribute("sessionUser", sessionUser);
         }
 
         User user = null;
@@ -471,6 +531,20 @@ public class FlightController {
         } else {
             user = sessionUser;
         }
+
+        passengerValidator.validate(passengerForm, bindingResult);
+
+        if(bindingResult.hasErrors()){
+            return "passengerDetails.html";
+        }
+        Passenger passenger = new Passenger();
+
+        passenger.setName(passenger.getName());
+        passenger.setSurname(passenger.getSurname());
+        passenger.setPhone(passenger.getPhone());
+        passenger.setAddress(passenger.getAddress());
+        passenger.setEmail(passenger.getEmail());
+
 
 
 //        User user = userSession.getUser();
@@ -491,13 +565,22 @@ public class FlightController {
         }
 
         numberOfPassengers -= 1;
-        response.sendRedirect("/displayBookingPage");
+        if (numberOfPassengers > 1) {
+            return "passengerDetails.html";
+        } else if (isGuest(user)) {
+            return "bookingDetails.html";
+        } else {
+            model.addAttribute("cards", user.getCredit_cards());
+            return "displayPaymentPage.html";
+        }
 
     }
 
+    //TODO Validator implemetnation
     @PostMapping("/processGuestPersonalDetails")
-    public String processGuestPersonalDetails(String name, String surname, String email, String phoneNumber,
-                                              String address, Model model, HttpServletRequest req) {
+    public String processGuestPersonalDetails(@Valid @ModelAttribute("passengerForm") Guest passengerForm, Model model,
+                                              @Valid @ModelAttribute("cardForm") CreditCard cardForm,
+                                              HttpServletResponse response, HttpServletRequest req, BindingResult bindingResult) {
 
         User sessionUser = null;
 
@@ -516,19 +599,28 @@ public class FlightController {
         }
         model.addAttribute("user", user);
 
+        guestValidator.validate(passengerForm, bindingResult);
 
-        guest.setName(name);
-        guest.setSurname(surname);
-        guest.setEmail(email);
-        guest.setPhone(phoneNumber);
-        guest.setAddress(address);
+        if(bindingResult.hasErrors()){
+            return "bookingDetails.html";
+        }
+
+
+
+        guest.setName(passengerForm.getName());
+        guest.setSurname(passengerForm.getSurname());
+        guest.setEmail(passengerForm.getEmail());
+        guest.setPhone(passengerForm.getPhone());
+        guest.setAddress(passengerForm.getAddress());
 
 
         return "/displayPaymentPage";
     }
 
     @GetMapping("/displayPaymentPage")
-    public String displayPaymentPage(Model model, HttpServletRequest req) {
+    public String displayPaymentPage(@Valid @ModelAttribute("passengerForm") Guest passengerForm, Model model,
+                                     @Valid @ModelAttribute("cardForm") CreditCard cardForm,
+                                     HttpServletRequest req) {
 
         User user = null;
 
@@ -600,8 +692,8 @@ public class FlightController {
 
 
     @PostMapping("/processGuestPayment")
-    public String processGuestPayment(String cardholder_name, String card_number, String card_type, int expiration_month,
-                                    int expiration_year, String security_code,
+    public String processGuestPayment(@Valid @ModelAttribute("cardForm") CreditCard cardForm,
+                                      @Valid @ModelAttribute("passengerForm") Guest passengerForm, BindingResult bindingResult,
                                     HttpServletResponse response, HttpServletRequest req, Model model) throws IOException {
 
         User sessionUser = null;
@@ -621,9 +713,18 @@ public class FlightController {
         }
         model.addAttribute("user", user);
 
+        creditCardValidator.validate(cardForm, bindingResult);
+
+        if(bindingResult.hasErrors()){
+            return "bookingDetails.html";
+        }
+
+
         Reservation reservation = new Reservation();
 
-        CreditCard card = new CreditCard(cardholder_name, card_number, card_type, expiration_month, expiration_year, security_code);
+        CreditCard card = new CreditCard(cardForm.getCardholder_name(), cardForm.getCard_number(),
+                cardForm.getType(), cardForm.getExpiration_month(), cardForm.getExpiration_year(), cardForm.getSecurity_code());
+
         creditCardRepository.saveAndFlush(card);
 
         guestRepository.save(guest);

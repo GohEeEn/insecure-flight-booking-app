@@ -104,7 +104,7 @@ public class UserController {
         model.addAttribute("users", users);
 
         return "adminViewUsers.html";
-    }
+     }
 
     //    Get a single registration by id
 //    the id can be changed to any other attribute
@@ -149,8 +149,8 @@ public class UserController {
 
     //    Delete a registration record
     @PreAuthorize("#username == authentication.name or hasAuthority('ADMIN')")
-    @GetMapping("/user/delete/{username}")
-    public String deleteRegistration(@PathVariable(value = "username") String username, HttpServletRequest req) throws UserNotFoundException {
+    @PostMapping("/user/delete")
+    public void deleteRegistration(@RequestParam String username, HttpServletRequest req, HttpServletResponse response) throws UserNotFoundException, IOException {
         Principal userDetails = req.getUserPrincipal();
         User sessionUser = userRepository.findByUsername(userDetails.getName());
         User user = userRepository.findByUsername(username);
@@ -160,7 +160,9 @@ public class UserController {
 
         userRepository.delete(user);
 
-        LOGGER.info("Successfully deleted user registration for user <" + username + "> by admin <" + userSession.getUser().getUsername() + ">");
+        //TODO
+//        LOGGER.info("Successfully deleted user registration for user <" + username + "> by admin <" + userSession.getUser().getUsername() + ">");
+
 
         if (sessionUser.getUsername().equals(user.getUsername())) {
             userSession.setUser(null);
@@ -168,8 +170,36 @@ public class UserController {
 
         //TODO Possible Session management after account deletion?
 
-        return "index.html";
+//        return "index.html";
+        response.sendRedirect("/login");
+
     }
+
+//    //    Delete a registration record
+//    @PreAuthorize("#username == authentication.name or hasAuthority('ADMIN')")
+//    @DeleteMapping("/delete/{username}")
+//    public String deleteRegistration(@PathVariable(value = "username") String username, HttpServletRequest req) throws UserNotFoundException {
+//        Principal userDetails = req.getUserPrincipal();
+//        User sessionUser = userRepository.findByUsername(userDetails.getName());
+//        User user = userRepository.findByUsername(username);
+//
+////        User user = userRepository.findById(registrationID)
+////                .orElseThrow(() -> new UserNotFoundException(registrationID));
+//
+//        LOGGER.info("Successfully deleted user registration for user <" + username + "> by admin <" + userSession.getUser().getUsername() + ">");
+//
+//        userRepository.delete(user);
+//
+//        if (sessionUser.getUsername().equals(user.getUsername())) {
+//            userSession.setUser(null);
+//        }
+//
+//        return "index.html";
+//    }
+
+
+
+
 
     @GetMapping("/register")
     public String register(Model model, @ModelAttribute("userForm") User userForm, HttpServletResponse response) throws Exception {
