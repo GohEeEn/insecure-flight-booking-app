@@ -46,7 +46,7 @@ public class LoginFailureHandler implements AuthenticationFailureHandler {
 
     private static final int ATTEMPTS_LIMIT = 3;
 
-    private static final long LOCK_TIME_DURATION = 60000; // 1200000; // 20 minutes from milliseconds
+    private static final long LOCK_TIME_DURATION = 1200000; // 20 minutes in milliseconds
 
     private static final String USERNAME_PARAM = "username";
 

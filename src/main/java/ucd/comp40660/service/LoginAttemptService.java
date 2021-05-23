@@ -17,7 +17,8 @@ import java.util.concurrent.TimeUnit;
 public class LoginAttemptService {
 
     private static final Logger logger = LoggerFactory.getLogger(LoginAttemptService.class);
-    private static final int MAX_ATTEMPT = 3;
+
+    private static final int MAX_ATTEMPT = 5;
 
     private final LoadingCache<String, Integer> attemptsCache;
 
