@@ -93,6 +93,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter{
                 .and().csrf().ignoringAntMatchers("/h2-console/**")
                 .and().headers().frameOptions().sameOrigin();
 
+
         // Enable Cross Origin RequestS (cors) and disable Spring Boot CSRF protection
         // CSRF protection is automatically enabled by Spring Security to create a stateful session, while we are using stateless session here
         // thus it has to be disabled here
@@ -101,9 +102,9 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter{
                 .and()
                 .authorizeRequests()
                 .antMatchers("/error", "/resources/**", "/img/**", "/css/**", "/js/**", "/login", "/register", "/", "/guestRegister").permitAll()
-                .antMatchers("/user").access("hasAnyAuthority('ADMIN','USER')")
-                .antMatchers("/user/delete/").access("hasAnyAuthority('ADMIN','USER')")
-                .antMatchers("/editProfile").access("hasAuthority('USER')")
+                .antMatchers("/user").access("hasAnyAuthority('ADMIN','MEMBER')")
+                .antMatchers("/user/delete/", "/user/editProfile/").access("hasAnyAuthority('ADMIN','MEMBER')")
+                .antMatchers("/editProfile", "/editPassword").access("hasAuthority('MEMBER')")
                 .antMatchers("/admin", "/adminRegister", "/users").access("hasAuthority('ADMIN')")
                 .anyRequest().authenticated()   // Authenticate all requests, with exception URL regexes mentioned above
                 .and()

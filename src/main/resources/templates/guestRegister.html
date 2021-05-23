@@ -29,7 +29,8 @@
 
     <div class="form-group">
       <label for="username">Username</label>
-      <input id="username" class="form-control" type="text" name="username" placeholder="Username, must be at least 4 characters" th:field="*{username}" onkeydown="clearErrors()" autocomplete="username" required/>
+      <input id="username" class="form-control" type="text" name="username" placeholder="Username, must be at least 4 characters" th:field="*{username}"
+             onkeydown="clearErrors()" autocomplete="username" required/>
       <span class="error" th:if="${#fields.hasErrors('username')}" th:errors="*{username}"></span>
     </div>
 
