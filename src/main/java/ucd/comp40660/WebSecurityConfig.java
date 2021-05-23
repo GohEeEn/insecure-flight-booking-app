@@ -35,7 +35,7 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.util.Arrays;
 
-import static ucd.comp40660.filter.SecurityConstants.COOKIE_NAME;
+import static ucd.comp40660.filter.SecurityConstants.*;
 
 @Configuration
 @EnableWebSecurity
@@ -100,7 +100,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter{
                 .requiresChannel().anyRequest().requiresSecure()        // Require HTTPS Requests
                 .and()
                 .authorizeRequests()
-                .antMatchers("/error", "/resources/**", "/img/**", "/css/**", "/js/**", "/login", "/register", "/", "/guestRegister").permitAll()
+                .antMatchers("/error", "/resources/**", "/img/**", "/css/**", "/js/**", LOGIN_URL, "/register", "/", "/guestRegister").permitAll()
                 .antMatchers("/user").access("hasAnyAuthority('ADMIN','USER')")
                 .antMatchers("/user/delete/").access("hasAnyAuthority('ADMIN','USER')")
                 .antMatchers("/editProfile").access("hasAuthority('USER')")
@@ -110,9 +110,9 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter{
                 .formLogin()
                 .defaultSuccessUrl("/", true)     // The landing page after a successful login
                 .successHandler(loginSuccessfulHandler)
-                .failureUrl("/login?error=true")                        // Landing page after an unsuccessful login
+                .failureUrl(FAILED_LOGIN_URL)                        // Landing page after an unsuccessful login
                 .failureHandler(loginFailureHandler)
-                .loginPage("/login").permitAll()                        // Specify URL for login
+                .loginPage(LOGIN_URL).permitAll()                        // Specify URL for login
 //                .loginProcessingUrl("/")                              // URL to submit the username and password to
 //                .successForwardUrl("/")
                 .and()
@@ -125,12 +125,11 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter{
                         UrlPathHelper helper = new UrlPathHelper();
                         String context = helper.getContextPath(httpServletRequest);
 
-                        httpServletResponse.sendRedirect(context + "/login");
+                        httpServletResponse.sendRedirect(context + LOGIN_URL);
                     }
                 })
                 .logoutUrl("/logout")           // Specify URL for logout
-                .invalidateHttpSession(true)        // Invalidate the session after logout
-                .clearAuthentication(true)          // Invalidate the authentication after logout
+                .clearAuthentication(true)      // Invalidate the authentication after logout
                 .deleteCookies(COOKIE_NAME)     // Delete the cookie containing the JWT after logout
                 .permitAll()
                 .and()

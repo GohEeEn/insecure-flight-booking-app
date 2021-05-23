@@ -13,5 +13,7 @@ public final class SecurityConstants {
     public static final String COOKIE_NAME = "JWT";
     public static final String HEADER_STRING = "Authorization";
     public static final String SIGN_UP_URL = "/register";
+    public static final String LOGIN_URL = "/login";
+    public static final String FAILED_LOGIN_URL = "/login?error=true";
     public static final String SPRING_SECURITY_LAST_EXCEPTION = "SPRING_SECURITY_LAST_EXCEPTION";
 }

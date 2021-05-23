@@ -13,6 +13,7 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.stereotype.Component;
+import ucd.comp40660.user.exception.IpAddressLockedException;
 
 import javax.servlet.FilterChain;
 import javax.servlet.ServletException;
@@ -62,17 +63,20 @@ public class JWTAuthenticationFilter extends UsernamePasswordAuthenticationFilte
         }
 
         String username = request.getParameter("username");
-        UserDetails userDetails = userDetailsService.loadUserByUsername(username);
+        try {
+            UserDetails userDetails = userDetailsService.loadUserByUsername(username);
 
-        if(userDetails == null)
-            unsuccessfulAuthentication(request, response, new UsernameNotFoundException("Username <" + username + "> not found"));
-        else {
-            UsernamePasswordAuthenticationToken usernamePasswordAuthenticationToken =
-                    new UsernamePasswordAuthenticationToken(userDetails, request.getParameter("password"), userDetails.getAuthorities());
+            if (userDetails == null)
+                unsuccessfulAuthentication(request, response, new UsernameNotFoundException("Username <" + username + "> not found"));
+            else {
+                UsernamePasswordAuthenticationToken usernamePasswordAuthenticationToken =
+                        new UsernamePasswordAuthenticationToken(userDetails, request.getParameter("password"), userDetails.getAuthorities());
 
-            return authenticationManager.authenticate(usernamePasswordAuthenticationToken);
+                return authenticationManager.authenticate(usernamePasswordAuthenticationToken);
+            }
+        } catch(IpAddressLockedException error) {
+            unsuccessfulAuthentication(request, response, error);
         }
-
         return null;
     }
 

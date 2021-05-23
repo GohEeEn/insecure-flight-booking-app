@@ -30,6 +30,8 @@ import java.security.Principal;
 import java.util.Iterator;
 import java.util.List;
 
+import static ucd.comp40660.filter.SecurityConstants.LOGIN_URL;
+
 
 @Controller
 public class UserController {
@@ -171,7 +173,7 @@ public class UserController {
         //TODO Possible Session management after account deletion?
 
 //        return "index.html";
-        response.sendRedirect("/login");
+        response.sendRedirect(LOGIN_URL);
 
     }
 
