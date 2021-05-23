@@ -224,20 +224,21 @@ public class UserController {
 
 
     @GetMapping("/register")
-    public String register(Model model, @ModelAttribute("userForm") User userForm, HttpServletResponse response) throws Exception {
-        if (userSession.isLoginFailed()) {
-            model.addAttribute("error", "Unable to create account, passwords do not match");
-            userSession.setLoginFailed(false);
-        }
-        if (userSession.getUser() != null) {
-            response.sendRedirect("/logout");
-        }
+    public String register(Model model, @Valid @ModelAttribute("userForm") User userForm, HttpServletResponse response) throws Exception {
+//        if (userSession.isLoginFailed()) {
+//            model.addAttribute("error", "Unable to create account, passwords do not match");
+//            userSession.setLoginFailed(false);
+//        }
+//        if (userSession.getUser() != null) {
+//            response.sendRedirect("/logout");
+//        }
         return "register.html";
     }
 
     @PostMapping("/register")
     public String register(@Valid @ModelAttribute("userForm") User userForm, BindingResult bindingResult,
                            Model model, HttpServletRequest req) throws ServletException {
+
         userValidator.validate(userForm, bindingResult);
 
         if (bindingResult.hasErrors()) {

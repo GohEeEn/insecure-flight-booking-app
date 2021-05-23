@@ -20,8 +20,8 @@ public class UserDetailsServiceImplementation implements UserDetailsService {
     @Autowired
     private RoleRepository roleRepository;
 
-    @Autowired
-    private LoginAttemptService loginAttemptService;
+//    @Autowired
+//    private LoginAttemptService loginAttemptService;
 
     @Autowired
     private HttpServletRequest request;
@@ -32,9 +32,9 @@ public class UserDetailsServiceImplementation implements UserDetailsService {
 
         final String ip = getClientIP();
 
-        if (loginAttemptService.isBlocked(ip)) {
-            throw new RuntimeException("blocked");
-        }
+//        if (loginAttemptService.isBlocked(ip)) {
+//            throw new RuntimeException("blocked");
+//        }
 
         try {
             User user = userRepository.findByUsername(username);

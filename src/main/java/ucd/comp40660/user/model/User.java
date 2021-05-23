@@ -54,6 +54,7 @@ public class User {
     @NotBlank(message = "E-mail field must not be empty.")
     private String email;
 
+
     @NotBlank(message = "Address field must not be empty.")
     private String address;
 
@@ -85,6 +86,16 @@ public class User {
             inverseJoinColumns = @JoinColumn(name="role_id", referencedColumnName="id")
     )
     private Set<Role> roles = new HashSet<>();
+
+
+    public String getAddress() {
+        return address;
+    }
+
+    public void setAddress(String address) {
+        this.address = address;
+    }
+
 
     @Column(name = "account_non_locked")
     private boolean accountNonLocked;
