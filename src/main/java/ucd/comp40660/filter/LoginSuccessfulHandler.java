@@ -26,7 +26,7 @@ import static ucd.comp40660.filter.SecurityConstants.*;
 @Component
 public class LoginSuccessfulHandler implements AuthenticationSuccessHandler {
 
-    private static final Logger logger = LoggerFactory.getLogger(LoginFailureHandler.class);
+    private static final Logger logger = LoggerFactory.getLogger(LoginSuccessfulHandler.class);
 
     @Autowired
     private AttemptsRepository attemptsRepository;
@@ -34,14 +34,19 @@ public class LoginSuccessfulHandler implements AuthenticationSuccessHandler {
     @Override
     public void onAuthenticationSuccess(HttpServletRequest request, HttpServletResponse response, Authentication auth) throws IOException, ServletException {
 
-        // Reset the number of attempts if the authentication is success and there was failed attempt(s) before
-        Optional<Attempts> userAttempts = attemptsRepository.findAttemptsByUsername(auth.getName());
+        String username = auth.getName();
 
+        // Reset the number of attempts if the authentication is success and there was failed attempt(s) before
+        Optional<Attempts> userAttempts = attemptsRepository.findAttemptsByUsername(username);
+
+        // Reset the information for consecutive failed login attempts for certain account
         if(userAttempts.isPresent()) {
             Attempts attempts = userAttempts.get();
             attempts.setAttempts(0);
             attemptsRepository.save(attempts);
         }
+
+        logger.info(String.format("User <%s> logins successfully, and all previous failed attempts have been reset", username));
 
         String token = JWT.create()
                 .withSubject(((ACUserDetails) auth.getPrincipal()).getUsername())
@@ -51,9 +56,9 @@ public class LoginSuccessfulHandler implements AuthenticationSuccessHandler {
 
         addCookie(token, response);
 
-        new DefaultRedirectStrategy().sendRedirect(request, response, "/");
+        logger.info(String.format("Authentication token for <%s> has been created successfully", username));
 
-        System.out.println("Authentication approval handled successfully");
+        new DefaultRedirectStrategy().sendRedirect(request, response, "/");
     }
 
 
