@@ -54,7 +54,7 @@
 						    <div class="form-group col-md-6">
 						      <label for="phone">Phone Number</label>
 						      <input type="tel" class="form-control" id="phone" placeholder="123-456-7890" name="phone" pattern="[0-9]{3}-[0-9]{3}-[0-9]{4}"
-									 onkeyup="passengerPhoneValidator(document.passenger_form.phone)" onkeydown="clearPassengerErrors()" required>
+									 onchange="passengerPhoneValidator(document.profile_form.phone)" onkeydown="clearPassengerErrors()" required>
 								<label for="phone_validity"><span color="red" id="phone_validity"></span></label>
 								<span class="error" th:if="${#fields.hasErrors('phone')}" th:errors="*{phone}"></span>
 								<small>Format:123-456-7890</small>

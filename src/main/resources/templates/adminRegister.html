@@ -29,19 +29,22 @@
 
     <div class="form-group">
       <label for="username">Username</label>
-      <input id="username" class="form-control" type="text" name="username" placeholder="Username, must be at least 4 characters" th:field="*{username}" onkeydown="clearErrors()" autocomplete="username" required/>
+      <input id="username" class="form-control" type="text" name="username" placeholder="Username, must be at least 4 characters" th:field="*{username}"
+             onkeydown="clearErrors()" autocomplete="username" required/>
       <span class="error" th:if="${#fields.hasErrors('username')}" th:errors="*{username}"></span>
     </div>
 
     <div class="form-row">
       <div class="form-group col-md-6">
         <label for="password">Password</label>
-        <input id="password" class="form-control" type="password" name="password" placeholder="Password" onkeyup="CheckPasswordStrength(this.value)" onkeydown="clearErrors()" autocomplete="new-password" required/>
+        <input id="password" class="form-control" type="password" name="password" placeholder="Password"
+               onkeyup="CheckPasswordStrength(this.value)" onkeydown="clearErrors()" autocomplete="new-password" required/>
       </div>
 
       <div class="form-group col-md-6">
         <label for="passwordConfirm">Confirm Password</label>
-        <input id="passwordConfirm" class="form-control" type="password" name="passwordConfirm" placeholder="Confirm Password" th:field="*{passwordConfirm}" onkeydown="clearErrors()" autocomplete="new-password" required/>
+        <input id="passwordConfirm" class="form-control" type="password" name="passwordConfirm" placeholder="Confirm Password"
+               th:field="*{passwordConfirm}" onkeydown="clearErrors()" autocomplete="new-password" required/>
       </div>
     </div>
 
@@ -54,13 +57,15 @@
 
     <div class="form-group">
       <label for="phone">Phone Number</label>
-      <input id="phone" class="form-control" type="text" name="phone" placeholder="Phone Number" th:field="*{phone}" onkeydown="clearErrors()" required/>
+      <input id="phone" class="form-control" type="text" name="phone" placeholder="Phone Number" th:field="*{phone}"
+             onkeydown="clearErrors()" required/>
       <span class="error" th:if="${#fields.hasErrors('phone')}" th:errors="*{phone}"></span>
     </div>
 
     <div class="form-group">
       <label for="email">Email</label>
-      <input id="email" class="form-control" type="text" name="email" placeholder="E-mail Address" th:field="*{email}" onkeydown="clearErrors()" required/>
+      <input id="email" class="form-control" type="text" name="email" placeholder="E-mail Address" th:field="*{email}"
+             onkeydown="clearErrors()" required/>
       <span class="error" th:if="${#fields.hasErrors('email')}" th:errors="*{email}"></span>
     </div>
 
