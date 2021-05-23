@@ -735,8 +735,8 @@ public class FlightController {
 
         Reservation reservation = new Reservation();
 
-        CreditCard card = new CreditCard(cardForm.getCardholder_name(), cardForm.getCard_number(),
-                cardForm.getType(), cardForm.getExpiration_month(), cardForm.getExpiration_year(), cardForm.getSecurity_code());
+        CreditCard card = new CreditCard(EncryptionService.encrypt(cardForm.getCardholder_name()), EncryptionService.encrypt(cardForm.getCard_number()),
+                EncryptionService.encrypt(cardForm.getType()), cardForm.getExpiration_month(), cardForm.getExpiration_year(), EncryptionService.encrypt(cardForm.getSecurity_code()));
 
         creditCardRepository.saveAndFlush(card);
 
