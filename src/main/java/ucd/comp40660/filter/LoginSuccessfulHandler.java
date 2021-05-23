@@ -26,7 +26,7 @@ import static ucd.comp40660.filter.SecurityConstants.*;
 @Component
 public class LoginSuccessfulHandler implements AuthenticationSuccessHandler {
 
-    private static final Logger logger = LoggerFactory.getLogger(LoginFailureHandler.class);
+    private static final Logger logger = LoggerFactory.getLogger(LoginSuccessfulHandler.class);
 
     @Autowired
     private AttemptsRepository attemptsRepository;
@@ -34,9 +34,12 @@ public class LoginSuccessfulHandler implements AuthenticationSuccessHandler {
     @Override
     public void onAuthenticationSuccess(HttpServletRequest request, HttpServletResponse response, Authentication auth) throws IOException, ServletException {
 
-        // Reset the number of attempts if the authentication is success and there was failed attempt(s) before
-        Optional<Attempts> userAttempts = attemptsRepository.findAttemptsByUsername(auth.getName());
+        String username = auth.getName();
 
+        // Reset the number of attempts if the authentication is success and there was failed attempt(s) before
+        Optional<Attempts> userAttempts = attemptsRepository.findAttemptsByUsername(username);
+
+        // Reset the information for consecutive failed login attempts for certain account
         if(userAttempts.isPresent()) {
             Attempts attempts = userAttempts.get();
             attempts.setAttempts(0);
@@ -51,10 +54,8 @@ public class LoginSuccessfulHandler implements AuthenticationSuccessHandler {
 
         addCookie(token, response);
 
+        logger.info(String.format("User <%s> logins successfully, and all previous failed attempts have been reset", username));
         new DefaultRedirectStrategy().sendRedirect(request, response, "/");
-
-//        System.out.println("Authentication approval handled successfully");
-        logger.info("User <" + ((ACUserDetails) auth.getPrincipal()).getUser().getUsername() + "> logged in successfully");
     }
 
 

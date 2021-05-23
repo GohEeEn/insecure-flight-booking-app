@@ -5,6 +5,7 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import ucd.comp40660.user.exception.IpAddressLockedException;
 import ucd.comp40660.user.model.User;
 import ucd.comp40660.user.repository.RoleRepository;
 import ucd.comp40660.user.repository.UserRepository;
@@ -33,7 +34,7 @@ public class UserDetailsServiceImplementation implements UserDetailsService {
         final String ip = getClientIP();
 
         if (loginAttemptService.isBlocked(ip)) {
-            throw new RuntimeException("blocked");
+            throw new IpAddressLockedException(ip);
         }
 
         try {
