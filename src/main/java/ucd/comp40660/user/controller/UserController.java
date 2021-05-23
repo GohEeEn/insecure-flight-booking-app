@@ -584,11 +584,6 @@ public class UserController {
             userRoles.append(role.getName());
         }
 
-        System.out.println("\n\nCURRENT: " + passwordUpdateForm.getCurrentPassword());
-        System.out.println("NEW: " + passwordUpdateForm.getNewPassword());
-        System.out.println("CONFIRM: " + passwordUpdateForm.getPasswordConfirm() + "\n\n");
-
-
         passwordValidator.validate(passwordUpdateForm, bindingResult);
 
         if(bindingResult.hasErrors()){

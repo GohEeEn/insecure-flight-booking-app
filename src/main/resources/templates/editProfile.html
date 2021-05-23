@@ -15,47 +15,55 @@
 
             <h2>Edit Profile</h2>
 
-            <form method="POST" th:action="@{/editProfile/{username}(username=${user.getUsername()})}" th:object="${userForm}">
+            <form name="profile_form" method="POST" th:action="@{/editProfile/{username}(username=${user.getUsername()})}" th:object="${userForm}">
 
                 <div class="form-group">
                     <label for="name">First Name</label>
-                    <input id="name" class="form-control" type="text" name="name" placeholder="First Name" th:field="*{name}" onkeydown="clearErrors()" required/>
-                    <span class="error" th:if="${#fields.hasErrors('name')}" th:errors="*{name}" th:value="${user.name}"></span>
+                    <input type="text" class="form-control" placeholder="First Name" id="name" name="name" th:field="*{name}"
+                           oninput="passengerForenameValidator(document.profile_form.name)" onkeydown="clearPassengerErrors()" required/>
+                    <label for="forename_validity"><span color="red" id="forename_validity"></span></label>
+                    <span class="error" th:if="${#fields.hasErrors('name')}" th:errors="*{name}"></span>
                 </div>
 
                 <div class="form-group">
                     <label for="surname">Surname: </label>
-                    <input id="surname" class="form-control" type="text" name="surname" placeholder="Surname"
-                           th:field="*{surname}" onkeydown="clearErrors()" required/>
-                    <span class="error" th:if="${#fields.hasErrors('surname')}" th:errors="*{surname}" th:value="${user.surname}"></span>
+                    <input type="text" class="form-control" id="surname" placeholder="Surname" name="surname"
+                           onkeyup="passengerSurnameValidator(document.profile_form.surname)" onkeydown="clearPassengerErrors()" required/>
+                    <label for="surname_validity"><span color="red" id="surname_validity"></span></label>
+                    <span class="error" th:if="${#fields.hasErrors('surname')}" th:errors="*{surname}"></span>
                 </div>
 
                 <div class="form-group">
                     <label for="username">Username:</label>
                     <input id="username" class="form-control" type="text" name="username" placeholder="Username, must be at least 4 characters"
-                           th:field="*{username}" onkeydown="clearErrors()" autocomplete="username" required/>
+                           th:field="*{username}" onkeyup="checkUsername(document.profile_form.username)" onkeydown="clearErrors()" autocomplete="username" required/>
+                    <label for="username_validity"><span color="red" id="username_validity"></span></label>
                     <span class="error" th:if="${#fields.hasErrors('username')}" th:errors="*{username}"></span>
                 </div>
 
                 <div class="form-group">
                     <label for="phone">Phone: </label>
-                    <input id="phone" class="form-control" type="text" name="phone" placeholder="Phone Number"
-                           th:field="*{phone}" onkeydown="clearErrors()" required/>
-                    <span class="error" th:if="${#fields.hasErrors('phone')}" th:errors="*{phone}" th:value="${user.phone}"></span>
+                    <input type="tel" class="form-control" id="phone" placeholder="123-456-7890" name="phone"
+                           onkeyup="passengerPhoneValidator(document.profile_form.phone)" onkeydown="clearPassengerErrors()" required/>
+                    <label for="phone_validity"><span color="red" id="phone_validity"></span></label>
+                    <span class="error" th:if="${#fields.hasErrors('phone')}" th:errors="*{phone}"></span>
+                    <small>Format:123-456-7890</small>
                 </div>
 
                 <div class="form-group">
                     <label for="email">E-mail: </label>
-                    <input id="email" class="form-control" type="text" name="email" placeholder="E-mail Address"
-                           th:field="*{email}" onkeydown="clearErrors()" required/>
-                    <span class="error" th:if="${#fields.hasErrors('email')}" th:errors="*{email}" th:value="${user.email}"></span>
+                    <input type="email" class="form-control" id="email" placeholder="E-mail Address" name="email"
+                           onkeyup="passengerEmailValidator(document.profile_form.email)" onkeydown="clearPassengerErrors()" required/>
+                    <label for="email_validity"><span color="red" id="email_validity"></span></label>
+                    <span class="error" th:if="${#fields.hasErrors('email')}" th:errors="*{email}"></span>
                 </div>
 
                 <div class="form-group">
                     <label for="address">Address: </label>
-                    <input  type="text" name="address" placeholder="New Living Address"
-                           id="address" class="form-control"
-                           th:value="${user.address}" required/>
+                    <input type="text" class="form-control" id="address" placeholder="Enter Home Address" name="address"
+                           onkeyup="passengerAddressValidator(document.profile_form.address)" onkeydown="clearPassengerErrors()" required/>
+                    <label for="address_validity"><span color="red" id="address_validity"></span></label>
+                    <span class="error" th:if="${#fields.hasErrors('address')}" th:errors="*{address}"></span>
                 </div>
 
                 <div class="form-group">

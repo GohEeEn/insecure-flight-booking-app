@@ -1,10 +1,10 @@
 function passengerForenameValidator(name){
 
     let forename_validity = document.getElementById("forename_validity");
-    const nameRegex = /^[a-zA-Z]+(([',. -][a-zA-Z ])?[a-zA-Z]*)*$/
+    const nameRegex = /^[a-zA-Z]+(([',. -][a-zA-Z ])?[a-zA-Z]*)*$/;
 
     if(name.value.match(nameRegex)){
-        forename_validity.innerHTML = ""
+        forename_validity.innerHTML = "";
         return true;
     }
     else{
@@ -20,11 +20,11 @@ function passengerSurnameValidator(name){
     const nameRegex = /^[a-zA-Z]+(([',. -][a-zA-Z ])?[a-zA-Z]*)*$/
 
     if(name.value.match(nameRegex)){
-        surname_validity.innerHTML = ""
+        surname_validity.innerHTML = "";
         return true;
     }
     else{
-        surname_validity.innerHTML = "Invalid Name Given.";
+        surname_validity.innerHTML = "Invalid Surname Given.";
         surname_validity.style.color = "red";
         return false;
     }
@@ -37,7 +37,7 @@ function passengerAddressValidator(address){
     const addressRegex = /^[a-zA-Z]+(([',. -][a-zA-Z ])?[a-zA-Z]*)*$/;
 
     if(address.value.match(addressRegex)){
-        address_validity.innerHTML = ""
+        address_validity.innerHTML = "";
         return true;
     }
     else{
@@ -53,7 +53,7 @@ function passengerEmailValidator(email){
     const emailRegex = /^[a-zA-Z0-9_+&*-]+(?:\.[a-zA-Z0-9_+&*-]+)*@(?:[a-zA-Z0-9-]+\.)+[a-zA-Z]{2,7}$/
 
     if(email.value.match(emailRegex)){
-        email_validity.innerHTML = ""
+        email_validity.innerHTML = "";
         return true;
     }
     else{
@@ -69,11 +69,11 @@ function passengerPhoneValidator(phone){
     const phoneRegex = /^[0-9]{3}[-][0-9]{3}[-][0-9]{4}$/
 
     if(phone.value.match(phoneRegex)){
-        phone_validity.innerHTML = ""
+        phone_validity.innerHTML = "";
         return true;
     }
     else{
-        phone_validity.innerHTML = "Invalid Phone Given.";
+        phone_validity.innerHTML = "Invalid Phone Number Given.";
         phone_validity.style.color = "red";
         return false;
     }
