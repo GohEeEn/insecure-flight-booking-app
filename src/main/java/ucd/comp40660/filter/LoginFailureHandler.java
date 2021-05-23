@@ -27,7 +27,6 @@ import java.io.IOException;
 import java.util.Date;
 import java.util.Optional;
 
-import static java.lang.String.format;
 import static ucd.comp40660.filter.SecurityConstants.FAILED_LOGIN_URL;
 import static ucd.comp40660.filter.SecurityConstants.SPRING_SECURITY_LAST_EXCEPTION;
 
@@ -47,101 +46,164 @@ public class LoginFailureHandler implements AuthenticationFailureHandler {
 
     private static final int ATTEMPTS_LIMIT = 3;
 
-    private static final long LOCK_TIME_DURATION = 1200000; // 20 minutes from milliseconds
+    private static final long LOCK_TIME_DURATION = 60000; // 1200000; // 20 minutes from milliseconds
+
+    private static final String USERNAME_PARAM = "username";
 
     @Override
     public void onAuthenticationFailure(HttpServletRequest request, HttpServletResponse response, AuthenticationException failed) throws IOException, ServletException {
 
-//        System.out.println("Handle authentication failed found");
+        String username = request.getParameter(USERNAME_PARAM);
+
+        // Load the User object to check if this user exist
+        User user = userRepository.findByUsername(username);
+
+        // Failed login attempt with unknown username from certain IP address
+        if(user == null)
+            failed = ipBasedFailureHandler(username, request.getParameter("password"), failed);
+
+        // Failed login attempt with certain registered username
+        else
+            failed = accountBasedFailureHandler(user, failed);
+
+        request.getSession().setAttribute(SPRING_SECURITY_LAST_EXCEPTION, failed);
+
+        new DefaultRedirectStrategy().sendRedirect(request, response, FAILED_LOGIN_URL);
+    }
+
+    /**
+     * Prevent IP-based brute-force login attempts, ie. login attempt with incorrect username from certain IP address
+     * @param username
+     * @param password
+     * @param failed
+     * @return
+     */
+    private AuthenticationException ipBasedFailureHandler(String username, String password, AuthenticationException failed) {
 
         if(failed instanceof IpAddressLockedException) {
-            logger.warn(failed.getMessage());
+            logger.warn(String.format("Username <%s> not found", username));
+            failed = new UsernameNotFoundException("User <" + username + "> does not exist");
+
+        } else if(failed instanceof UsernameNotFoundException) {
+//            Authentication auth = new UsernamePasswordAuthenticationToken(username, password);
+//            applicationEventPublisher.publishEvent(new AuthenticationFailureBadCredentialsEvent(auth, failed));
+            createAuthFailureBadCredentialsEvent(username, password, failed);
+        }
+
+        return failed;
+    }
+
+    private void createAuthFailureBadCredentialsEvent(String username, String password, AuthenticationException failed) {
+        Authentication auth = new UsernamePasswordAuthenticationToken(username, password);
+        applicationEventPublisher.publishEvent(new AuthenticationFailureBadCredentialsEvent(auth, failed));
+    }
+
+    /**
+     * Prevent account-based brute-force login attempts, ie. login attempt with correct username but wrong password
+     * @param user
+     * @param failed
+     * @return
+     */
+    private AuthenticationException accountBasedFailureHandler(User user, AuthenticationException failed) {
+
+        String username = user.getUsername();
+
+        // Check if the account is locked
+        Optional<Attempts> userAttempts = attemptsRepository.findAttemptsByUsername(username);
+
+        // If the exception is about using incorrect credential
+        if (failed instanceof BadCredentialsException) {
+            return accountBasedFailureWithinLimit(user, userAttempts, failed);
+        } else if (failed instanceof LockedException) {
+            return accountBasedFailureExceedLimit(user, userAttempts, failed);
         } else {
+            logger.error(failed.getMessage());
+        }
 
-            String username = request.getParameter("username");
+        return failed;
+    }
 
-            // Load the User object to check if this user exist
-            User user = userRepository.findByUsername(username);
+    /**
+     * Handling of account-based login failure attempt when it is within the attempt limit.
+     * Tasks including increase the failed login attempts, and lock the account with it is more than the attempt limit
+     * @param user
+     * @param userAttempts
+     * @param failed
+     * @return
+     */
+    private AuthenticationException accountBasedFailureWithinLimit(User user, Optional<Attempts> userAttempts, AuthenticationException failed) {
 
-            // Case if this user does not exist
-            if (user == null) {
+        String username = user.getUsername();
 
-                logger.warn(String.format("Username <%s> not found", username));
-                failed = new UsernameNotFoundException("User <" + username + "> does not exist");
+        // New fail attempt
+        if (userAttempts.isEmpty()) {
+            Attempts attempts = new Attempts(username, new Date());
+            attemptsRepository.save(attempts);
+            logger.warn(String.format("%d times of failed login attempts by <%s>", attempts.getAttempts(), username));
+            failed = new BadCredentialsException("Invalid credentials. Please try again");
+        } else {
+            Attempts attempts = userAttempts.get();
+            attempts.setAttempts(attempts.getAttempts() + 1);
+            attempts.setLastModified(new Date());
+            attemptsRepository.save(attempts);
+            logger.warn(String.format("%d times of failed login attempts by <%s>", attempts.getAttempts(), username));
 
-                // Prevent IP-based brute-force login attempts
-                String password = request.getParameter("password");
-                Authentication auth = new UsernamePasswordAuthenticationToken(username, password);
-                applicationEventPublisher.publishEvent(new AuthenticationFailureBadCredentialsEvent(auth, failed));
+            if (attempts.getAttempts() + 1 > ATTEMPTS_LIMIT) {
+                user.setAccountNonLocked(false);
+                userRepository.save(user);
+                logger.warn(String.format("Failed login attempts by <%s> exceeds the consecutive limits, thus lock the account for 20 minutes", username));
+                failed = new LockedException("Too many invalid attempts. Your account will be locked for 20 minutes");
+            } else
+                failed = new BadCredentialsException("Invalid credentials. Please try again");
+        }
+
+        return failed;
+    }
+
+    /**
+     * Handling of account-based login failure attempt when it exceeds the attempt limit.
+     * It unlocks the account when the correct password is given after the lock time is over,
+     * but requires another correct login attempt in order to login successfully.
+     * Also, it denied the login attempt when it is still within the lock time
+     *
+     * @param user
+     * @param userAttempts
+     * @param failed
+     * @return
+     */
+    private AuthenticationException accountBasedFailureExceedLimit(User user, Optional<Attempts> userAttempts, AuthenticationException failed) {
+
+        String username = user.getUsername();
+
+        if (userAttempts.isEmpty())
+            logger.error(String.format("New failed login case by <%s> somehow lock the account", username));
+
+        else {
+
+            Attempts attempts = userAttempts.get();
+
+            if (attempts.getAttempts() < ATTEMPTS_LIMIT) {
+                logger.error(String.format("Failed login attempts with %d times by <%s> somehow lock the account", attempts.getAttempts(), username));
 
             } else {
 
-                // Check if the account is locked
-                Optional<Attempts> userAttempts = attemptsRepository.findAttemptsByUsername(username);
+                // Case if the account is locked
+                if (!user.getAccountNonLocked()) {
 
-                // If the exception is about using incorrect credential
-                if (failed instanceof BadCredentialsException) {
-
-                    // New fail attempt
-                    if (userAttempts.isEmpty()) {
-                        Attempts attempts = new Attempts(username, new Date());
-                        attemptsRepository.save(attempts);
-                        logger.warn(String.format("%d times of failed login attempts by <%s>", attempts.getAttempts(), username));
-                        failed = new BadCredentialsException("Invalid credentials. Please try again");
+                    // This account has exceed the allocated lock time
+                    if (attempts.getLastModified().getTime() + LOCK_TIME_DURATION < new Date().getTime()) {
+                        user.setAccountNonLocked(true);
+                        userRepository.save(user);
+                        logger.warn(String.format("User account <%s> has been unlocked with correct credential, login attempt can be done now", username));
+                        failed = new LockedException("Your account has been unlocked, please try again to login");
                     } else {
-                        Attempts attempts = userAttempts.get();
-                        attempts.setAttempts(attempts.getAttempts() + 1);
-                        attempts.setLastModified(new Date());
-                        attemptsRepository.save(attempts);
-                        logger.warn(String.format("%d times of failed login attempts by <%s>", attempts.getAttempts(), username));
-
-                        if (attempts.getAttempts() + 1 > ATTEMPTS_LIMIT) {
-                            user.setAccountNonLocked(false);
-                            userRepository.save(user);
-                            logger.warn(String.format("Failed login attempts by <%s> exceeds the consecutive limits, thus lock the account for 20 minutes", username));
-                            failed = new LockedException("Too many invalid attempts. Your account will be locked for 20 minutes");
-                        } else
-                            failed = new BadCredentialsException("Invalid credentials. Please try again");
-                    }
-
-                } else if (failed instanceof LockedException) {
-
-                    if (userAttempts.isEmpty())
-                        logger.error(String.format("New failed login case by <%s> somehow lock the account", username));
-
-                    else {
-
-                        Attempts attempts = userAttempts.get();
-
-                        // Handle the locked case
-                        if (attempts.getAttempts() < ATTEMPTS_LIMIT) {
-                            logger.error(String.format("Failed login attempts with %d times by <%s> somehow lock the account", attempts.getAttempts(), username));
-
-                        } else {
-
-                            // Case if the account is locked
-                            if (!user.getAccountNonLocked()) {
-
-                                // This account has exceed the allocated lock time
-                                if (attempts.getLastModified().getTime() + LOCK_TIME_DURATION < new Date().getTime()) {
-                                    user.setAccountNonLocked(true);
-                                    userRepository.save(user);
-                                    logger.warn(format("User account <%s> has been unlocked, login attempt can be done now", username));
-                                    failed = new LockedException("Your account has been unlocked, please try again to login");
-                                } else {
-                                    logger.warn(format("User account <%s> is still locked, login attempt cannot be done now until 20 minutes later", username));
-                                    failed = new LockedException("Your account is still locked, try again after 20 minutes");
-                                }
-                            }
-                        }
+                        logger.warn(String.format("User account <%s> is still locked, login attempt cannot be done now until 20 minutes later", username));
+                        failed = new LockedException("Your account is still locked, try again after 20 minutes");
                     }
                 }
             }
         }
 
-        request.getSession().setAttribute(SPRING_SECURITY_LAST_EXCEPTION, failed);
-//        System.out.println("Done authentication failed handling");
-
-        new DefaultRedirectStrategy().sendRedirect(request, response, FAILED_LOGIN_URL);
+        return failed;
     }
 }
