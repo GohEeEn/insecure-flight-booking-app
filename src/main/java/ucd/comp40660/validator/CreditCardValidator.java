@@ -10,12 +10,7 @@ import ucd.comp40660.user.model.CreditCard;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import static ucd.comp40660.filter.RegexConstants.NAME_REGEX;
-import static ucd.comp40660.filter.RegexConstants.SIMPLE_CREDIT_CARD_REGEX;
-import static ucd.comp40660.filter.RegexConstants.MONTH_REGEX;
-import static ucd.comp40660.filter.RegexConstants.YEAR_REGEX;
-import static ucd.comp40660.filter.RegexConstants.CVV_REGEX;
-
+import static ucd.comp40660.filter.RegexConstants.*;
 @Component
 public class CreditCardValidator implements Validator {
     @Override
@@ -28,7 +23,7 @@ public class CreditCardValidator implements Validator {
 
         CreditCard creditCard = (CreditCard) o;
 
-        if(!isValid(creditCard.getCardholder_name(), NAME_REGEX))
+        if(!isValid(creditCard.getCardholder_name(), FLIGHT_NAME_REGEX))
             errors.rejectValue("cardholder_name", "InvalidCreditCardName");
 
         if(!isValid(creditCard.getCard_number(), SIMPLE_CREDIT_CARD_REGEX))
