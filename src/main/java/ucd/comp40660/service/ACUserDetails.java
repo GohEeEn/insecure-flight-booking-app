@@ -34,6 +34,14 @@ public class ACUserDetails implements UserDetails {
         return authorities;
     }
 
+    public User getUser() {
+        return user;
+    }
+
+    public void setUser(User user) {
+        this.user = user;
+    }
+
     @Override
     public String getPassword() {
         return user.getPassword();
@@ -51,7 +59,15 @@ public class ACUserDetails implements UserDetails {
 
     @Override
     public boolean isAccountNonLocked() {
-        return true;
+        return user.getAccountNonLocked();
+    }
+
+    public boolean getAccountNonLocked() {
+        return user.getAccountNonLocked();
+    }
+
+    public void setAccountNonLocked(Boolean accountNonLocked) {
+        user.setAccountNonLocked(accountNonLocked);
     }
 
     @Override
@@ -63,5 +79,4 @@ public class ACUserDetails implements UserDetails {
     public boolean isEnabled() {
         return true;
     }
-
 }

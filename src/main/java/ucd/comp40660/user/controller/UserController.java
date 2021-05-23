@@ -10,6 +10,8 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.web.authentication.WebAuthenticationDetails;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
@@ -36,8 +38,6 @@ import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
 import java.io.IOException;
 import java.security.Principal;
-import java.sql.SQLIntegrityConstraintViolationException;
-import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Objects;
@@ -235,7 +235,6 @@ public class UserController {
         return "register.html";
     }
 
-
     @PostMapping("/register")
     public String register(@Valid @ModelAttribute("userForm") User userForm, BindingResult bindingResult,
                            Model model, HttpServletRequest req) throws ServletException {
@@ -334,42 +333,6 @@ public class UserController {
         return "index.html";
     }
 
-
-//    @PostMapping("/register")
-//    public String createUser(String name, String surname, String username, String phone, String address, String email,
-//                             String password, String passwordDuplicate, Model model) throws SQLIntegrityConstraintViolationException, IOException {
-//
-//        if (userRepository.existsByUsername(username)) {
-//            System.out.println("\n\nDUPLICATE USERNAME DETECTED\n\n");
-//            model.addAttribute("error", "Username already exists.");
-//            return "register.html";
-//        } else if (userRepository.existsByEmail(email)) {
-//            model.addAttribute("error", "E-mail address already in use.");
-//            return "register.html";
-//        } else if (userRepository.existsByPhone(phone)) {
-//            model.addAttribute("error", "Phone number already in use.");
-//            return "register.html";
-//        } else {
-//            if (password.equals(passwordDuplicate)) {
-//                User user = new User();
-//                user.setName(name);
-//                user.setSurname(surname);
-//                user.setUsername(username);
-//                user.setPhone(phone);
-//                user.setAddress(address);
-//                user.setEmail(email);
-//                user.setRole("MEMBER");
-//                user.setPassword(password);
-//                userRepository.save(user);
-//                userSession.setUser(user);
-//                return "index.html";
-//            } else {
-//                userSession.setLoginFailed(true);
-//                return "register.html";
-//            }
-//        }
-//    }
-
     @PreAuthorize("#username == authentication.name or hasAuthority('ADMIN')")
     @GetMapping("/viewProfile/{username}")
     public String viewProfile(@PathVariable(value = "username") String username, Model model, HttpServletRequest req) {
@@ -403,7 +366,6 @@ public class UserController {
         Principal userDetails = req.getUserPrincipal();
         if (userDetails != null) {
             sessionUser = userRepository.findByUsername(userDetails.getName());
-            System.out.println("EDIT PROFILE USER: " + sessionUser.getUsername());
             model.addAttribute("sessionUser", sessionUser);
         }
 
@@ -416,12 +378,10 @@ public class UserController {
             user = sessionUser;
         }
         model.addAttribute("user", user);
-        System.out.println("USER ASSIGNED: " + user.getUsername());
 
 //        model.addAttribute("user", userSession.getUser());
         return "editProfile.html";
     }
-
 
     @PreAuthorize("#username == authentication.name or hasAuthority('ADMIN')")
     @PostMapping("/editProfile/{username}")

@@ -1,32 +1,58 @@
 package ucd.comp40660.service;
 
-import ucd.comp40660.user.exception.UserNotFoundException;
-import ucd.comp40660.user.model.Role;
-import ucd.comp40660.user.model.User;
-import ucd.comp40660.user.repository.UserRepository;
-
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.core.GrantedAuthority;
-import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
-import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import ucd.comp40660.user.model.User;
+import ucd.comp40660.user.repository.RoleRepository;
+import ucd.comp40660.user.repository.UserRepository;
 
-import java.util.Collection;
-import java.util.HashSet;
-import java.util.Set;
+import javax.servlet.http.HttpServletRequest;
 
 @Service
-public class UserDetailsServiceImplementation implements UserDetailsService{
+public class UserDetailsServiceImplementation implements UserDetailsService {
+
     @Autowired
     private UserRepository userRepository;
 
+    @Autowired
+    private RoleRepository roleRepository;
+
+    @Autowired
+    private LoginAttemptService loginAttemptService;
+
+    @Autowired
+    private HttpServletRequest request;
+
     @Override
     @Transactional(readOnly = true)
-    public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-        User user = userRepository.findByUsername(username);
-        return new ACUserDetails(user);
+    public UserDetails loadUserByUsername(String username) {
+
+        final String ip = getClientIP();
+
+        if (loginAttemptService.isBlocked(ip)) {
+            throw new RuntimeException("blocked");
+        }
+
+        try {
+            User user = userRepository.findByUsername(username);
+
+            if (user == null) return null;
+
+            return new ACUserDetails(user);
+
+        } catch(final Exception e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    private String getClientIP() {
+        final String xfHeader = request.getHeader("X-Forwarded-For");
+        if (xfHeader != null) {
+            return xfHeader.split(",")[0];
+        }
+        return request.getRemoteAddr();
     }
 }
