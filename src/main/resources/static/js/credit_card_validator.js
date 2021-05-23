@@ -39,7 +39,7 @@ function yearValidator(expiration_year){
         return true;
     }
     else{
-        year_validity.innerHTML = 'Invalid Expiration Year Selected, year 2021 - 2039 required.';
+        year_validity.innerHTML = 'Invalid Expiration Year Selected, year 2021 - 2029 required.';
         year_validity.style.colour = "red";
         return false;
     }

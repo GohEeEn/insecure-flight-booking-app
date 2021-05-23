@@ -46,8 +46,6 @@ public class LoginSuccessfulHandler implements AuthenticationSuccessHandler {
             attemptsRepository.save(attempts);
         }
 
-        logger.info(String.format("User <%s> logins successfully, and all previous failed attempts have been reset", username));
-
         String token = JWT.create()
                 .withSubject(((ACUserDetails) auth.getPrincipal()).getUsername())
                 .withExpiresAt(new Date(System.currentTimeMillis() + EXPIRATION_TIME))
@@ -56,8 +54,7 @@ public class LoginSuccessfulHandler implements AuthenticationSuccessHandler {
 
         addCookie(token, response);
 
-        logger.info(String.format("Authentication token for <%s> has been created successfully", username));
-
+        logger.info(String.format("User <%s> logins successfully, and all previous failed attempts have been reset", username));
         new DefaultRedirectStrategy().sendRedirect(request, response, "/");
     }
 

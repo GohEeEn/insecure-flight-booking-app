@@ -2,6 +2,12 @@ package ucd.comp40660.user.controller;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.web.authentication.WebAuthenticationDetails;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -12,16 +18,21 @@ import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 import ucd.comp40660.flight.repository.FlightRepository;
 import ucd.comp40660.reservation.repository.ReservationRepository;
+import ucd.comp40660.service.EncryptionService;
 import ucd.comp40660.service.SecurityService;
+import ucd.comp40660.service.SecurityServiceImplementation;
 import ucd.comp40660.service.UserService;
 import ucd.comp40660.user.UserSession;
 import ucd.comp40660.user.exception.UserNotFoundException;
+import ucd.comp40660.user.model.*;
 import ucd.comp40660.user.model.Role;
-import ucd.comp40660.user.model.User;
 import ucd.comp40660.user.repository.CreditCardRepository;
 import ucd.comp40660.user.repository.UserRepository;
+import ucd.comp40660.validator.PasswordValidator;
+import ucd.comp40660.validator.ProfileUpdateValidator;
 import ucd.comp40660.validator.UserValidator;
 
+import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
@@ -29,6 +40,7 @@ import java.io.IOException;
 import java.security.Principal;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Objects;
 
 import static ucd.comp40660.filter.SecurityConstants.LOGIN_URL;
 
@@ -57,13 +69,23 @@ public class UserController {
     UserValidator userValidator;
 
     @Autowired
+    ProfileUpdateValidator profileUpdateValidator;
+
+    @Autowired
+    PasswordValidator passwordValidator;
+
+    @Autowired
     UserService userService;
 
     @Autowired
     protected AuthenticationManager authenticationManager;
 
     @Autowired
-    SecurityService securityService;
+    SecurityServiceImplementation securityService;
+
+    @Autowired
+    BCryptPasswordEncoder bCryptPasswordEncoder;
+
 
 
     @GetMapping("/")
@@ -217,7 +239,7 @@ public class UserController {
 
     @PostMapping("/register")
     public String register(@Valid @ModelAttribute("userForm") User userForm, BindingResult bindingResult,
-                           Model model, HttpServletRequest req) {
+                           Model model, HttpServletRequest req) throws ServletException {
         userValidator.validate(userForm, bindingResult);
 
         if (bindingResult.hasErrors()) {
@@ -226,8 +248,9 @@ public class UserController {
             return "register.html";
         }
 
+        String originalPassword = userForm.getPassword();
         userService.save(userForm);
-        securityService.autoLogin(userForm.getUsername(), userForm.getPasswordConfirm());
+        securityService.autoLogin(userForm.getUsername(), originalPassword, req);
 
         StringBuilder userRoles = new StringBuilder();
         for (Role role : userRepository.findByUsername(userForm.getUsername()).getRoles()) {
@@ -256,7 +279,7 @@ public class UserController {
 
     @PostMapping("/adminRegister")
     public String adminRegister(@Valid @ModelAttribute("userForm") User userForm, BindingResult bindingResult,
-                                Model model, HttpServletRequest req) {
+                                Model model, HttpServletRequest req) throws ServletException {
         userValidator.validate(userForm, bindingResult);
 
         if (bindingResult.hasErrors()) {
@@ -266,7 +289,8 @@ public class UserController {
 
         LOGGER.warn("New admin registered with username <" + userForm.getUsername() + ">");
         userService.adminSave(userForm);
-        securityService.autoLogin(userForm.getUsername(), userForm.getPasswordConfirm());
+        securityService.autoLogin(userForm.getUsername(), userForm.getPassword(), req);
+
 
         Principal userDetails = req.getUserPrincipal();
         User sessionUser = userRepository.findByUsername(userDetails.getName());
@@ -291,7 +315,7 @@ public class UserController {
 
     @PostMapping("/guestRegister")
     public String guestRegister(Model model, @ModelAttribute("userForm") User userForm,
-                                BindingResult bindingResult, HttpServletRequest req){
+                                BindingResult bindingResult, HttpServletRequest req) throws ServletException {
         userValidator.validate(userForm, bindingResult);
 
         if(bindingResult.hasErrors()){
@@ -300,7 +324,7 @@ public class UserController {
         }
 
         userService.guestSave(userForm);
-        securityService.autoLogin(userForm.getUsername(), userForm.getPasswordConfirm());
+        securityService.autoLogin(userForm.getUsername(), userForm.getPasswordConfirm(), req);
 
         Principal userDetails = req.getUserPrincipal();
         User sessionUser = userRepository.findByUsername(userDetails.getName());
@@ -335,7 +359,9 @@ public class UserController {
 
     @PreAuthorize("#username == authentication.name or hasAuthority('ADMIN')")
     @GetMapping("/editProfile/{username}")
-    public String loadEditProfile(@PathVariable(value = "username") String username, Model model, HttpServletRequest req) {
+    public String loadEditProfile(@PathVariable(value = "username") String username,
+                                  @ModelAttribute("userForm") User userForm,
+                                  Model model, HttpServletRequest req) {
 
         User sessionUser = null;
 
@@ -361,8 +387,8 @@ public class UserController {
 
     @PreAuthorize("#username == authentication.name or hasAuthority('ADMIN')")
     @PostMapping("/editProfile/{username}")
-    public String editProfile(@PathVariable(value = "username") String username, String newName, String newSurname,
-                              String newPhone, String newEmail, String newAddress, String newUsername, String password,
+    public String editProfile(@PathVariable("username") String username,
+                              @Valid @ModelAttribute("userForm") User userForm, BindingResult bindingResult,
                               HttpServletRequest req, Model model) throws Exception {
 
         User sessionUser = null;
@@ -374,7 +400,8 @@ public class UserController {
         }
 
         //Determine if booking as admin
-        User user = null;
+        User user;
+
         if(isAdmin(sessionUser)){
             user = userRepository.findByUsername(username);
         }
@@ -388,42 +415,49 @@ public class UserController {
             userRoles.append(role.getName());
         }
 
+        profileUpdateValidator.validate(userForm, bindingResult);
+
+        if(bindingResult.hasErrors()){
+            return "editProfile.html";
+        }
+
         LOGGER.info("Profile edited by user <" + user.getUsername() + "> with the role of <" + userRoles + ">");
 
-        if (password.equals(user.getPassword())) {
+        bCryptPasswordEncoder = new BCryptPasswordEncoder(12);
 
-            if (!(newName.isEmpty())) {
-                user.setName(newName);
+        if(bCryptPasswordEncoder.matches(userForm.getPasswordConfirm(), user.getPassword())){
+
+            if (!(userForm.getName().isEmpty())) {
+                user.setName(userForm.getName());
             } else {
                 user.setName(user.getName());
             }
-            if (!(newSurname.isEmpty())) {
-                user.setSurname(newSurname);
+            if (!(userForm.getSurname().isEmpty())) {
+                user.setSurname(userForm.getSurname());
             } else {
                 user.setSurname(user.getSurname());
             }
-            if (!(newAddress.isEmpty())) {
-                user.setAddress(newAddress);
+            if (!(userForm.getAddress().isEmpty())) {
+                user.setAddress(userForm.getAddress());
             } else {
                 user.setAddress(user.getAddress());
             }
-            if (!(newEmail.isEmpty())) {
-                user.setEmail(newEmail);
+            if (!(userForm.getEmail().isEmpty())) {
+                user.setEmail(userForm.getEmail());
             } else {
                 user.setEmail(user.getEmail());
             }
-            if (!(newPhone.isEmpty())) {
-                user.setPhone(newPhone);
+            if (!(userForm.getPhone().isEmpty())) {
+                user.setPhone(userForm.getPhone());
             } else {
                 user.setPhone(user.getPhone());
             }
-            if (!(newUsername.isEmpty())) {
+            if (!(userForm.getUsername().isEmpty())) {
 
-                if (!user.getUsername().equals(newUsername) && userService.findByUsername(newUsername) == null)
-                    user.setUsername(newUsername);
+                if (!user.getUsername().equals(userForm.getUsername()) && userService.findByUsername(userForm.getUsername()) == null)
+                    user.setUsername(userForm.getUsername());
                 else {
-                    System.out.println("\n\nINVALID USERNAME <" + newUsername + "> \n\n");
-                    model.addAttribute("user", userSession.getUser());
+                    System.out.println("\n\nINVALID USERNAME <" + userForm.getUsername() + "> \n\n");
                     model.addAttribute("error", "\nInvalid Username, alterations denied.");
                     return "editProfile.html";
                 }
@@ -432,24 +466,33 @@ public class UserController {
                 user.setUsername(user.getUsername());
             }
 
-            userRepository.save(user);
+            userRepository.saveAndFlush(user);
 
-            model.addAttribute("user", userSession.getUser());
+            System.out.println("\nUSERNAME: " + userForm.getUsername() + " PASSWORD: " + userForm.getPasswordConfirm() + "\n");
+            securityService.autoLogin(userForm.getUsername(), userForm.getPasswordConfirm(), req);
+
+            userDetails = req.getUserPrincipal();
+            user = userRepository.findByUsername(userDetails.getName());
+            model.addAttribute("sessionUser", user);
+            model.addAttribute("user", user);
+
+
 
             return "viewProfile.html";
 
         } else {
             System.out.println("\n\nPASSWORD FOUND TO BE INCORRECT\n\n");
-            model.addAttribute("user", userSession.getUser());
             model.addAttribute("error", "\nIncorrect Password, alterations denied.");
             LOGGER.warn("Unsuccessful attempt of profile edit for user <" + user.getUsername() + "> with the role of <" + userRoles + ">");
             return "editProfile.html";
         }
     }
 
-    @PreAuthorize("#username == authentication.name or hasAuthority('ADMIN')")
+    @PreAuthorize("#username == authentication.name")
     @GetMapping("/editPassword/{username}")
-    public String changePassword(@PathVariable(value = "username") String username, Model model, HttpServletRequest req) {
+    public String changePassword(@PathVariable(value = "username") String username,
+                                 @Valid @ModelAttribute("passwordUpdateForm") PasswordUpdate passwordUpdateForm,
+                                 Model model, HttpServletRequest req) {
 
         User sessionUser = null;
 
@@ -472,10 +515,13 @@ public class UserController {
         return "editPassword.html";
     }
 
-//    @PreAuthorize("#username == authentication.name or hasAuthority('ADMIN')")
-    @PostMapping("/editPassword")
-    public String editPassword(String username, String password, String newPassword, String newPasswordDuplicate,
-                               HttpServletRequest req, Model model)
+
+    @PreAuthorize("#username == authentication.name")
+    @PostMapping("/editPassword/{username}")
+    public String editPassword(@PathVariable("username") String username,
+                               @Valid @ModelAttribute("passwordUpdateForm") PasswordUpdate passwordUpdateForm,
+                               BindingResult bindingResult,
+                               HttpServletResponse response, HttpServletRequest req, Model model)
             throws Exception {
 
         User sessionUser = null;
@@ -488,10 +534,9 @@ public class UserController {
 
         //Determine if booking as admin
         User user = null;
-        if(isAdmin(sessionUser)){
+        if (isAdmin(sessionUser)) {
             user = userRepository.findByUsername(username);
-        }
-        else{
+        } else {
             user = sessionUser;
         }
         model.addAttribute("user", user);
@@ -501,45 +546,38 @@ public class UserController {
             userRoles.append(role.getName());
         }
 
-        BCryptPasswordEncoder bCryptPasswordEncoder = new BCryptPasswordEncoder(12);
+        passwordValidator.validate(passwordUpdateForm, bindingResult);
 
-        // Check if the current password matches given current password input
-        if (bCryptPasswordEncoder.matches(password, user.getPassword())) {
-
-            // Check if the new password matches the passwordConfirm
-            if (newPassword.equals(newPasswordDuplicate)) {
-
-                // Check if the new password matches the policy pattern
-                if(userValidator.isPasswordValid(newPassword)) {
-
-                    user.setPassword(newPassword);
-                    userRepository.save(user);
-                    model.addAttribute("user", userSession.getUser());
-
-                    LOGGER.info("Password successfully changed by user <" + user.getUsername() + ">");
-
-                    return "viewProfile.html";
-
-                } else {
-                    model.addAttribute("error", "\nInvalid password, update denied.");
-                    LOGGER.warn("Password change rejected due to invalid password by user <" + user.getUsername() + ">");
-                }
-
-            } else {
-                model.addAttribute("error", "\nNew Password entries do not match, update denied.");
-                model.addAttribute("user", userSession.getUser());
-                LOGGER.warn("Password change rejected due to new password mismatch for user <" + user.getUsername() + "> with role of <" + userRoles + ">");
-            }
-
-        } else {
-            System.out.println("\n\nPASSWORD FOUND TO BE INCORRECT, given : " + password + ", actual : " + user.getPassword() + "\n\n");
-            model.addAttribute("user", userSession.getUser());
-            model.addAttribute("error", "\nIncorrect Password, alterations denied.");
-            LOGGER.warn("Incorrectly entered password for user <" + user.getUsername() + "> with role of <" + userRoles + ">");
+        if(bindingResult.hasErrors()){
+            return "editPassword.html";
         }
 
-        return "editPassword.html";
+        bCryptPasswordEncoder = new BCryptPasswordEncoder(12);
+
+        if (bCryptPasswordEncoder.matches(passwordUpdateForm.getCurrentPassword(), user.getPassword()) &&
+                (passwordUpdateForm.getNewPassword().equals(passwordUpdateForm.getPasswordConfirm()))) {
+
+            //TODO create new hashed password here
+
+            user.setPassword(bCryptPasswordEncoder.encode(passwordUpdateForm.getNewPassword()));
+
+            userRepository.saveAndFlush(user);
+            LOGGER.info("Password successfully changed by user <" + user.getUsername() + ">");
+            req.logout();
+            model.addAttribute("sessionUser", user);
+            model.addAttribute("user", user);
+
+            return "viewProfile.html";
+
+        } else {
+                    model.addAttribute("error", "\nNew Password entries do not match, update denied.");
+                    model.addAttribute("user", userSession.getUser());
+                    LOGGER.warn("Password change rejected due to new password mismatch for user <" + user.getUsername() + "> with role of <" + userRoles + ">");
+
+                    return "editPassword.html";
+        }
     }
+
 
     private boolean isAdmin(User sessionUser) {
         boolean isAdmin = false;

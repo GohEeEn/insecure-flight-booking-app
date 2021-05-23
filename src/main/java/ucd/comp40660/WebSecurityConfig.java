@@ -23,10 +23,7 @@ import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 import org.springframework.web.util.UrlPathHelper;
-import ucd.comp40660.filter.JWTAuthenticationFilter;
-import ucd.comp40660.filter.JWTAuthorisationFilter;
-import ucd.comp40660.filter.LoginFailureHandler;
-import ucd.comp40660.filter.LoginSuccessfulHandler;
+import ucd.comp40660.filter.*;
 import ucd.comp40660.service.UserDetailsServiceImplementation;
 
 import javax.servlet.ServletException;
@@ -41,7 +38,7 @@ import static ucd.comp40660.filter.SecurityConstants.*;
 @EnableWebSecurity
 @EnableEncryptableProperties
 @EnableGlobalMethodSecurity(securedEnabled = true, prePostEnabled = true)
-public class WebSecurityConfig extends WebSecurityConfigurerAdapter{
+public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 
     @Qualifier("userDetailsServiceImplementation")
     @Autowired
@@ -77,8 +74,13 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter{
         return authProvider;
     }
 
+    @Bean
+    public CustomLogoutHandler customLogoutHandler() {
+        return new CustomLogoutHandler();
+    }
+
     public WebSecurityConfig(UserDetailsServiceImplementation userDetailsService, BCryptPasswordEncoder bCryptPasswordEncoder,
-                             LoginSuccessfulHandler loginSuccessfulHandler, LoginFailureHandler loginFailureHandler){
+                             LoginSuccessfulHandler loginSuccessfulHandler, LoginFailureHandler loginFailureHandler) {
         this.userDetailsService = userDetailsService;
         this.bCryptPasswordEncoder = bCryptPasswordEncoder;
         this.loginFailureHandler = loginFailureHandler;
@@ -93,6 +95,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter{
                 .and().csrf().ignoringAntMatchers("/h2-console/**")
                 .and().headers().frameOptions().sameOrigin();
 
+
         // Enable Cross Origin RequestS (cors) and disable Spring Boot CSRF protection
         // CSRF protection is automatically enabled by Spring Security to create a stateful session, while we are using stateless session here
         // thus it has to be disabled here
@@ -101,9 +104,9 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter{
                 .and()
                 .authorizeRequests()
                 .antMatchers("/error", "/resources/**", "/img/**", "/css/**", "/js/**", LOGIN_URL, "/register", "/", "/guestRegister").permitAll()
-                .antMatchers("/user").access("hasAnyAuthority('ADMIN','USER')")
-                .antMatchers("/user/delete/").access("hasAnyAuthority('ADMIN','USER')")
-                .antMatchers("/editProfile").access("hasAuthority('USER')")
+                .antMatchers("/user").access("hasAnyAuthority('ADMIN','MEMBER')")
+                .antMatchers("/user/delete/", "/user/editProfile/").access("hasAnyAuthority('ADMIN','MEMBER')")
+                .antMatchers("/editProfile", "/editPassword").access("hasAuthority('MEMBER')")
                 .antMatchers("/admin", "/adminRegister", "/users").access("hasAuthority('ADMIN')")
                 .anyRequest().authenticated()   // Authenticate all requests, with exception URL regexes mentioned above
                 .and()
@@ -113,23 +116,11 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter{
                 .failureUrl(FAILED_LOGIN_URL)                        // Landing page after an unsuccessful login
                 .failureHandler(loginFailureHandler)
                 .loginPage(LOGIN_URL).permitAll()                        // Specify URL for login
-//                .loginProcessingUrl("/")                              // URL to submit the username and password to
-//                .successForwardUrl("/")
                 .and()
                 .logout()
-                .logoutSuccessHandler(new LogoutSuccessHandler() {
-                    @Override
-                    public void onLogoutSuccess(HttpServletRequest httpServletRequest, HttpServletResponse httpServletResponse, Authentication authentication) throws IOException, ServletException {
-                        LOGGER.info("User logged out successfully.");
-
-                        UrlPathHelper helper = new UrlPathHelper();
-                        String context = helper.getContextPath(httpServletRequest);
-
-                        httpServletResponse.sendRedirect(context + LOGIN_URL);
-                    }
-                })
                 .logoutUrl("/logout")           // Specify URL for logout
-                .clearAuthentication(true)      // Invalidate the authentication after logout
+                .addLogoutHandler(customLogoutHandler())
+                .clearAuthentication(true)          // Invalidate the authentication after logout
                 .deleteCookies(COOKIE_NAME)     // Delete the cookie containing the JWT after logout
                 .permitAll()
                 .and()
