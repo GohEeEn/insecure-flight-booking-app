@@ -53,7 +53,8 @@ public class LoginSuccessfulHandler implements AuthenticationSuccessHandler {
 
         new DefaultRedirectStrategy().sendRedirect(request, response, "/");
 
-        System.out.println("Authentication approval handled successfully");
+//        System.out.println("Authentication approval handled successfully");
+        logger.info("User <" + ((ACUserDetails) auth.getPrincipal()).getUser().getUsername() + "> logged in successfully");
     }
 
 
