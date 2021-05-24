@@ -111,7 +111,7 @@ public class JWTAuthorisationFilter extends BasicAuthenticationFilter {
                 jwtTokenService = FilterUtil.loadJwtTokenService(request);
             }
 
-            if(jwtTokenService.validateToken(token)){
+            if(jwtTokenService.isValidToken(token)){
 
                 if(userDetailsService == null){
                     userDetailsService = FilterUtil.loadUserDetailsService(request);

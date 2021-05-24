@@ -40,15 +40,6 @@ public class JwtTokenService {
         return jwtTokenRepository.findByJwtToken(token).getExpirationDate();
     }
 
-//    public List<String> getRoles(String token) {
-//        return getClaimFromToken(token, claims -> (List) claims.get(ROLES));
-//    }
-
-//    public <T> T getClaimFromToken(String token, Function<Claims, T> claimsResolver) {
-//        final Claims claims = getAllClaimsFromToken(token);
-//        return claimsResolver.apply(claims);
-//    }
-
     /**
      * Check if the token has expired
      * @param token
@@ -94,40 +85,20 @@ public class JwtTokenService {
     }
 
     /**
-     * While creating the token :<br/>
-     * 1. Define  claims of the token, like Issuer, Expiration, Subject, and the ID<br/>
-     * 2. Sign the JWT using the HS512 algorithm and secret key.<br/>
-     * 3. According to JWS Compact Serialization (https://tools.ietf.org/html/draft-ietf-jose-json-web-signature-41#section-3.1)
-     *    compaction of the JWT to a URL-safe string<br/>
-     *
-     * @param claims
-     * @param subject
-     * @return
-     */
-//    private String generateToken(Map<String, Object> claims, String subject) {
-//        final long now = System.currentTimeMillis();
-//        return Jwts.builder()
-//                .setClaims(claims)
-//                .setSubject(subject)
-//                .setIssuedAt(new Date(now))
-//                .setExpiration(new Date(now + JWT_TOKEN_VALIDITY * 1000))
-//                .signWith(SignatureAlgorithm.HS512, secret).compact();
-//    }
-
-    /**
      * Validate token by checking if the token belongs to certain user or it has not expired yet
      * or the user using this token has not logout yet
      *
      * @param token
      * @return
      */
-    public Boolean validateToken(String token) {
+    public Boolean isValidToken(String token) {
 
         final boolean with_username = getUsernameFromToken(token) != null;
         final boolean has_logout = isUserLogout(token);
 
         if(!with_username) log.warn("Username not found in the given JWT token");
         if(has_logout) log.warn("This JWT token has been used by a logout user");
+
         return with_username && !has_logout;
     }
 }
