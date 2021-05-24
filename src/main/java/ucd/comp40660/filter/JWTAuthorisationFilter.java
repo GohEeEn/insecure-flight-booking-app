@@ -47,10 +47,14 @@ public class JWTAuthorisationFilter extends BasicAuthenticationFilter {
         Cookie[] cookies = request.getCookies();
         String token = null;
 
+        Cookie jwtCookie = null;
+
         if(cookies != null) {
             for (Cookie cookie : cookies) {
                 if (cookie.getName().equals(COOKIE_NAME)) {
+                    jwtCookie = cookie;
                     token = cookie.getValue();
+                    break;
                 }
             }
         }
@@ -63,15 +67,15 @@ public class JWTAuthorisationFilter extends BasicAuthenticationFilter {
 
         UsernamePasswordAuthenticationToken authentication = getAuthentication(request, token);
 
+        // Delete the invalid cookie from the response and the web browser
         if(authentication == null) {
-            Cookie cookie = new Cookie(COOKIE_NAME, null);
-            cookie.setPath("/MyApplication");
-            cookie.setHttpOnly(true);
-            cookie.setMaxAge(0);
-            response.addCookie(cookie);
+            jwtCookie.setPath("/");
+            jwtCookie.setHttpOnly(true);
+            jwtCookie.setMaxAge(0);
+            response.addCookie(jwtCookie);
         }
 
-        // Add teh authentication information to the context of the request
+        // Add the authentication information to the context of the request
         SecurityContextHolder.getContext().setAuthentication(authentication);
 
         // Pass the request to the next filter in the chain
@@ -96,7 +100,10 @@ public class JWTAuthorisationFilter extends BasicAuthenticationFilter {
                         .verify(token.replace(BEARER, ""))    // Verify the token signature
                         .getSubject();                                   // Retrieve the username
             } catch(TokenExpiredException error) {
-                log.warn("This request uses an expired JWT token, delete this JWT token is advised");
+                log.warn("This request uses an expired JWT token, it will be deleted");
+                return null;
+            } catch(Exception e) {
+                log.warn("This request uses an invalid value for JWT token, it will be deleted");
                 return null;
             }
 
@@ -121,6 +128,15 @@ public class JWTAuthorisationFilter extends BasicAuthenticationFilter {
         }
 
         log.error(String.format("Null JWT token was received during token authentication"));
+        return null;
+    }
+
+    private Cookie getCookie(Cookie[] cookies) {
+        for (Cookie cookie : cookies) {
+            if (cookie.getName().equals(COOKIE_NAME)) {
+                return cookie;
+            }
+        }
         return null;
     }
 }
