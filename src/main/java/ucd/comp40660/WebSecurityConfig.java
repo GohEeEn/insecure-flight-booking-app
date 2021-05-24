@@ -119,7 +119,8 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
                 .addFilter(new JWTAuthenticationFilter(authenticationManager(), loginSuccessfulHandler, loginFailureHandler))    // filter support authentication
                 .addFilter(new JWTAuthorisationFilter(authenticationManager()))     // filter support authorization
                 // Enforce stateless sessions : this disables session creation 0on Spring Security
-                .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS);
+                .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS)
+                .invalidSessionUrl(LOGIN_URL + "?expired");
     }
 
     @Bean
