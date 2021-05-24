@@ -1,8 +1,6 @@
 package ucd.comp40660.filter;
 
 import lombok.SneakyThrows;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -13,6 +11,9 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.stereotype.Component;
+import ucd.comp40660.handler.LoginFailureHandler;
+import ucd.comp40660.handler.LoginSuccessfulHandler;
+import ucd.comp40660.user.exception.IpAddressLockedException;
 
 import javax.servlet.FilterChain;
 import javax.servlet.ServletException;
@@ -34,8 +35,6 @@ public class JWTAuthenticationFilter extends UsernamePasswordAuthenticationFilte
 
     @Autowired
     private final LoginFailureHandler loginFailureHandler;
-
-    private static final Logger LOGGER = LoggerFactory.getLogger(JWTAuthenticationFilter.class);
 
     public JWTAuthenticationFilter(AuthenticationManager authenticationManager,
                                    LoginSuccessfulHandler loginSuccessfulHandler,
@@ -62,17 +61,20 @@ public class JWTAuthenticationFilter extends UsernamePasswordAuthenticationFilte
         }
 
         String username = request.getParameter("username");
-        UserDetails userDetails = userDetailsService.loadUserByUsername(username);
+        try {
+            UserDetails userDetails = userDetailsService.loadUserByUsername(username);
 
-        if(userDetails == null)
-            unsuccessfulAuthentication(request, response, new UsernameNotFoundException("Username <" + username + "> not found"));
-        else {
-            UsernamePasswordAuthenticationToken usernamePasswordAuthenticationToken =
-                    new UsernamePasswordAuthenticationToken(userDetails, request.getParameter("password"), userDetails.getAuthorities());
+            if (userDetails == null)
+                unsuccessfulAuthentication(request, response, new UsernameNotFoundException("Username <" + username + "> not found"));
+            else {
+                UsernamePasswordAuthenticationToken usernamePasswordAuthenticationToken =
+                        new UsernamePasswordAuthenticationToken(userDetails, request.getParameter("password"), userDetails.getAuthorities());
 
-            return authenticationManager.authenticate(usernamePasswordAuthenticationToken);
+                return authenticationManager.authenticate(usernamePasswordAuthenticationToken);
+            }
+        } catch(IpAddressLockedException error) {
+            unsuccessfulAuthentication(request, response, error);
         }
-
         return null;
     }
 
@@ -81,21 +83,18 @@ public class JWTAuthenticationFilter extends UsernamePasswordAuthenticationFilte
                                             FilterChain chain, Authentication auth) throws IOException {
 
         try {
-//            System.out.println(loginSuccessfulHandler.getClass());
             loginSuccessfulHandler.onAuthenticationSuccess(request, response, auth);
         } catch (ServletException e) {
             logger.error("Something wrong with AuthenticationSuccessHandler");
             e.printStackTrace();
         }
-
-//        System.out.println("Successful authentication done");
     }
 
     @Override
-    protected void unsuccessfulAuthentication(HttpServletRequest request, HttpServletResponse response, AuthenticationException failed) throws IOException, ServletException {
+    protected void unsuccessfulAuthentication(HttpServletRequest request, HttpServletResponse response,
+                                              AuthenticationException failed) throws IOException {
 
         try {
-//            System.out.println("Detect authentication failure successfully");
             loginFailureHandler.onAuthenticationFailure(request, response, failed);
         } catch (ServletException e) {
             logger.error("Something wrong with AuthenticationFailureHandler");

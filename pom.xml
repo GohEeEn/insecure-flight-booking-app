@@ -108,7 +108,6 @@
             <version>1.4.200</version>
         </dependency>
 
-
         <!-- https://mvnrepository.com/artifact/org.thymeleaf.extras/thymeleaf-extras-java8time -->
         <dependency>
             <groupId>org.thymeleaf.extras</groupId>
@@ -141,6 +140,12 @@
             <version>2.1.1</version>
         </dependency>
 
+        <!-- Used for caching here to prevent brute-force attack -->
+        <dependency>
+            <groupId>com.google.guava</groupId>
+            <artifactId>guava</artifactId>
+            <version>[30.0-jre,)</version>
+        </dependency>
     </dependencies>
 
     <build>

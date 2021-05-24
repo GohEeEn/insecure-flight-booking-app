@@ -1,8 +1,6 @@
 package ucd.comp40660;
 
 import com.ulisesbocchio.jasyptspringboot.annotation.EnableEncryptableProperties;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Bean;
@@ -15,33 +13,26 @@ import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
 import org.springframework.security.config.http.SessionCreationPolicy;
-import org.springframework.security.core.Authentication;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
-import org.springframework.security.web.authentication.logout.LogoutSuccessHandler;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
-import org.springframework.web.util.UrlPathHelper;
-import ucd.comp40660.filter.JWTAuthenticationFilter;
-import ucd.comp40660.filter.JWTAuthorisationFilter;
-import ucd.comp40660.filter.LoginFailureHandler;
-import ucd.comp40660.filter.LoginSuccessfulHandler;
+import ucd.comp40660.filter.*;
+import ucd.comp40660.handler.CustomLogoutHandler;
+import ucd.comp40660.handler.LoginFailureHandler;
+import ucd.comp40660.handler.LoginSuccessfulHandler;
 import ucd.comp40660.service.UserDetailsServiceImplementation;
 
-import javax.servlet.ServletException;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import java.io.IOException;
 import java.util.Arrays;
 
-import static ucd.comp40660.filter.SecurityConstants.COOKIE_NAME;
+import static ucd.comp40660.filter.SecurityConstants.*;
 
 @Configuration
 @EnableWebSecurity
 @EnableEncryptableProperties
 @EnableGlobalMethodSecurity(securedEnabled = true, prePostEnabled = true)
-public class WebSecurityConfig extends WebSecurityConfigurerAdapter{
+public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 
     @Qualifier("userDetailsServiceImplementation")
     @Autowired
@@ -54,8 +45,6 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter{
     private final LoginFailureHandler loginFailureHandler;
 
     private BCryptPasswordEncoder bCryptPasswordEncoder;
-
-    private static final Logger LOGGER = LoggerFactory.getLogger(WebSecurityConfig.class);
 
     @Override
     @Bean
@@ -77,8 +66,13 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter{
         return authProvider;
     }
 
+    @Bean
+    public CustomLogoutHandler customLogoutHandler() {
+        return new CustomLogoutHandler();
+    }
+
     public WebSecurityConfig(UserDetailsServiceImplementation userDetailsService, BCryptPasswordEncoder bCryptPasswordEncoder,
-                             LoginSuccessfulHandler loginSuccessfulHandler, LoginFailureHandler loginFailureHandler){
+                             LoginSuccessfulHandler loginSuccessfulHandler, LoginFailureHandler loginFailureHandler) {
         this.userDetailsService = userDetailsService;
         this.bCryptPasswordEncoder = bCryptPasswordEncoder;
         this.loginFailureHandler = loginFailureHandler;
@@ -88,7 +82,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter{
     @Override
     protected void configure(HttpSecurity http) throws Exception {
 
-//      enable h2 access via the h2-console
+        // Enable h2 access via the h2-console
         http.authorizeRequests().antMatchers("/h2-console/**").permitAll()
                 .and().csrf().ignoringAntMatchers("/h2-console/**")
                 .and().headers().frameOptions().sameOrigin();
@@ -101,36 +95,22 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter{
                 .requiresChannel().anyRequest().requiresSecure()        // Require HTTPS Requests
                 .and()
                 .authorizeRequests()
-                .antMatchers("/error", "/resources/**", "/img/**", "/css/**", "/js/**", "/login", "/register", "/", "/guestRegister").permitAll()
-                .antMatchers("/user", "/getUserReservations").access("hasAnyAuthority('ADMIN','MEMBER')")
-                .antMatchers("/user/delete/", "/user/editProfile/").access("hasAnyAuthority('ADMIN','MEMBER')")
+                .antMatchers("/error", "/resources/**", "/img/**", "/css/**", "/js/**", LOGIN_URL, "/register", "/", "/guestRegister").permitAll()
+                .antMatchers("/user","/user/delete/", "/user/editProfile/").access("hasAnyAuthority('ADMIN','MEMBER')")
                 .antMatchers("/editProfile", "/editPassword").access("hasAuthority('MEMBER')")
-                .antMatchers("/admin", "/adminRegister", "/users", "/flights").access("hasAuthority('ADMIN')")
+                .antMatchers("/admin", "/adminRegister", "/users").access("hasAuthority('ADMIN')")
                 .anyRequest().authenticated()   // Authenticate all requests, with exception URL regexes mentioned above
                 .and()
                 .formLogin()
                 .defaultSuccessUrl("/", true)     // The landing page after a successful login
                 .successHandler(loginSuccessfulHandler)
-                .failureUrl("/login?error=true")                        // Landing page after an unsuccessful login
+                .failureUrl(FAILED_LOGIN_URL)                        // Landing page after an unsuccessful login
                 .failureHandler(loginFailureHandler)
-                .loginPage("/login").permitAll()                        // Specify URL for login
-//                .loginProcessingUrl("/")                              // URL to submit the username and password to
-//                .successForwardUrl("/")
+                .loginPage(LOGIN_URL).permitAll()                        // Specify URL for login
                 .and()
                 .logout()
-                .logoutSuccessHandler(new LogoutSuccessHandler() {
-                    @Override
-                    public void onLogoutSuccess(HttpServletRequest httpServletRequest, HttpServletResponse httpServletResponse, Authentication authentication) throws IOException, ServletException {
-                        LOGGER.info("User logged out successfully.");
-
-                        UrlPathHelper helper = new UrlPathHelper();
-                        String context = helper.getContextPath(httpServletRequest);
-
-                        httpServletResponse.sendRedirect(context + "/login");
-                    }
-                })
                 .logoutUrl("/logout")           // Specify URL for logout
-                .invalidateHttpSession(true)        // Invalidate the session after logout
+                .addLogoutHandler(customLogoutHandler())
                 .clearAuthentication(true)          // Invalidate the authentication after logout
                 .deleteCookies(COOKIE_NAME)     // Delete the cookie containing the JWT after logout
                 .permitAll()
