@@ -19,6 +19,9 @@ import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 import ucd.comp40660.filter.*;
+import ucd.comp40660.handler.CustomLogoutHandler;
+import ucd.comp40660.handler.LoginFailureHandler;
+import ucd.comp40660.handler.LoginSuccessfulHandler;
 import ucd.comp40660.service.UserDetailsServiceImplementation;
 
 import java.util.Arrays;

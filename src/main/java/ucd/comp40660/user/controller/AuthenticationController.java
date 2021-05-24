@@ -13,7 +13,6 @@ import org.springframework.web.bind.annotation.RequestParam;
 import ucd.comp40660.user.UserSession;
 import ucd.comp40660.user.exception.IpAddressLockedException;
 import ucd.comp40660.user.model.Role;
-import ucd.comp40660.user.repository.UserRepository;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
@@ -30,9 +29,6 @@ public class AuthenticationController {
 
     @Autowired
     private UserSession userSession;
-
-    @Autowired
-    private UserRepository userRepository;
 
     @GetMapping(LOGIN_URL)
     public String login(Model model, HttpServletRequest request,

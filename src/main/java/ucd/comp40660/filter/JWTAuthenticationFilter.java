@@ -11,6 +11,8 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.stereotype.Component;
+import ucd.comp40660.handler.LoginFailureHandler;
+import ucd.comp40660.handler.LoginSuccessfulHandler;
 import ucd.comp40660.user.exception.IpAddressLockedException;
 
 import javax.servlet.FilterChain;
