@@ -1,4 +1,4 @@
-package ucd.comp40660.filter;
+package ucd.comp40660.handler;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -85,8 +85,6 @@ public class LoginFailureHandler implements AuthenticationFailureHandler {
             failed = new UsernameNotFoundException("User <" + username + "> does not exist");
 
         } else if(failed instanceof UsernameNotFoundException) {
-//            Authentication auth = new UsernamePasswordAuthenticationToken(username, password);
-//            applicationEventPublisher.publishEvent(new AuthenticationFailureBadCredentialsEvent(auth, failed));
             createAuthFailureBadCredentialsEvent(username, password, failed);
         }
 

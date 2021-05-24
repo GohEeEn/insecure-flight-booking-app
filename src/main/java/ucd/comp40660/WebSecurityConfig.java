@@ -19,6 +19,9 @@ import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 import ucd.comp40660.filter.*;
+import ucd.comp40660.handler.CustomLogoutHandler;
+import ucd.comp40660.handler.LoginFailureHandler;
+import ucd.comp40660.handler.LoginSuccessfulHandler;
 import ucd.comp40660.service.UserDetailsServiceImplementation;
 
 import java.util.Arrays;
@@ -79,7 +82,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
     @Override
     protected void configure(HttpSecurity http) throws Exception {
 
-//      enable h2 access via the h2-console
+        // Enable h2 access via the h2-console
         http.authorizeRequests().antMatchers("/h2-console/**").permitAll()
                 .and().csrf().ignoringAntMatchers("/h2-console/**")
                 .and().headers().frameOptions().sameOrigin();
@@ -93,8 +96,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
                 .and()
                 .authorizeRequests()
                 .antMatchers("/error", "/resources/**", "/img/**", "/css/**", "/js/**", LOGIN_URL, "/register", "/", "/guestRegister").permitAll()
-                .antMatchers("/user").access("hasAnyAuthority('ADMIN','MEMBER')")
-                .antMatchers("/user/delete/", "/user/editProfile/").access("hasAnyAuthority('ADMIN','MEMBER')")
+                .antMatchers("/user","/user/delete/", "/user/editProfile/").access("hasAnyAuthority('ADMIN','MEMBER')")
                 .antMatchers("/editProfile", "/editPassword").access("hasAuthority('MEMBER')")
                 .antMatchers("/admin", "/adminRegister", "/users").access("hasAuthority('ADMIN')")
                 .anyRequest().authenticated()   // Authenticate all requests, with exception URL regexes mentioned above
