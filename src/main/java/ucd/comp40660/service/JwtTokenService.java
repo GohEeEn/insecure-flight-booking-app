@@ -66,26 +66,14 @@ public class JwtTokenService {
      */
     public String generateToken(Authentication authentication) {
 
-//        final Map<String, Object> claims = new HashMap<>();
-//        final UserDetails user = (UserDetails) authentication.getPrincipal();
-//
-//        final List<String> roles = authentication.getAuthorities()
-//                .stream()
-//                .map(GrantedAuthority::getAuthority)
-//                .collect(Collectors.toList());
-//
-//        claims.put(ROLES, roles);
-
         return JWT.create()
             .withSubject(((ACUserDetails) authentication.getPrincipal()).getUsername())
             .withExpiresAt(new Date(System.currentTimeMillis() + EXPIRATION_TIME))
             .sign(HMAC512(SECRET.getBytes()));
-
-//        return generateToken(claims, user.getUsername());
     }
 
     /**
-     * Validate token by checking if the token belongs to certain user or it has not expired yet
+     * Validate token by checking if the token belongs to certain user
      * or the user using this token has not logout yet
      *
      * @param token

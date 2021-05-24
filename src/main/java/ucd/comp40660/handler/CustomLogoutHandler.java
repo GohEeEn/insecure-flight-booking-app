@@ -35,6 +35,9 @@ public class CustomLogoutHandler implements LogoutHandler {
             }
         }
 
+        // Invalidate the token used in this session before logout
+        // by adding it into a blacklist. Deletion of expired token
+        // can be implemented if time is efficient
         JwtToken jwtToken = jwtTokenRepository.findByJwtToken(token);
         jwtToken.setLogout(true);
         jwtTokenRepository.save(jwtToken);

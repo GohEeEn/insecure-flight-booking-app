@@ -85,8 +85,6 @@ public class LoginFailureHandler implements AuthenticationFailureHandler {
             failed = new UsernameNotFoundException("User <" + username + "> does not exist");
 
         } else if(failed instanceof UsernameNotFoundException) {
-//            Authentication auth = new UsernamePasswordAuthenticationToken(username, password);
-//            applicationEventPublisher.publishEvent(new AuthenticationFailureBadCredentialsEvent(auth, failed));
             createAuthFailureBadCredentialsEvent(username, password, failed);
         }
 

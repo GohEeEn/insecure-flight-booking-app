@@ -130,14 +130,5 @@ public class JWTAuthorisationFilter extends BasicAuthenticationFilter {
         log.error(String.format("Null JWT token was received during token authentication"));
         return null;
     }
-
-    private Cookie getCookie(Cookie[] cookies) {
-        for (Cookie cookie : cookies) {
-            if (cookie.getName().equals(COOKIE_NAME)) {
-                return cookie;
-            }
-        }
-        return null;
-    }
 }
 
