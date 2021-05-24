@@ -1,6 +1,6 @@
 package ucd.comp40660.service;
 
-import ucd.comp40660.user.model.ConfirmationToken;
+import ucd.comp40660.user.model.JwtToken;
 import ucd.comp40660.user.model.User;
 
 public interface UserService {
@@ -17,7 +17,7 @@ public interface UserService {
 
     User findByPhone(String phone);
 
-    void save(ConfirmationToken confirmationToken);
+    void save(JwtToken confirmationToken);
 
     User isValidToken(String confirmationToken);
 
