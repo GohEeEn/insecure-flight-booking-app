@@ -21,7 +21,6 @@ public class PasswordUpdate {
         this.passwordConfirm = passwordConfirm;
     }
 
-
     public String getPasswordConfirm() {
         return passwordConfirm;
     }
