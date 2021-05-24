@@ -299,7 +299,7 @@ public class ReservationController {
         LOGGER.info("Attempting to get Guest Info");
 
         Guest guest = guestRepository.findByEmail(email);
-        LOGGER.info(String.format("Flight ID: '%s', Guest: '%s %s %s'"), flight.getFlightID(), guest.getName(), guest.getSurname(), guest.getEmail());
+        LOGGER.info(String.format("Flight ID: '%d', Guest: '%s %s %s'", flight.getFlightID(), guest.getName(), guest.getSurname(), guest.getEmail()));
 
 
         Reservation reservation = reservationRepository.findByGuestAndFlight(guest, flight);
