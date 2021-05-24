@@ -687,8 +687,8 @@ public class FlightController {
         } else {
             reservation.setFlight(flight);
             reservation.setEmail(user.getEmail());
-            flight.getReservations().add(reservation);
-            flightRepository.saveAndFlush(flight);
+//            flight.getReservations().add(reservation);
+//            flightRepository.saveAndFlush(flight);
             reservationRepository.saveAndFlush(reservation);
             reservation.setCredit_card(card);
 

@@ -11,11 +11,12 @@
   <nav th:replace="fragments/header :: navigation-bar"></nav>
 
   <div>
-    <a href="/registerFlight">Create a Flight</a>
+
   </div>
   <div class="container">
     <div class="row">
       <div class="col-8">
+        <a href="/registerFlight">Create a Flight</a>
         <div th:each="entry: ${sessionUser.getRoles()}">
           <div th:if="${entry.name} == 'ADMIN'">
             <div class="col-lg-12 align-self-center">
