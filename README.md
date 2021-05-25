@@ -78,16 +78,13 @@ Homepage is the first page you will always see when you open this application wi
 7. From the home page, select a Fight to book. An example might be From Sofia to Dublin on the 19th of March.
 8. After completing a booking it will be available to view in `Reservations` in the Member drop-down menu in the upper-right hand side.
 9. If more than 24 hours away, an option to cancel will be available.
+10.To log in as test member, please use the following credentials: **john_smith : Password1234!**
+
 
 ### Guest
 
 1. As a guest, you can use the flight search form (5) right away to make reservation
 2. You will require the `email address` and the `reservation id` to retrieve your reservation information
-
-### Member
-
-1. As a member, you can look search through the different flights, book/cancel flights, update your profile and more. 
-2. To log in as member, please use the following credentials: **john_smith : Password1234!**
 
 ### Admin
 
