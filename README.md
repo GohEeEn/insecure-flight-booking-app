@@ -6,49 +6,26 @@ This is the Flight Reservation Web Application repository for UCD BSc Computer S
 
 - Java 8 or higher version (version 1.8+)
 - Maven
-- MySQL server
 
 ## How to run this program
 
-1. Create a database schema on your MySQL server. let say `application`
+1. Encrypting sensitive properties
+    - Encryption of sensitive properties inside file application.properties is enabled with [Jasypt](http://www.jasypt.org)
+    - To generate the encoded credential value, go to maven library path ` ~/.m2/repository/org/jasypt/jasypt/1.9.0` on terminal (CLI)
+    - Use the following commmand to run the JAR program to generate the encoded value
+      ```
+       java -cp jasypt-1.9.0.jar org.jasypt.intf.cli.JasyptPBEStringEncryptionCLI input="value" password=<key> algorithm=PBEWithMD5AndDES
+      ```
+        - __input__ - The value in string to be encoded
+        - __password__ - The key for both encryption and decryption of the input
+        - __algorithm__ - The encoding algorithm, that here we use a Password-Based version of DES Encryption algorithm, with the MD5 hash of the password as the encryption key
+    - Jasypt reads all the properties from _application.properties_ or any classpath properties that you passed, with value prefix __ENC(__ and suffix __)__
+    - The password is required to run this application, with the following Maven argument :
 
-    - With `MySQL Workbench` :
+      `-Djasypt.encryptor.password=<key>`
 
-        ![Create a MySQL DB schema with MySQL Workbench](./img/1.1_MySQL_Workbench_create_a_db_schema.png)
+    - Reference : <https://medium.com/@mail2rajeevshukla/hiding-encrypting-database-password-in-the-application-properties-34d59fe104eb>
 
-    - With `MySQL Shell` :
-
-        ```SQL
-        CREATE SCHEMA IF NOT EXISTS `application`; -- application : <schema_name>
-        ```
-
-2. Go to `<project_root_directory>/src/main/resources/application.properties` to configure the application connection with your server credential :
-
-    ```properties
-    # schema_name=`application` by default
-    spring.datasource.url=jdbc:mysql://localhost:3306/application?createDatabaseIfNotExist=true
-    spring.datasource.username=ENC(<your_encoded_username>)
-    spring.datasource.password=ENC(<your_encoded_password>)
-    ```
-
-    (**Note** : *Make sure the user account of credential given used has the privilege to modify the schema*)
-
-   - Encryption of sensitive properties inside file application.properties is enabled with [Jasypt](http://www.jasypt.org)
-   - To generate the encoded credential value, go to maven library path ` ~/.m2/repository/org/jasypt/jasypt/1.9.0` on terminal (CLI)
-   - Use the following commmand to run the JAR program to generate the encoded value
-     ```
-      java -cp jasypt-1.9.0.jar org.jasypt.intf.cli.JasyptPBEStringEncryptionCLI input="value" password=<key> algorithm=PBEWithMD5AndDES
-     ```
-      - __input__ - The value in string to be encoded
-      - __password__ - The key for both encryption and decryption of the input
-      - __algorithm__ - The encoding algorithm, that here we use a Password-Based version of DES Encryption algorithm, with the MD5 hash of the password as the encryption key
-   - Jasypt reads all the properties from _application.properties_ or any classpath properties that you passed, with value prefix __ENC(__ and suffix __)__
-   - The password is required to run this application, with the following Maven argument :
-     
-     `-Djasypt.encryptor.password=<key>`
-     
-   - Reference : <https://medium.com/@mail2rajeevshukla/hiding-encrypting-database-password-in-the-application-properties-34d59fe104eb>
-   
 3. Open a terminal on the root directory of this project (ie. where this doc is stored)
 4. Run the command `mvn clean install` to run tests and build the project
 5. Run the command `mvn spring-boot:run` to run the Spring Boot application
@@ -59,6 +36,18 @@ This is the Flight Reservation Web Application repository for UCD BSc Computer S
     # 8080 by default
     server.port=<open_port>
     ```
+
+8. To connect to the **h2** database, open up any browser and navigate to *localhost:8080/h2-console*
+
+- Click on **Advanced -> Proceed to localhost (unsafe)**. 
+        ![Navigate to h2 database](./img/fix.png)
+
+- Use the credentials **admin : password** and the corresponding settings (in the photo below) to get access to the database console.
+    ![Get access to the database](./img/credentials.png)
+  
+- Browse through the different tables and query them. 
+    ![Query the tables](./img/query.png)
+
 
 ## Introduction to this web application
 
@@ -94,6 +83,17 @@ Homepage is the first page you will always see when you open this application wi
 
 1. As a guest, you can use the flight search form (5) right away to make reservation
 2. You will require the `email address` and the `reservation id` to retrieve your reservation information
+
+### Member
+
+1. As a member, you can look search through the different flights, book/cancel flights, update your profile and more. 
+2. To log in as member, please use the following credentials: **john_smith : Password1234!**
+
+### Admin
+
+1. As an admin, you can look at users' profiles, update their information, and change their reservations. 
+2. To log in as admin, please use the following credentials: **zuckerberg : Password1234!**
+
 
 #### General Reservation Workflow
 
