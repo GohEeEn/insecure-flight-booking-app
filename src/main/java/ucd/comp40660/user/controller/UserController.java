@@ -138,6 +138,7 @@ public class UserController {
     }
 
     //    update registration details
+    @PreAuthorize("#username == authentication.name or hasAuthority('ADMIN')")
     @PutMapping("/users/{id}")
     public User updateRegistration(@PathVariable(value = "id") Long registrationId, @Valid @RequestBody User userDetails) throws UserNotFoundException {
 
@@ -217,6 +218,7 @@ public class UserController {
     }
 
 
+    @PreAuthorize("hasAuthority('ADMIN')")
     @GetMapping("/adminRegister")
     public String adminRegister(Model model, @ModelAttribute("userForm") User userForm, HttpServletResponse response) throws Exception {
         if (userSession.isLoginFailed()) {
@@ -229,7 +231,7 @@ public class UserController {
         return "adminRegister.html";
     }
 
-
+    @PreAuthorize("hasAuthority('ADMIN')")
     @PostMapping("/adminRegister")
     public String adminRegister(@Valid @ModelAttribute("userForm") User userForm, BindingResult bindingResult,
                                 Model model, HttpServletRequest req) throws ServletException {
@@ -253,7 +255,7 @@ public class UserController {
         return "index.html";
     }
 
-
+    @PreAuthorize("hasAuthority('ADMIN')")
     @GetMapping("/guestRegister")
     public String guestRegister(Model model, HttpServletResponse response,
                                 @Valid @ModelAttribute("userForm") User userForm) throws Exception {
@@ -267,7 +269,7 @@ public class UserController {
         return "guestRegister.html";
     }
 
-
+    @PreAuthorize("hasAuthority('ADMIN')")
     @PostMapping("/guestRegister")
     public String guestRegister(Model model, @ModelAttribute("userForm") User userForm,
                                 BindingResult bindingResult, HttpServletRequest req) throws ServletException {
