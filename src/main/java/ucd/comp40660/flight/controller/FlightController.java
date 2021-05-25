@@ -36,9 +36,9 @@ import java.security.Principal;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Date;
 
 
 @Controller
@@ -88,7 +88,7 @@ public class FlightController {
     Long temporaryFlightReference;
     int numberOfPassengers;
 
-    @PostMapping("/home")
+    @GetMapping("/home")
     public void home(HttpServletResponse response) throws IOException {
         response.sendRedirect("/");
     }
@@ -387,7 +387,6 @@ public class FlightController {
             model.addAttribute("sessionUser", sessionUser);
         }
 
-
         model.addAttribute("displayedFlights", flightList);
 
         //Determine if booking as a Member/Guest, or as an admin.
@@ -665,7 +664,6 @@ public class FlightController {
             return "displayReservation.html";
         }
     }
-
 
     @PostMapping("/processGuestPayment")
     public String processGuestPayment(@Valid @ModelAttribute("cardForm") CreditCard cardForm,

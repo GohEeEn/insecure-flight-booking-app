@@ -33,10 +33,15 @@ public class AuthenticationController {
     @GetMapping(LOGIN_URL)
     public String login(Model model, HttpServletRequest request,
                         @RequestParam(value = "error", required = false) String error,
-                        @RequestParam(value = "logout", required = false) String logout) {
+                        @RequestParam(value = "logout", required = false) String logout,
+                        @RequestParam(value = "expired", required = false) String expired) {
 
         if (error != null) {
             model.addAttribute("error", getErrorMessage(request, SPRING_SECURITY_LAST_EXCEPTION));
+        }
+
+        if (expired != null) {
+            model.addAttribute("msg", "You've been logged out due to cookie expired.");
         }
 
         if (logout != null) {

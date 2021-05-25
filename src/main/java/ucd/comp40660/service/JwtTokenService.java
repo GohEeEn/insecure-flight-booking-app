@@ -7,6 +7,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Service;
 import ucd.comp40660.user.repository.JwtTokenRepository;
+import ucd.comp40660.user.repository.UserRepository;
 
 import java.util.Date;
 
@@ -18,6 +19,9 @@ import static ucd.comp40660.filter.SecurityConstants.SECRET;
 public class JwtTokenService {
 
     private static final Logger log = LoggerFactory.getLogger(JwtTokenService.class);
+
+    @Autowired
+    private UserRepository userRepository;
 
     @Autowired
     private JwtTokenRepository jwtTokenRepository;
@@ -73,7 +77,7 @@ public class JwtTokenService {
     }
 
     /**
-     * Validate token by checking if the token belongs to certain user
+     * Validate token by checking if the token belongs to certain registered user
      * or the user using this token has not logout yet
      *
      * @param token
@@ -81,12 +85,27 @@ public class JwtTokenService {
      */
     public Boolean isValidToken(String token) {
 
-        final boolean with_username = getUsernameFromToken(token) != null;
-        final boolean has_logout = isUserLogout(token);
+        try {
+            String username = getUsernameFromToken(token);
 
-        if(!with_username) log.warn("Username not found in the given JWT token");
-        if(has_logout) log.warn("This JWT token has been used by a logout user");
+            if (username == null) log.warn("Username not found in the given JWT token");
 
-        return with_username && !has_logout;
+            final boolean with_valid_username = userRepository.findByUsername(username) != null;
+            final boolean has_logout = isUserLogout(token);
+
+            if (!with_valid_username)
+                log.warn(String.format("Username <%s> found in the given JWT token is not registered", username));
+            if (has_logout) log.warn("This JWT token has been used by a logout user");
+
+            return with_valid_username && !has_logout;
+
+        } catch(NullPointerException error) {
+            log.warn("JWT token in valid structure with unregistered username is used, thus an invalid token");
+        } catch(Exception error) {
+            log.warn("JWT token  in valid structure with suspicious/unexpected claims was used : " + token);
+            log.warn(error.getMessage());
+        }
+
+        return false;
     }
 }
