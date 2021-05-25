@@ -95,7 +95,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
                 .requiresChannel().anyRequest().requiresSecure()        // Require HTTPS Requests
                 .and()
                 .authorizeRequests()
-                .antMatchers("/error", "/resources/**", "/img/**", "/css/**", "/js/**", LOGIN_URL, "/register", "/", "/guestRegister").permitAll()
+                .antMatchers("/error", "/resources/**", "/img/**", "/css/**", "/js/**", LOGIN_URL, "/register", "/").permitAll()
                 .antMatchers("/user","/user/delete/", "/processMemberPayment").access("hasAnyAuthority('ADMIN','MEMBER')")
                 .antMatchers("/editProfile", "/editPassword", "/viewCreditCards").access("hasAuthority('MEMBER')")
                 .antMatchers("/admin", "/adminRegister", "/users", "/flights", "/reservations", "/deleteReservation", "/guestRegister", "/adminRegister",
