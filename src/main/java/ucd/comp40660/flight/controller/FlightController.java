@@ -391,7 +391,7 @@ public class FlightController {
         flightSearch.setOutboundDate(outboundDate);
 
         //TODO Better define Guest User object than hardcoded name.
-        userSession.setUser(userRepository.findByUsername("testGuest"));
+        userSession.setUser(userRepository.findByUsername("testguest"));
         model.addAttribute("user", userRepository.findByUsername("testguest"));
 
         response.sendRedirect("/flightSearchResults");
@@ -590,7 +590,6 @@ public class FlightController {
 
     }
 
-    //TODO Validator implemetnation
     @PostMapping("/processGuestPersonalDetails")
     public String processGuestPersonalDetails(@Valid @ModelAttribute("passengerForm") Guest passengerForm, Model model,
                                               @Valid @ModelAttribute("cardForm") CreditCard cardForm,
@@ -688,8 +687,8 @@ public class FlightController {
         } else {
             reservation.setFlight(flight);
             reservation.setEmail(user.getEmail());
-            flight.getReservations().add(reservation);
-            flightRepository.saveAndFlush(flight);
+//            flight.getReservations().add(reservation);
+//            flightRepository.saveAndFlush(flight);
             reservationRepository.saveAndFlush(reservation);
             reservation.setCredit_card(card);
 
