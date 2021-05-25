@@ -81,7 +81,7 @@
                 <div class="form-group">
                     <label for="address">Address</label>
                     <input id="address" class="form-control" type="text" name="address" placeholder="Living Address" th:field="*{address}"
-                           onchange="passengerAddressValidator(document.memberForm.address)" onkeydown="clearErrors()" required/>
+                           onkeyup="passengerAddressValidator(document.memberForm.address)" onkeydown="clearErrors()" required/>
                     <label for="address_validity"><span color="red" id="address_validity"></span></label>
                     <span class="error" th:if="${#fields.hasErrors('address')}" th:errors="*{address}"></span>
                 </div>

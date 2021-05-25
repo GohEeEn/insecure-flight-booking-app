@@ -34,7 +34,7 @@ function passengerSurnameValidator(name){
 function passengerAddressValidator(address){
 
     let address_validity = document.getElementById("address_validity");
-    const addressRegex = /^[a-zA-Z]+(([',. -][a-zA-Z ])?[a-zA-Z]*)*$/;
+    const addressRegex = /^[a-zA-Z0-9]+(([',. -][a-zA-Z0-9 ])?[a-zA-Z0-9 ]*)*$/;
 
     if(address.value.match(addressRegex)){
         address_validity.innerHTML = "";
