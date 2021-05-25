@@ -27,7 +27,7 @@
                         <td th:text="${card.cardholder_name}"></td>
                         <td th:text="${card.maskedCardNumber()}"></td>
                         <td th:text="${card.type}"></td>
-                        <td><a th:href="@{/deleteCard/{id}(id=${card.id})}" class="btn btn-danger">Delete</a></td>
+                        <td><a th:href="@{/deleteCard/{username}/{id}(username = ${user.username}, id=${card.id})}" class="btn btn-danger">Delete</a></td>
                     </tr>
                 </tbody>
 

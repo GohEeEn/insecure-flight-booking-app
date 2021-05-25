@@ -126,6 +126,7 @@ public class CardController {
             sessionUser.setCredit_cards(creditCards);
 
             model.addAttribute("sessionUser", sessionUser);
+            model.addAttribute("user", sessionUser);
         }
 
         model.addAttribute("cards", creditCardRepository.findAllByUser(sessionUser));
@@ -159,9 +160,9 @@ public class CardController {
         return "registerCreditCard.html";
     }
 
-
-    @GetMapping("/deleteCard/{id}")
-    public void deleteCard(@PathVariable(value = "id") Long id, Model model, HttpServletRequest req, HttpServletResponse response) throws CreditCardNotFoundException, IOException {
+    @PreAuthorize("#username == authentication.name")
+    @GetMapping("/deleteCard/{username}/{id}")
+    public void deleteCard(@PathVariable(value = "id") Long id, @PathVariable(value = "username") String username, Model model, HttpServletRequest req, HttpServletResponse response) throws CreditCardNotFoundException, IOException {
         User user = null;
 
         Principal userDetails = req.getUserPrincipal();
