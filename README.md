@@ -37,7 +37,7 @@ This is the Flight Reservation Web Application repository for UCD BSc Computer S
     server.port=<open_port>
     ```
 
-8. To connect to the **h2** database, open up any browser and navigate to *localhost:8080/h2-console*
+8. To connect to the **h2** database, open up any browser and navigate to ***localhost:8080/h2-console***
 
 - Click on **Advanced -> Proceed to localhost (unsafe)**. 
         ![Navigate to h2 database](./img/fix.png)
