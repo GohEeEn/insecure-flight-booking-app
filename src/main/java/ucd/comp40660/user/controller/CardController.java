@@ -141,9 +141,9 @@ public class CardController {
         return "viewCreditCards.html";
     }
 
-
-    @GetMapping("/registerCard")
-    public String registerCardView(Model model, @Valid @ModelAttribute("cardForm") CreditCard cardForm, HttpServletRequest req) {
+    @PreAuthorize("#username == authentication.name")
+    @GetMapping("/registerCard/{username}")
+    public String registerCardView(@PathVariable(value = "username") String username, Model model, @Valid @ModelAttribute("cardForm") CreditCard cardForm, HttpServletRequest req) {
         User user = null;
 
 

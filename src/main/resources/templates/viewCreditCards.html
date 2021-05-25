@@ -36,7 +36,7 @@
                 </caption>
             </table>
 
-            <a href="/registerCard" class="btn btn-primary">Add New Card</a>
+            <a th:href="@{/registerCard/{username}(username = ${user.username})}" class="btn btn-primary">Add New Card</a>
             <a href="javascript:history.back()" class="btn btn-link">Back</a>
         </div>
     </div>
