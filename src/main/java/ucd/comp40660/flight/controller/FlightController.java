@@ -433,11 +433,13 @@ public class FlightController {
             List<Flight> flightList = flightCheck();
             int flightIndex = Integer.parseInt(flightIndexSelected);
             if (flightIndex <= 0 || flightIndex > flightList.size()) {
-                PrintWriter out = response.getWriter();
-                out.println("<script>");
-                out.println("alert('" + "Select from displayed Index" + "');");
-                out.println("window.location.replace('" + "/flightSearchResults" + "');");
-                out.println("</script>");
+                model.addAttribute("error", "No flight matching your criteria exist for that date.");
+                response.sendRedirect("/");
+//                PrintWriter out = response.getWriter();
+//                out.println("<script>");
+//                out.println("alert('" + "Select from displayed Index" + "');");
+//                out.println("window.location.replace('" + "/flightSearchResults" + "');");
+//                out.println("</script>");
             } else {
                 List<Flight> allFlight = flightRepository.findAll();
                 List<Flight> flightOptions = flightCheck();
