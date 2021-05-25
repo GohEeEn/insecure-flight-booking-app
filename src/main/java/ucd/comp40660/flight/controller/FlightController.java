@@ -3,13 +3,10 @@ package ucd.comp40660.flight.controller;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Controller;
-import org.springframework.transaction.annotation.Transactional;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
-import org.springframework.web.bind.WebDataBinder;
 import org.springframework.web.bind.annotation.*;
 import ucd.comp40660.flight.exception.FlightNotFoundException;
 import ucd.comp40660.flight.model.Flight;
@@ -30,21 +27,18 @@ import ucd.comp40660.validator.GuestValidator;
 import ucd.comp40660.validator.PassengerValidator;
 import ucd.comp40660.validator.UserValidator;
 
-import javax.persistence.Transient;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.security.Principal;
-import java.sql.Time;
-import java.sql.Timestamp;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Date;
 
 
 @Controller
@@ -94,7 +88,7 @@ public class FlightController {
     Long temporaryFlightReference;
     int numberOfPassengers;
 
-    @PostMapping("/home")
+    @GetMapping("/home")
     public void home(HttpServletResponse response) throws IOException {
         response.sendRedirect("/");
     }
@@ -410,7 +404,6 @@ public class FlightController {
             model.addAttribute("sessionUser", sessionUser);
         }
 
-
         model.addAttribute("displayedFlights", flightList);
 
         //Determine if booking as a Member/Guest, or as an admin.
@@ -511,10 +504,6 @@ public class FlightController {
         user.setCredit_cards(creditCards);
 
         model.addAttribute("user", user);
-
-
-//        model.addAttribute("user", userSession.getUser());
-
 
         if (numberOfPassengers > 1) {
             return "passengerDetails.html";
@@ -703,7 +692,6 @@ public class FlightController {
 
         }
     }
-
 
     @PostMapping("/processGuestPayment")
     public String processGuestPayment(@Valid @ModelAttribute("cardForm") CreditCard cardForm,
