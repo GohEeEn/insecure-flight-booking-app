@@ -81,10 +81,10 @@ public class LoginFailureHandler implements AuthenticationFailureHandler {
     private AuthenticationException ipBasedFailureHandler(String username, String password, AuthenticationException failed) {
 
         if(failed instanceof IpAddressLockedException) {
-            logger.warn(String.format("Username <%s> not found", username));
-            failed = new UsernameNotFoundException("User <" + username + "> does not exist");
+            logger.warn(String.format("The IP address sending this request has been locked"));
 
         } else if(failed instanceof UsernameNotFoundException) {
+            logger.warn(String.format("Username <%s> not found", username));
             createAuthFailureBadCredentialsEvent(username, password, failed);
         }
 

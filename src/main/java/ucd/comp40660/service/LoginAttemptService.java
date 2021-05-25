@@ -71,9 +71,9 @@ public class LoginAttemptService {
      */
     public boolean isBlocked(final String ip_addr) {
         try {
-            boolean blocked = attemptsCache.get(ip_addr) > MAX_ATTEMPT;
+            boolean blocked = attemptsCache.get(ip_addr) >= MAX_ATTEMPT;
             if(blocked) {
-                logger.warn(String.format("Failed login attempts by <%s> has exceed the limit, thus it is be block for 1 minutes", ip_addr));
+                logger.warn(String.format("Failed login attempts by <%s> has exceed the limit, thus it is be block for 20 minutes", ip_addr));
             }
             return blocked;
         } catch (final ExecutionException e) {
