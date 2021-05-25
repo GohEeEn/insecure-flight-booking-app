@@ -3,13 +3,10 @@ package ucd.comp40660.flight.controller;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Controller;
-import org.springframework.transaction.annotation.Transactional;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
-import org.springframework.web.bind.WebDataBinder;
 import org.springframework.web.bind.annotation.*;
 import ucd.comp40660.flight.exception.FlightNotFoundException;
 import ucd.comp40660.flight.model.Flight;
@@ -30,15 +27,12 @@ import ucd.comp40660.validator.GuestValidator;
 import ucd.comp40660.validator.PassengerValidator;
 import ucd.comp40660.validator.UserValidator;
 
-import javax.persistence.Transient;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.security.Principal;
-import java.sql.Time;
-import java.sql.Timestamp;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -249,7 +243,6 @@ public class FlightController {
         }
 
 
-//        LOGGER.info("Called updateFlight() with id <" + FLIGHTID + "> by user <" + sessionUser.getUsername() + "> with the role of <" + sessionUser.getRoles() + ">");
         LOGGER.info("Called updateFlight() with id <" + FLIGHTID + "> by user <" + sessionUser.getUsername() + "> with the role of <" + userRoles + ">");
 
 
@@ -265,26 +258,6 @@ public class FlightController {
         response.sendRedirect("/flights");
     }
 
-//    //    Delete a flight record
-//    @DeleteMapping(value = "/deleteFlight")
-//    public void deleteFlight(@RequestParam(value = "id") Long flightID, HttpServletResponse response) throws FlightNotFoundException, IOException {
-//        LOGGER.info("Flight ID: " + flightID);
-//
-//        Flight flight = flightRepository.findById(flightID)
-//                .orElseThrow(() -> new FlightNotFoundException(flightID));
-//
-//        flightRepository.delete(flight);
-//
-//        StringBuilder userRoles = new StringBuilder();
-//        for (Role role : userSession.getUser().getRoles()) {
-//            userRoles.append(role.getName());
-//        }
-//
-//        LOGGER.info("Called deleteFlight() with id <" + flightID + "> by user <" + userSession.getUser().getUsername() + "> with the role of <" + userRoles + ">");
-//
-//        response.sendRedirect("/flights");
-//    }
-
 
     //    Delete a flight record
     @PostMapping(value = "/deleteFlight")
@@ -299,8 +272,6 @@ public class FlightController {
             model.addAttribute("sessionUser", sessionUser);
         }
 
-
-//        Long flightID = flightNew.getFlightID();
         LOGGER.info("Flight ID: " + flightID);
 
         Flight flight = flightRepository.findById(flightID)
@@ -472,7 +443,6 @@ public class FlightController {
                         temporaryFlightReference = aFlight.getFlightID();
                     }
                 }
-//                model.addAttribute("user", user);
 
                 response.sendRedirect("/displayBookingPage");
             }
@@ -511,10 +481,6 @@ public class FlightController {
         user.setCredit_cards(creditCards);
 
         model.addAttribute("user", user);
-
-
-//        model.addAttribute("user", userSession.getUser());
-
 
         if (numberOfPassengers > 1) {
             return "passengerDetails.html";
@@ -559,9 +525,6 @@ public class FlightController {
         passenger.setPhone(passenger.getPhone());
         passenger.setAddress(passenger.getAddress());
         passenger.setEmail(passenger.getEmail());
-
-
-//        User user = userSession.getUser();
 
         if (user == null) {
             guest.getPassengers().add(passenger);
@@ -624,7 +587,6 @@ public class FlightController {
         guest.setPhone(passengerForm.getPhone());
         guest.setAddress(passengerForm.getAddress());
 
-
         return "/displayPaymentPage";
     }
 
@@ -647,6 +609,7 @@ public class FlightController {
         }
 
         model.addAttribute("user", user);
+
         return "displayPaymentPage.html";
     }
 
@@ -671,13 +634,10 @@ public class FlightController {
         }
         model.addAttribute("user", user);
 
-//      User user = userSession.getUser();
         Reservation reservation = new Reservation();
-        //        if(!user.getReservations().contains())
         user.getReservations().add(reservation);
         userRepository.flush();
         reservation.setUser(user);
-
 
         Flight flight = flightRepository.findFlightByFlightID(temporaryFlightReference);
         if (reservationRepository.existsByUserAndFlight(user, flight)) {
@@ -687,8 +647,6 @@ public class FlightController {
         } else {
             reservation.setFlight(flight);
             reservation.setEmail(user.getEmail());
-//            flight.getReservations().add(reservation);
-//            flightRepository.saveAndFlush(flight);
             reservationRepository.saveAndFlush(reservation);
             reservation.setCredit_card(card);
 
@@ -699,7 +657,6 @@ public class FlightController {
             LOGGER.info("User <" + user.getUsername() + "> booked a flight with id <" + flight.getFlightID() + ">");
 
             return "displayReservation.html";
-
         }
     }
 
@@ -731,7 +688,6 @@ public class FlightController {
             return "bookingDetails.html";
         }
 
-
         Reservation reservation = new Reservation();
 
         CreditCard card = new CreditCard(EncryptionService.encrypt(cardForm.getCardholder_name()), EncryptionService.encrypt(cardForm.getCard_number()),
@@ -759,7 +715,6 @@ public class FlightController {
 
         model.addAttribute("reservation", reservation);
         model.addAttribute("flight", flightRepository.findFlightByFlightID(temporaryFlightReference));
-//        response.sendRedirect("/displayReservationId");
         return "displayReservation.html";
 
     }
@@ -785,8 +740,6 @@ public class FlightController {
 
         List<Reservation> guestReservationId = new ArrayList<>();
         List<Guest> guestList = guestRepository.findAll();
-//        log.info(allGuests.get(1).getPassengers().size());
-
         List<Reservation> reservationList = reservationRepository.findAll();
 
         for (Reservation reserved : reservationList) {
@@ -888,6 +841,4 @@ public class FlightController {
         }
         return isGuest;
     }
-
-
 }
