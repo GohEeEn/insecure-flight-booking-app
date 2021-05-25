@@ -11,7 +11,7 @@
 
 		<div class="container">
 
-				<h4>Payment Method</h4>
+				<h3>Payment Method</h3>
 				<div th:each="entry: ${user.getRoles()}">
 					<div th:if="${entry.name} == 'MEMBER'">
 						<div class="container">
@@ -36,17 +36,16 @@
 								</table>
 
 								<button type="submit" class="btn btn-primary">Select</button>
+								<a href="/registerCard" class="btn btn-outline-primary">Add New Card</a>
 							</form>
 						</div>
 
-
 						<div th:if="${cards.size() == 0}">
-							<h3 class="text-center">No stored payment methods detected.<br/>
-								Please add a Payment Method and restart the booking process.</h3>
-						</div>
-
-						<div>
-							<a href="/registerCard" class="btn btn-outline-primary">Add New Card</a>
+							<h4 class="text-center">No stored payment methods detected.<br/>
+								Please add a Payment Method and restart the booking process.</h4>
+							<div>
+								<a href="/registerCard" class="btn btn-outline-primary">Add New Card</a>
+							</div>
 						</div>
 					</div>
 

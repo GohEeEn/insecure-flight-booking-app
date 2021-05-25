@@ -52,9 +52,13 @@
                         </div>
                         <br>
 						  <div class="form-group row">
-						    <label for="flightIndexSelected" class="col-sm-4 col-form-label">Enter the Index of Flight</label>
+						    <label for="flightIndexSelected" class="col-sm-4 col-form-label">Select the Index of Flight</label>
 						    <div class="col-sm-2">
-						      <input type="text" class="form-control" id="flightIndexSelected" placeholder="Flight" name="flightIndexSelected" required>
+<!--						      <input type="text" class="form-control" id="flightIndexSelected" placeholder="Flight" name="flightIndexSelected" required>-->
+						      <select class="form-control" id="flightIndexSelected" name="flightIndexSelected" required>
+							  	<option disabled>Flight Index</option>
+								<option th:each="i : ${#numbers.sequence(1, #lists.size(displayedFlights))}" th:value="${i}" th:text="${i}"></option>
+							  </select>
 						    </div>
 						    <div class="col-sm-6">
 						    </div>
