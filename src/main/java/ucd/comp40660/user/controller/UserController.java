@@ -3,23 +3,15 @@ package ucd.comp40660.user.controller;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.security.authentication.AuthenticationManager;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
-import org.springframework.security.web.authentication.WebAuthenticationDetails;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.security.authentication.AuthenticationManager;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 import ucd.comp40660.flight.repository.FlightRepository;
 import ucd.comp40660.reservation.repository.ReservationRepository;
-import ucd.comp40660.service.EncryptionService;
-import ucd.comp40660.service.SecurityService;
 import ucd.comp40660.service.SecurityServiceImplementation;
 import ucd.comp40660.service.UserService;
 import ucd.comp40660.user.UserSession;
@@ -40,7 +32,6 @@ import java.io.IOException;
 import java.security.Principal;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Objects;
 
 import static ucd.comp40660.filter.SecurityConstants.LOGIN_URL;
 
@@ -131,12 +122,11 @@ public class UserController {
      }
 
     //    Get a single registration by id
-//    the id can be changed to any other attribute
+    //    the id can be changed to any other attribute
     @PreAuthorize("#username == authentication.name or hasAuthority('ADMIN')")
     @GetMapping("/users/{username}")
     @ResponseBody
     public User getRegistrationByUsername(@PathVariable(value = "username") String username, HttpServletRequest req) throws UserNotFoundException {
-//        Principal userDetails = req.getUserPrincipal();
 
         StringBuilder userRoles = new StringBuilder();
         for (Role role : userRepository.findByUsername(userSession.getUser().getUsername()).getRoles()) {
@@ -148,6 +138,7 @@ public class UserController {
     }
 
     //    update registration details
+    @PreAuthorize("#username == authentication.name or hasAuthority('ADMIN')")
     @PutMapping("/users/{id}")
     public User updateRegistration(@PathVariable(value = "id") Long registrationId, @Valid @RequestBody User userDetails) throws UserNotFoundException {
 
@@ -171,6 +162,7 @@ public class UserController {
         return userRepository.save(user);
     }
 
+
     //    Delete a registration record
     @PreAuthorize("#username == authentication.name or hasAuthority('ADMIN')")
     @PostMapping("/user/delete")
@@ -179,63 +171,22 @@ public class UserController {
         User sessionUser = userRepository.findByUsername(userDetails.getName());
         User user = userRepository.findByUsername(username);
 
-//        User user = userRepository.findById(registrationID)
-//                .orElseThrow(() -> new UserNotFoundException(registrationID));
-
         userRepository.delete(user);
-
-        //TODO
-//        LOGGER.info("Successfully deleted user registration for user <" + username + "> by admin <" + userSession.getUser().getUsername() + ">");
-
 
         if (sessionUser.getUsername().equals(user.getUsername())) {
             userSession.setUser(null);
         }
 
-        //TODO Possible Session management after account deletion?
-
-//        return "index.html";
         response.sendRedirect(LOGIN_URL);
 
     }
 
-//    //    Delete a registration record
-//    @PreAuthorize("#username == authentication.name or hasAuthority('ADMIN')")
-//    @DeleteMapping("/delete/{username}")
-//    public String deleteRegistration(@PathVariable(value = "username") String username, HttpServletRequest req) throws UserNotFoundException {
-//        Principal userDetails = req.getUserPrincipal();
-//        User sessionUser = userRepository.findByUsername(userDetails.getName());
-//        User user = userRepository.findByUsername(username);
-//
-////        User user = userRepository.findById(registrationID)
-////                .orElseThrow(() -> new UserNotFoundException(registrationID));
-//
-//        LOGGER.info("Successfully deleted user registration for user <" + username + "> by admin <" + userSession.getUser().getUsername() + ">");
-//
-//        userRepository.delete(user);
-//
-//        if (sessionUser.getUsername().equals(user.getUsername())) {
-//            userSession.setUser(null);
-//        }
-//
-//        return "index.html";
-//    }
-
-
-
-
 
     @GetMapping("/register")
     public String register(Model model, @Valid @ModelAttribute("userForm") User userForm, HttpServletResponse response) throws Exception {
-//        if (userSession.isLoginFailed()) {
-//            model.addAttribute("error", "Unable to create account, passwords do not match");
-//            userSession.setLoginFailed(false);
-//        }
-//        if (userSession.getUser() != null) {
-//            response.sendRedirect("/logout");
-//        }
         return "register.html";
     }
+
 
     @PostMapping("/register")
     public String register(@Valid @ModelAttribute("userForm") User userForm, BindingResult bindingResult,
@@ -249,9 +200,7 @@ public class UserController {
             return "register.html";
         }
 
-        String originalPassword = userForm.getPassword();
         userService.save(userForm);
-        securityService.autoLogin(userForm.getUsername(), originalPassword, req);
 
         StringBuilder userRoles = new StringBuilder();
         for (Role role : userRepository.findByUsername(userForm.getUsername()).getRoles()) {
@@ -259,13 +208,16 @@ public class UserController {
         }
         LOGGER.info("New user registered with username <" + userForm.getUsername() + "> with authority <" + userRoles + ">");
 
-        Principal userDetails = req.getUserPrincipal();
-        User sessionUser = userRepository.findByUsername(userDetails.getName());
+//        Principal userDetails = req.getUserPrincipal();
+        securityService.guestLogin();
+        User sessionUser = userRepository.findByUsername("testguest");
         model.addAttribute("sessionUser", sessionUser);
 
         return "index.html";
     }
 
+
+    @PreAuthorize("hasAuthority('ADMIN')")
     @GetMapping("/adminRegister")
     public String adminRegister(Model model, @ModelAttribute("userForm") User userForm, HttpServletResponse response) throws Exception {
         if (userSession.isLoginFailed()) {
@@ -278,6 +230,7 @@ public class UserController {
         return "adminRegister.html";
     }
 
+    @PreAuthorize("hasAuthority('ADMIN')")
     @PostMapping("/adminRegister")
     public String adminRegister(@Valid @ModelAttribute("userForm") User userForm, BindingResult bindingResult,
                                 Model model, HttpServletRequest req) throws ServletException {
@@ -301,6 +254,7 @@ public class UserController {
         return "index.html";
     }
 
+    @PreAuthorize("hasAuthority('ADMIN')")
     @GetMapping("/guestRegister")
     public String guestRegister(Model model, HttpServletResponse response,
                                 @Valid @ModelAttribute("userForm") User userForm) throws Exception {
@@ -314,6 +268,7 @@ public class UserController {
         return "guestRegister.html";
     }
 
+    @PreAuthorize("hasAuthority('ADMIN')")
     @PostMapping("/guestRegister")
     public String guestRegister(Model model, @ModelAttribute("userForm") User userForm,
                                 BindingResult bindingResult, HttpServletRequest req) throws ServletException {
@@ -335,6 +290,7 @@ public class UserController {
 
         return "index.html";
     }
+
 
     @PreAuthorize("#username == authentication.name or hasAuthority('ADMIN')")
     @GetMapping("/viewProfile/{username}")
@@ -358,7 +314,8 @@ public class UserController {
         return "viewProfile.html";
     }
 
-    @PreAuthorize("#username == authentication.name or hasAuthority('ADMIN')")
+
+    @PreAuthorize("#username == authentication.name")
     @GetMapping("/editProfile/{username}")
     public String loadEditProfile(@PathVariable(value = "username") String username,
                                   @ModelAttribute("userForm") User userForm,
@@ -386,7 +343,8 @@ public class UserController {
         return "editProfile.html";
     }
 
-    @PreAuthorize("#username == authentication.name or hasAuthority('ADMIN')")
+
+    @PreAuthorize("#username == authentication.name")
     @PostMapping("/editProfile/{username}")
     public String editProfile(@PathVariable("username") String username,
                               @Valid @ModelAttribute("userForm") User userForm, BindingResult bindingResult,
@@ -489,6 +447,7 @@ public class UserController {
         }
     }
 
+
     @PreAuthorize("#username == authentication.name")
     @GetMapping("/editPassword/{username}")
     public String changePassword(@PathVariable(value = "username") String username,
@@ -590,6 +549,7 @@ public class UserController {
         }
         return isAdmin;
     }
+
 
     private boolean isGuest(User sessionUser) {
         boolean isGuest = false;

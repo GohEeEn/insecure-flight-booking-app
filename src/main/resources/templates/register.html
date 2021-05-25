@@ -66,6 +66,7 @@
                     <input id="phone" class="form-control" type="text" name="phone" placeholder="Phone Number" th:field="*{phone}"
                            onchange="passengerPhoneValidator(document.memberForm.phone)" onkeydown="clearErrors()" required/>
                     <label for="phone_validity"><span color="red" id="phone_validity"></span></label>
+                    <small>Format:123-456-7890</small>
                     <span class="error" th:if="${#fields.hasErrors('phone')}" th:errors="*{phone}"></span>
                 </div>
 

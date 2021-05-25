@@ -41,6 +41,10 @@ public class UserValidator implements Validator {
         if(userService.findByPhone(user.getPhone()) != null)
             errors.rejectValue("phone", "InvalidPhone");
 
+        if(!isValid(user.getAddress(), ADDRESS_REGEX)){
+            errors.rejectValue("address", "InvalidAddress");
+        }
+
         if ((!user.getPasswordConfirm().equals(user.getPassword())) ||
             (!isValid(user.getPassword(), PASSWORD_REGEX)) ||
             (user.getUsername().length() < 4 || user.getUsername().length() > 32) ||

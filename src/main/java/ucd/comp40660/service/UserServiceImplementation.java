@@ -40,7 +40,7 @@ public class UserServiceImplementation implements UserService {
         Set<Role> roleSet = new HashSet<Role>();
         roleSet.add(userRole);
         user.setRoles(roleSet);
-        userRepository.save(user);
+        userRepository.saveAndFlush(user);
     }
 
     @Override

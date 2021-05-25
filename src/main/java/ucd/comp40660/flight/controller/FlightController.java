@@ -119,6 +119,7 @@ public class FlightController {
         return "viewAllFlights.html";
     }
 
+    @PreAuthorize("hasAuthority('ADMIN')")
     @GetMapping("/registerFlight")
     public String registerFlight(Model model, HttpServletRequest req) {
         User sessionUser = null;
@@ -133,6 +134,8 @@ public class FlightController {
 
     }
 
+
+    @PreAuthorize("hasAuthority('ADMIN')")
     @PostMapping("/registerFlight")
     public void registerFlight(Model model, HttpServletRequest req, HttpServletResponse response,
                                String source, String destination, String departureDate, String departureTime,
@@ -200,6 +203,7 @@ public class FlightController {
                 .orElseThrow(() -> new FlightNotFoundException(flightID));
     }
 
+    @PreAuthorize("hasAuthority('ADMIN')")
     @PostMapping("/updateFlight")
     public String updateFlight(@RequestParam Long flightID, Model model, HttpServletRequest req) {
         User sessionUser = null;
@@ -217,6 +221,7 @@ public class FlightController {
 
 
     //    Update flight details
+    @PreAuthorize("hasAuthority('ADMIN')")
     @PostMapping("/updateFlightInfo")
     public void updateFlightInfo(@RequestParam Long FLIGHTID, String source, String destination, String departureDate, String departureTime,
                                  String arrivalDate, String arrivalTime, HttpServletResponse response, HttpServletRequest req, Model model) throws FlightNotFoundException, ParseException, IOException {
@@ -243,7 +248,6 @@ public class FlightController {
         }
 
 
-//        LOGGER.info("Called updateFlight() with id <" + FLIGHTID + "> by user <" + sessionUser.getUsername() + "> with the role of <" + sessionUser.getRoles() + ">");
         LOGGER.info("Called updateFlight() with id <" + FLIGHTID + "> by user <" + sessionUser.getUsername() + "> with the role of <" + userRoles + ">");
 
 
@@ -259,28 +263,9 @@ public class FlightController {
         response.sendRedirect("/flights");
     }
 
-//    //    Delete a flight record
-//    @DeleteMapping(value = "/deleteFlight")
-//    public void deleteFlight(@RequestParam(value = "id") Long flightID, HttpServletResponse response) throws FlightNotFoundException, IOException {
-//        LOGGER.info("Flight ID: " + flightID);
-//
-//        Flight flight = flightRepository.findById(flightID)
-//                .orElseThrow(() -> new FlightNotFoundException(flightID));
-//
-//        flightRepository.delete(flight);
-//
-//        StringBuilder userRoles = new StringBuilder();
-//        for (Role role : userSession.getUser().getRoles()) {
-//            userRoles.append(role.getName());
-//        }
-//
-//        LOGGER.info("Called deleteFlight() with id <" + flightID + "> by user <" + userSession.getUser().getUsername() + "> with the role of <" + userRoles + ">");
-//
-//        response.sendRedirect("/flights");
-//    }
-
 
     //    Delete a flight record
+    @PreAuthorize("hasAuthority('ADMIN')")
     @PostMapping(value = "/deleteFlight")
     public void deleteFlight(@RequestParam Long flightID, Model model, HttpServletRequest req, HttpServletResponse response) throws FlightNotFoundException, IOException {
         System.out.println("here:" + flightID);
@@ -293,8 +278,6 @@ public class FlightController {
             model.addAttribute("sessionUser", sessionUser);
         }
 
-
-//        Long flightID = flightNew.getFlightID();
         LOGGER.info("Flight ID: " + flightID);
 
         Flight flight = flightRepository.findById(flightID)
@@ -465,7 +448,6 @@ public class FlightController {
                         temporaryFlightReference = aFlight.getFlightID();
                     }
                 }
-//                model.addAttribute("user", user);
 
                 response.sendRedirect("/displayBookingPage");
             }
@@ -549,9 +531,6 @@ public class FlightController {
         passenger.setAddress(passenger.getAddress());
         passenger.setEmail(passenger.getEmail());
 
-
-//        User user = userSession.getUser();
-
         if (user == null) {
             guest.getPassengers().add(passenger);
             guestRepository.save(guest);
@@ -613,7 +592,6 @@ public class FlightController {
         guest.setPhone(passengerForm.getPhone());
         guest.setAddress(passengerForm.getAddress());
 
-
         return "/displayPaymentPage";
     }
 
@@ -636,10 +614,11 @@ public class FlightController {
         }
 
         model.addAttribute("user", user);
+
         return "displayPaymentPage.html";
     }
 
-    //    @PreAuthorize("hasAuthority('MEMBER') or hasAuthority('ADMIN')")
+    @PreAuthorize("hasAuthority('MEMBER') or hasAuthority('ADMIN')")
     @PostMapping("/processMemberPayment")
     public String processMemberPayment(Model model, CreditCard card, HttpServletRequest req) {
 
@@ -660,13 +639,10 @@ public class FlightController {
         }
         model.addAttribute("user", user);
 
-//      User user = userSession.getUser();
         Reservation reservation = new Reservation();
-        //        if(!user.getReservations().contains())
         user.getReservations().add(reservation);
         userRepository.flush();
         reservation.setUser(user);
-
 
         Flight flight = flightRepository.findFlightByFlightID(temporaryFlightReference);
         if (reservationRepository.existsByUserAndFlight(user, flight)) {
@@ -676,8 +652,6 @@ public class FlightController {
         } else {
             reservation.setFlight(flight);
             reservation.setEmail(user.getEmail());
-//            flight.getReservations().add(reservation);
-//            flightRepository.saveAndFlush(flight);
             reservationRepository.saveAndFlush(reservation);
             reservation.setCredit_card(card);
 
@@ -688,7 +662,6 @@ public class FlightController {
             LOGGER.info("User <" + user.getUsername() + "> booked a flight with id <" + flight.getFlightID() + ">");
 
             return "displayReservation.html";
-
         }
     }
 
@@ -719,7 +692,6 @@ public class FlightController {
             return "bookingDetails.html";
         }
 
-
         Reservation reservation = new Reservation();
 
         CreditCard card = new CreditCard(EncryptionService.encrypt(cardForm.getCardholder_name()), EncryptionService.encrypt(cardForm.getCard_number()),
@@ -747,7 +719,6 @@ public class FlightController {
 
         model.addAttribute("reservation", reservation);
         model.addAttribute("flight", flightRepository.findFlightByFlightID(temporaryFlightReference));
-//        response.sendRedirect("/displayReservationId");
         return "displayReservation.html";
 
     }
@@ -773,8 +744,6 @@ public class FlightController {
 
         List<Reservation> guestReservationId = new ArrayList<>();
         List<Guest> guestList = guestRepository.findAll();
-//        log.info(allGuests.get(1).getPassengers().size());
-
         List<Reservation> reservationList = reservationRepository.findAll();
 
         for (Reservation reserved : reservationList) {
@@ -876,6 +845,4 @@ public class FlightController {
         }
         return isGuest;
     }
-
-
 }

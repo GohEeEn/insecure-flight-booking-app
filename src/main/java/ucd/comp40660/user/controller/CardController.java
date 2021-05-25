@@ -3,8 +3,6 @@ package ucd.comp40660.user.controller;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.validation.BindingResult;
 import ucd.comp40660.service.EncryptionService;
 import ucd.comp40660.user.UserSession;
@@ -14,7 +12,6 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.ui.Model;
 
 import ucd.comp40660.user.exception.CreditCardNotFoundException;
-import ucd.comp40660.user.exception.UserNotFoundException;
 import ucd.comp40660.user.model.CreditCard;
 import ucd.comp40660.user.model.Role;
 import ucd.comp40660.user.model.User;
@@ -30,7 +27,6 @@ import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
 import java.io.IOException;
 import java.security.Principal;
-import java.sql.SQLIntegrityConstraintViolationException;
 import java.util.List;
 
 
@@ -53,12 +49,6 @@ public class CardController {
 
     @Autowired
     CreditCardValidator creditCardValidator;
-
-//    @GetMapping("/cards")
-//    @ResponseBody
-//    public List<CreditCard> getCreditCards() {
-//        return creditCardRepository.findAll();
-//    }
 
 
     @PostMapping("/addMemberCreditCard")
@@ -84,15 +74,11 @@ public class CardController {
             return "registerCreditCard.html";
         }
 
-
-
         // encrypt card_number and security_code before saving it in the database
         String encryptedCardholderName = EncryptionService.encrypt(cardForm.getCardholder_name());
         String encryptedCardNumber = EncryptionService.encrypt(cardForm.getCard_number());
         String encryptedCardType = EncryptionService.encrypt(cardForm.getType());
         String encryptedSecurityCode = EncryptionService.encrypt(cardForm.getSecurity_code());
-
-
 
 //        User user = userSession.getUser();
         model.addAttribute("user", user);
@@ -119,6 +105,7 @@ public class CardController {
         return "viewProfile.html";
     }
 
+
     @PreAuthorize("#username == authentication.name")
     @GetMapping("/viewCreditCards/{username}")
     public String viewMemberCreditCards(@PathVariable(value = "username") String username, Model model, HttpServletRequest req) {
@@ -139,6 +126,7 @@ public class CardController {
             sessionUser.setCredit_cards(creditCards);
 
             model.addAttribute("sessionUser", sessionUser);
+            model.addAttribute("user", sessionUser);
         }
 
         model.addAttribute("cards", creditCardRepository.findAllByUser(sessionUser));
@@ -153,8 +141,9 @@ public class CardController {
         return "viewCreditCards.html";
     }
 
-    @GetMapping("/registerCard")
-    public String registerCardView(Model model, @Valid @ModelAttribute("cardForm") CreditCard cardForm, HttpServletRequest req) {
+    @PreAuthorize("#username == authentication.name")
+    @GetMapping("/registerCard/{username}")
+    public String registerCardView(@PathVariable(value = "username") String username, Model model, @Valid @ModelAttribute("cardForm") CreditCard cardForm, HttpServletRequest req) {
         User user = null;
 
 
@@ -171,8 +160,9 @@ public class CardController {
         return "registerCreditCard.html";
     }
 
-    @GetMapping("/deleteCard/{id}")
-    public void deleteCard(@PathVariable(value = "id") Long id, Model model, HttpServletRequest req, HttpServletResponse response) throws CreditCardNotFoundException, IOException {
+    @PreAuthorize("#username == authentication.name")
+    @GetMapping("/deleteCard/{username}/{id}")
+    public void deleteCard(@PathVariable(value = "id") Long id, @PathVariable(value = "username") String username, Model model, HttpServletRequest req, HttpServletResponse response) throws CreditCardNotFoundException, IOException {
         User user = null;
 
         Principal userDetails = req.getUserPrincipal();
@@ -197,5 +187,4 @@ public class CardController {
 
         response.sendRedirect("/viewCreditCards/" + user.getUsername());
     }
-
 }
