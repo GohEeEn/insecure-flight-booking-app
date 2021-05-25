@@ -28,7 +28,7 @@
 									<tbody>
 										<tr th:each="card : ${cards}">
 											<td><label for="card"></label><input type="radio" id="card" name="card_choice" required></td>
-											<td><span th:text="${card.card_number}" ></span></td>
+											<td><span th:text="${card.maskedCardNumber()}" ></span></td>
 											<td><span th:text="${card.cardholder_name}" ></span></td>
 											<td><span th:text="${card.expiration_year}" ></span></td>
 										</tr>

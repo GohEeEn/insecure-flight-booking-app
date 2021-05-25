@@ -6,6 +6,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
@@ -15,6 +16,7 @@ import ucd.comp40660.reservation.controller.ReservationController;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpSession;
 
 
 @Service
@@ -44,35 +46,15 @@ public class SecurityServiceImplementation implements SecurityService {
     @Override
     public void autoLogin(String username, String password, HttpServletRequest req) throws ServletException {
 
-        req.logout();
-        req.login(username, password);
         UserDetails userDetails = userDetailsService.loadUserByUsername(username);
         UsernamePasswordAuthenticationToken usernamePasswordAuthenticationToken = new UsernamePasswordAuthenticationToken(userDetails, password, userDetails.getAuthorities());
-
+        usernamePasswordAuthenticationToken.setDetails(new WebAuthenticationDetails(req));
         Authentication auth = authenticationManager.authenticate(usernamePasswordAuthenticationToken);
 
         if (auth.isAuthenticated()) {
+            LOGGER.info(String.format("Logging in with %s", auth.getName()));
             SecurityContextHolder.getContext().setAuthentication(auth);
         }
-
-
-//        try{
-//            UserDetails userDetails = userDetailsService.loadUserByUsername(username);
-//            UsernamePasswordAuthenticationToken usernamePasswordAuthenticationToken = new UsernamePasswordAuthenticationToken(username, password);
-//            usernamePasswordAuthenticationToken.setDetails(new WebAuthenticationDetails((req)));
-//
-//            Authentication authentication = authenticationManager.authenticate(usernamePasswordAuthenticationToken);
-//
-//            SecurityContextHolder.getContext().setAuthentication(authentication);
-//
-//            LOGGER.info(String.format("Auto Login as newly registered User %s, with authority %s", username, userDetails.getAuthorities()));
-//        }
-//        catch(Exception e){
-//            SecurityContextHolder.getContext().setAuthentication(null);
-//            LOGGER.info(String.format("Auto Login Failed"));
-//
-//        }
-//
     }
 
     @Override

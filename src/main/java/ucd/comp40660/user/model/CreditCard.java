@@ -65,9 +65,9 @@ public class CreditCard {
         this.security_code = security_code;
     }
 
-    public String maskedCardDetails(){
-        String maskedDetails = "Ends in ";
-        maskedDetails = card_number.substring(card_number.length()-4);
+    public String maskedCardNumber(){
+        String maskedDetails = "Ends with ";
+        maskedDetails += card_number.substring(card_number.length()-4);
         return maskedDetails;
     }
 
