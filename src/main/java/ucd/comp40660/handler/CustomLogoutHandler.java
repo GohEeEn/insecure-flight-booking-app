@@ -42,6 +42,6 @@ public class CustomLogoutHandler implements LogoutHandler {
         jwtToken.setLogout(true);
         jwtTokenRepository.save(jwtToken);
 
-        LOGGER.info(String.format("User <%s> logged out successfully", request.getParameter("username")));
+        LOGGER.info(String.format("User logged out successfully"));
     }
 }
