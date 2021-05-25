@@ -96,9 +96,9 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
                 .and()
                 .authorizeRequests()
                 .antMatchers("/error", "/resources/**", "/img/**", "/css/**", "/js/**", LOGIN_URL, "/register", "/", "/guestRegister").permitAll()
-                .antMatchers("/user","/user/delete/", "/user/editProfile/").access("hasAnyAuthority('ADMIN','MEMBER')")
-                .antMatchers("/editProfile", "/editPassword").access("hasAuthority('MEMBER')")
-                .antMatchers("/admin", "/adminRegister", "/users").access("hasAuthority('ADMIN')")
+                .antMatchers("/user","/user/delete/").access("hasAnyAuthority('ADMIN','MEMBER')")
+                .antMatchers("/editProfile", "/editPassword", "/viewCreditCards").access("hasAuthority('MEMBER')")
+                .antMatchers("/admin", "/adminRegister", "/users", "/flights", "/reservations").access("hasAuthority('ADMIN')")
                 .anyRequest().authenticated()   // Authenticate all requests, with exception URL regexes mentioned above
                 .and()
                 .formLogin()

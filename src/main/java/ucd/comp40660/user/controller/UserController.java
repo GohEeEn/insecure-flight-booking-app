@@ -314,7 +314,7 @@ public class UserController {
     }
 
 
-    @PreAuthorize("#username == authentication.name or hasAuthority('ADMIN')")
+    @PreAuthorize("#username == authentication.name")
     @GetMapping("/editProfile/{username}")
     public String loadEditProfile(@PathVariable(value = "username") String username,
                                   @ModelAttribute("userForm") User userForm,
@@ -343,7 +343,7 @@ public class UserController {
     }
 
 
-    @PreAuthorize("#username == authentication.name or hasAuthority('ADMIN')")
+    @PreAuthorize("#username == authentication.name")
     @PostMapping("/editProfile/{username}")
     public String editProfile(@PathVariable("username") String username,
                               @Valid @ModelAttribute("userForm") User userForm, BindingResult bindingResult,
