@@ -119,6 +119,7 @@ public class FlightController {
         return "viewAllFlights.html";
     }
 
+    @PreAuthorize("hasAuthority('ADMIN')")
     @GetMapping("/registerFlight")
     public String registerFlight(Model model, HttpServletRequest req) {
         User sessionUser = null;
@@ -133,6 +134,8 @@ public class FlightController {
 
     }
 
+
+    @PreAuthorize("hasAuthority('ADMIN')")
     @PostMapping("/registerFlight")
     public void registerFlight(Model model, HttpServletRequest req, HttpServletResponse response,
                                String source, String destination, String departureDate, String departureTime,
@@ -200,6 +203,7 @@ public class FlightController {
                 .orElseThrow(() -> new FlightNotFoundException(flightID));
     }
 
+    @PreAuthorize("hasAuthority('ADMIN')")
     @PostMapping("/updateFlight")
     public String updateFlight(@RequestParam Long flightID, Model model, HttpServletRequest req) {
         User sessionUser = null;
@@ -217,6 +221,7 @@ public class FlightController {
 
 
     //    Update flight details
+    @PreAuthorize("hasAuthority('ADMIN')")
     @PostMapping("/updateFlightInfo")
     public void updateFlightInfo(@RequestParam Long FLIGHTID, String source, String destination, String departureDate, String departureTime,
                                  String arrivalDate, String arrivalTime, HttpServletResponse response, HttpServletRequest req, Model model) throws FlightNotFoundException, ParseException, IOException {
@@ -260,6 +265,7 @@ public class FlightController {
 
 
     //    Delete a flight record
+    @PreAuthorize("hasAuthority('ADMIN')")
     @PostMapping(value = "/deleteFlight")
     public void deleteFlight(@RequestParam Long flightID, Model model, HttpServletRequest req, HttpServletResponse response) throws FlightNotFoundException, IOException {
         System.out.println("here:" + flightID);
@@ -613,7 +619,7 @@ public class FlightController {
         return "displayPaymentPage.html";
     }
 
-    //    @PreAuthorize("hasAuthority('MEMBER') or hasAuthority('ADMIN')")
+    @PreAuthorize("hasAuthority('MEMBER') or hasAuthority('ADMIN')")
     @PostMapping("/processMemberPayment")
     public String processMemberPayment(Model model, CreditCard card, HttpServletRequest req) {
 

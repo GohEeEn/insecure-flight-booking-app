@@ -65,6 +65,7 @@ public class ReservationController {
 
 
     //    Get all reservations
+    @PreAuthorize("hasAuthority('ADMIN')")
     @GetMapping("/reservations")
     public String getAllReservations(HttpServletRequest req, Model model) {
 
@@ -376,7 +377,7 @@ public class ReservationController {
         }
     }
 
-
+    @PreAuthorize("hasAuthority('ADMIN')")
     @PostMapping("/updateReservation")
     public String updateReservation(@RequestParam String reservationID, Model model, HttpServletRequest req){
         User sessionUser = null;
@@ -435,6 +436,7 @@ public class ReservationController {
         response.sendRedirect("/reservations");
     }
 
+    @PreAuthorize("hasAuthority('ADMIN')")
     @PostMapping("/deleteReservation")
     public void updateReservationInfo(@RequestParam Long reservationID, HttpServletResponse response)
                                                                             throws ReservationNotFoundException, IOException{
