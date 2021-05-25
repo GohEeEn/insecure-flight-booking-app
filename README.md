@@ -91,11 +91,6 @@ Homepage is the first page you will always see when you open this application wi
 1. As an admin, you can look at users' profiles, update their information, and change their reservations. 
 2. To log in as admin, please use the following credentials: **zuckerberg : Password1234!**
 
-
-#### General Reservation Workflow
-
-![Reservation workflow of this application](img/Reservation_Workflow.PNG)
-
 #### Authors (Team inSecurity)
 
 - [Ee En Goh](https://github.com/GohEeEn)
