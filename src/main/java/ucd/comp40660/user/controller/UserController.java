@@ -200,9 +200,7 @@ public class UserController {
             return "register.html";
         }
 
-        String originalPassword = userForm.getPassword();
         userService.save(userForm);
-        securityService.autoLogin(userForm.getUsername(), originalPassword, req);
 
         StringBuilder userRoles = new StringBuilder();
         for (Role role : userRepository.findByUsername(userForm.getUsername()).getRoles()) {
@@ -210,8 +208,9 @@ public class UserController {
         }
         LOGGER.info("New user registered with username <" + userForm.getUsername() + "> with authority <" + userRoles + ">");
 
-        Principal userDetails = req.getUserPrincipal();
-        User sessionUser = userRepository.findByUsername(userDetails.getName());
+//        Principal userDetails = req.getUserPrincipal();
+        securityService.guestLogin();
+        User sessionUser = userRepository.findByUsername("testguest");
         model.addAttribute("sessionUser", sessionUser);
 
         return "index.html";
