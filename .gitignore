@@ -34,3 +34,4 @@ build/
 
 ### Logging ###
 *.log
+*.trace.db
