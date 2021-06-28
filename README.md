@@ -1,6 +1,13 @@
 # inSecurity
 
-This is the Flight Reservation Web Application repository for UCD BSc Computer Science module [COMP47660](https://sisweb.ucd.ie/usis/!W_HU_MENU.P_PUBLISH?p_tag=MODULE&MODULE=COMP47660) Secure Software Engineering
+This is the Flight Reservation Web Application repository for UCD BSc Computer Science module [COMP47660](https://sisweb.ucd.ie/usis/!W_HU_MENU.P_PUBLISH?p_tag=MODULE&MODULE=COMP47660) Secure Software Engineering in 2020-21
+
+## Authors (Team inSecurity)
+
+- [Ee En Goh](https://github.com/GohEeEn) (Current maintainer)
+- [Seán Conor McLoughlin](https://github.com/SeanConor)
+- [Olanipekun Akintola](https://github.com/olaakintola)
+- [Svetoslav Nizhnichenkov](https://github.com/nizhnichenkov)
 
 ## Pre-requisites
 
@@ -9,10 +16,10 @@ This is the Flight Reservation Web Application repository for UCD BSc Computer S
 
 ## How to run this program
 
-1. Encrypting sensitive properties
+1. Decrypt encrypted sensitive properties
     - Encryption of sensitive properties inside file application.properties is enabled with [Jasypt](http://www.jasypt.org)
     - To generate the encoded credential value, go to maven library path ` ~/.m2/repository/org/jasypt/jasypt/1.9.0` on terminal (CLI)
-    - Use the following commmand to run the JAR program to generate the encoded value
+    - Use the following command to run the JAR program to generate the encoded value
       ```
        java -cp jasypt-1.9.0.jar org.jasypt.intf.cli.JasyptPBEStringEncryptionCLI input="value" password=<key> algorithm=PBEWithMD5AndDES
       ```
@@ -22,7 +29,7 @@ This is the Flight Reservation Web Application repository for UCD BSc Computer S
     - Jasypt reads all the properties from _application.properties_ or any classpath properties that you passed, with value prefix __ENC(__ and suffix __)__
     - The password is required to run this application, with the following Maven argument :
 
-      `-Djasypt.encryptor.password=<key>`
+      `-Djasypt.encryptor.password=secretkey`
 
     - Reference : <https://medium.com/@mail2rajeevshukla/hiding-encrypting-database-password-in-the-application-properties-34d59fe104eb>
 
@@ -39,14 +46,17 @@ This is the Flight Reservation Web Application repository for UCD BSc Computer S
 
 8. To connect to the **h2** database, open up any browser and navigate to ***localhost:8080/h2-console***
 
-- Click on **Advanced -> Proceed to localhost (unsafe)**. 
-        ![Navigate to h2 database](./img/fix.png)
-
-- Use the credentials **admin : password** and the corresponding settings (in the photo below) to get access to the database console.
-    ![Get access to the database](./img/credentials.png)
+- Click on **Advanced -> Proceed to localhost (unsafe)**.
   
-- Browse through the different tables and query them. 
-    ![Query the tables](./img/query.png)
+   ![Accept the risk of using self-signed certificate](./img/fix.png)
+
+[comment]: <> (- Use the credentials **admin : password** and the corresponding settings &#40;in the photo below&#41; to get access to the database console.)
+  
+[comment]: <> (   ![Get access to the database]&#40;./img/credentials.png&#41;)
+  
+[comment]: <> (- Browse through the different tables and query them. )
+  
+[comment]: <> (   ![Query the tables]&#40;./img/query.png&#41;)
 
 
 ## Introduction to this web application
@@ -78,8 +88,6 @@ Homepage is the first page you will always see when you open this application wi
 7. From the home page, select a Fight to book. An example might be From Sofia to Dublin on the 19th of March.
 8. After completing a booking it will be available to view in `Reservations` in the Member drop-down menu in the upper-right hand side.
 9. If more than 24 hours away, an option to cancel will be available.
-10.To log in as test member, please use the following credentials: **john_smith : Password1234!**
-
 
 ### Guest
 
@@ -88,12 +96,4 @@ Homepage is the first page you will always see when you open this application wi
 
 ### Admin
 
-1. As an admin, you can look at users' profiles, update their information, and change their reservations. 
-2. To log in as admin, please use the following credentials: **zuckerberg : Password1234!**
-
-#### Authors (Team inSecurity)
-
-- [Ee En Goh](https://github.com/GohEeEn)
-- [Seán Conor McLoughlin](https://github.com/SeanConor)
-- [Olanipekun Akintola](https://github.com/olaakintola)
-- [Svetoslav Nizhnichenkov](https://github.com/nizhnichenkov)
+As an admin, you can look at users' profiles, update their information, and change their reservations.
