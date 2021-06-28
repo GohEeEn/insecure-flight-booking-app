@@ -2,7 +2,6 @@ package ucd.comp47660.model;
 
 public class PasswordUpdate {
 
-
     private String currentPassword;
 
     private String newPassword;
@@ -32,5 +31,4 @@ public class PasswordUpdate {
     public String getNewPassword() {
         return newPassword;
     }
-
 }

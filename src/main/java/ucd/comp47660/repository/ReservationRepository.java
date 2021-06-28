@@ -12,17 +12,11 @@ import java.util.Optional;
 
 @Repository
 public interface ReservationRepository extends JpaRepository<Reservation, Long> {
-    Optional<Reservation> findByEmail(String email);
-    List<Reservation> findAllByUser(User user);
-    Reservation findOneByGuest(Guest guest);
-    Reservation findByFlight(Flight flight);
+
     Reservation findByUserAndFlight(User user, Flight flight);
     List <Reservation> findAllByUserAndCancelledIsTrue(User user);
     List <Reservation> findAllByUserAndCancelledIsFalse(User user);
-    Reservation findByUserAndFlightAndCancelledIsTrue(User user, Flight flight);
     Reservation findOneByEmailAndId(String email, Long id);
     Reservation findByGuestAndFlight(Guest guest, Flight flight);
-
     boolean existsByUserAndFlight(User user, Flight flight);
-//    public findFirstByUser(User user);
 }

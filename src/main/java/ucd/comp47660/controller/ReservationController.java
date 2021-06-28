@@ -53,7 +53,7 @@ public class ReservationController {
     @Autowired
     GuestRepository guestRepository;
 
-    //  use it to implement the get user/member reservations and display it
+    // Implement the get user/member reservations and display it
     @Autowired
     private UserSession userSession;
 
@@ -64,7 +64,6 @@ public class ReservationController {
     UserService userService;
 
 
-    //    Get all reservations
     @PreAuthorize("hasAuthority('ADMIN')")
     @GetMapping("/reservations")
     public String getAllReservations(HttpServletRequest req, Model model) {
@@ -89,7 +88,6 @@ public class ReservationController {
         return "viewReservations.html";
     }
 
-    //    Get a single reservation by id
     @GetMapping("/reservations/{id}")
     @ResponseBody
     public Reservation getReservationById(@PathVariable(value = "id") Long reservationID) throws ReservationNotFoundException {
@@ -104,7 +102,6 @@ public class ReservationController {
                 .orElseThrow(() -> new ReservationNotFoundException(reservationID));
     }
 
-    //    Update the details of a reservation record
     @PreAuthorize("#username == authentication.name or hasAuthority('ADMIN')")
     @PutMapping("/reservations/{username}/{id}")
     @ResponseBody
@@ -126,7 +123,6 @@ public class ReservationController {
         return reservationRepository.saveAndFlush(reservation);
     }
 
-    //    Delete a reservation record
     @PreAuthorize("#username == authentication.name or hasAuthority('ADMIN')")
     @DeleteMapping("/reservations/{username}/{id}")
     @ResponseBody
@@ -151,7 +147,7 @@ public class ReservationController {
 
     @PreAuthorize("#username == authentication.name or hasAuthority('ADMIN')")
     @GetMapping("/getUserReservations/{username}")
-    public String getUserReservations(@PathVariable(value = "username") String username, Model model, HttpServletRequest req) throws ReservationNotFoundException {
+    public String getUserReservations(@PathVariable(value = "username") String username, Model model, HttpServletRequest req) {
         User user = null;
         User sessionUser = null;
 
@@ -163,22 +159,18 @@ public class ReservationController {
         Principal userDetails = req.getUserPrincipal();
         if (userDetails != null) {
             sessionUser = userRepository.findByUsername(userDetails.getName());
-//          model.addAttribute("user", user);
         }
 
         user = userRepository.findByUsername(username);
 
         if (user != null) {
-//            User user = userSession.getUser();
-
 
             // find all reservations associated with a user
             List<Reservation> reservations = reservationRepository.findAllByUserAndCancelledIsFalse(user);
             List<Reservation> cancelled_reservations = reservationRepository.findAllByUserAndCancelledIsTrue(user);
 
-
+            // Loop through each reservation and find the flights associated
             if (reservations.size() > 0 || cancelled_reservations.size() > 0) {
-//            loop through each reservation and find the flights associated
 
                 List<Flight> flights = new ArrayList<>();
                 List<Flight> upcoming = new ArrayList<>();
@@ -205,7 +197,7 @@ public class ReservationController {
                     cancelled_flights.add(flightRepository.findFlightByReservations(cancelled_reservation));
                 }
 
-                // add the flights to the model, so thymeleaf can display them
+                // Add the flights to the model, so thymeleaf can display them
                 model.addAttribute("flightsUser", flights);
                 model.addAttribute("upcoming", upcoming);
                 model.addAttribute("past", past);
@@ -239,15 +231,11 @@ public class ReservationController {
         User user = null;
 
         Principal userDetails = req.getUserPrincipal();
-//        if (userDetails != null) {
-//            user = userRepository.findByUsername(username);
-//            model.addAttribute("user", user);
-//        }
+
         user = userRepository.findByUsername(username);
 
         Flight flight = flightRepository.findFlightByFlightID(flightID);
 
-//        User user = userSession.getUser();
         Reservation reservation = reservationRepository.findByUserAndFlight(user, flight);
         reservation.setCancelled(true);
         reservationRepository.saveAndFlush(reservation);
@@ -265,15 +253,15 @@ public class ReservationController {
         response.sendRedirect("/getUserReservations/" + username);
     }
 
-//    @PreAuthorize("hasAuthority('ADMIN')")
     @GetMapping("/guestReservations/cancel/{email}/{id}")
     public void cancelGuestReservation(@PathVariable(value = "email") String email, @PathVariable(value = "id") Long flightID,
-                                  Model model, HttpServletResponse response, HttpServletRequest req) throws ReservationNotFoundException, IOException {
+                                  Model model, HttpServletResponse response, HttpServletRequest req) throws IOException {
 
         LOGGER.info("Beginning Guest cancellation process.");
 
         Principal userDetails = req.getUserPrincipal();
-        User user = userRepository.findByUsername(userDetails.getName());
+        userRepository.findByUsername(userDetails.getName());
+        User user;
         User sessionUser = null;
 
 
@@ -291,8 +279,6 @@ public class ReservationController {
         user = sessionUser;
         model.addAttribute("user", user);
 
-//        List<User> users = userRepository.findAll();
-//        model.addAttribute("users", users);
         LOGGER.info("Attempting to get Flight Info");
 
         Flight flight = flightRepository.findFlightByFlightID(flightID);
@@ -313,17 +299,11 @@ public class ReservationController {
         LOGGER.info("Reservation cancelled with flight id = <" + flightID + "> by user <" + sessionUser.getUsername() + "> with the role of <" + userRoles + ">");
 
         response.sendRedirect("/");
-
-
     }
-
-
-
 
     @PostMapping("/getGuestReservations")
     public String getGuestReservations(Model model, String inputEmail, String inputReservationID, HttpServletRequest req) throws ReservationNotFoundException {
 
-        User user = null;
         User sessionUser = null;
 
         Principal userDetails = req.getUserPrincipal();
@@ -332,9 +312,6 @@ public class ReservationController {
             model.addAttribute("sessionUser", sessionUser);
         }
 
-
-
-//        backend log messages
         if (inputEmail != null && inputReservationID != null) {
             LOGGER.info("Called getGuestReservations(): with email <" + inputEmail + "> and reservation id <" + inputReservationID + ">");
         }
@@ -358,7 +335,6 @@ public class ReservationController {
             Guest guest = guestRepository.findByEmail(inputEmail);
             LOGGER.info(String.format("Called guest findByEmail from repo, found guest '%s %s'", guest.getName(), guest.getSurname() ));
 
-
 //            LOGGER.info(String.format("Called getGuestReservations(): Flight info: '%s'", flight));
 
             // add flight and guest to the model
@@ -370,7 +346,7 @@ public class ReservationController {
             return "viewFlightsGuest.html";
         } else {
 
-//            if no reservation found with the provided details, keep user on the same page
+            // Keep user on the same page if no reservation found with the provided details
             model.addAttribute("error", "No such reservation found.");
 
             return "index.html";
@@ -389,12 +365,8 @@ public class ReservationController {
         }
         model.addAttribute("reservationID", reservationID);
 
-
         return "/updateReservation.html";
     }
-
-
-
 
     @PostMapping("/updateReservationInfo")
     public void updateReservationInfo(@RequestParam Long reservationID, String userDetails,
@@ -439,15 +411,10 @@ public class ReservationController {
     @PreAuthorize("hasAuthority('ADMIN')")
     @PostMapping("/deleteReservation")
     public void updateReservationInfo(@RequestParam Long reservationID, HttpServletResponse response)
-                                                                            throws ReservationNotFoundException, IOException{
-
-        Reservation reservation = reservationRepository.findById(reservationID)
-                .orElseThrow(() -> new ReservationNotFoundException(reservationID));
+                                                                            throws IOException{
 
         reservationRepository.deleteById(reservationID);
 
         response.sendRedirect("/reservations");
     }
-
-
 }

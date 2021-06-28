@@ -74,13 +74,12 @@ public class CardController {
             return "registerCreditCard.html";
         }
 
-        // encrypt card_number and security_code before saving it in the database
+        // Encrypt card_number and security_code before saving it in the database
         String encryptedCardholderName = EncryptionService.encrypt(cardForm.getCardholder_name());
         String encryptedCardNumber = EncryptionService.encrypt(cardForm.getCard_number());
         String encryptedCardType = EncryptionService.encrypt(cardForm.getType());
         String encryptedSecurityCode = EncryptionService.encrypt(cardForm.getSecurity_code());
 
-//        User user = userSession.getUser();
         model.addAttribute("user", user);
         CreditCard newCard = new CreditCard(encryptedCardholderName, encryptedCardNumber, encryptedCardType,
                 cardForm.getExpiration_month(), cardForm.getExpiration_year(), encryptedSecurityCode);
@@ -155,8 +154,6 @@ public class CardController {
             model.addAttribute("sessionUser", sessionUser);
         }
 
-
-//        model.addAttribute("user", userSession.getUser());
         return "registerCreditCard.html";
     }
 

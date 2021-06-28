@@ -86,7 +86,6 @@ public class User {
     )
     private Set<Role> roles = new HashSet<>();
 
-
     public String getAddress() {
         return address;
     }
@@ -94,7 +93,6 @@ public class User {
     public void setAddress(String address) {
         this.address = address;
     }
-
 
     @Column(name = "account_non_locked")
     private boolean accountNonLocked;

@@ -25,6 +25,7 @@ import ucd.comp47660.handler.LoginSuccessfulHandler;
 import ucd.comp47660.service.UserDetailsServiceImplementation;
 
 import java.util.Arrays;
+import java.util.Collections;
 
 import static ucd.comp47660.filter.SecurityConstants.*;
 
@@ -53,7 +54,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
     }
 
     @Override
-    protected void configure(AuthenticationManagerBuilder auth) throws Exception {
+    protected void configure(AuthenticationManagerBuilder auth) {
         auth.authenticationProvider(authenticationProvider());
     }
 
@@ -96,10 +97,10 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
                 .and()
                 .authorizeRequests()
                 .antMatchers("/error", "/resources/**", "/img/**", "/css/**", "/js/**", LOGIN_URL, "/register", "/").permitAll()
-                .antMatchers("/user","/user/delete/", "/processMemberPayment").access("hasAnyAuthority('ADMIN','MEMBER')")
+                .antMatchers("/user", "/user/delete/", "/processMemberPayment").access("hasAnyAuthority('ADMIN','MEMBER')")
                 .antMatchers("/editProfile", "/editPassword", "/viewCreditCards").access("hasAuthority('MEMBER')")
-                .antMatchers("/admin", "/adminRegister", "/users", "/flights", "/reservations", "/deleteReservation", "/guestRegister", "/adminRegister",
-                        "/registerFlight", "/updateFlight", "/deleteFlight").access("hasAuthority('ADMIN')")
+                .antMatchers("/admin", "/adminRegister", "/deleteFlight", "/deleteReservation", "/flights", "/guestRegister", "/registerFlight",
+                        "/reservations", "/updateFlight", "/users").access("hasAuthority('ADMIN')")
                 .anyRequest().authenticated()   // Authenticate all requests, with exception URL regexes mentioned above
                 .and()
                 .formLogin()
@@ -128,7 +129,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
         final UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
-        configuration.setAllowedOrigins(Arrays.asList("localhost"));
+        configuration.setAllowedOrigins(Collections.singletonList("localhost"));
         source.registerCorsConfiguration("/**", new CorsConfiguration().applyPermitDefaultValues());
         return source;
     }

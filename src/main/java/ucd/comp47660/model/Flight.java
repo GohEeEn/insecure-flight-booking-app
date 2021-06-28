@@ -43,9 +43,7 @@ public class Flight {
         super();
     }
 
-
     public Flight(String from, String destination, Date departureDateTime, Date arrivalDateTime) {
-//        this.flightID = flightID;
         this.source= from;
         this.destination= destination;
         this.departure_date_time= departureDateTime;

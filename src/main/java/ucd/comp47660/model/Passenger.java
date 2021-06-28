@@ -41,9 +41,6 @@ public class Passenger {
     @ManyToOne(cascade = CascadeType.ALL)
     private Reservation reservation;
 
-
-
-    //    public Passenger(Long id, String name, String surname, String phone, String email, String address) {
     public Passenger(String name, String surname, String phone, String email, String address) {
 
         this.name = name;

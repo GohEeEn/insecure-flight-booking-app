@@ -91,7 +91,6 @@ public class FlightController {
         response.sendRedirect("/");
     }
 
-    //    Get all flights
     @PreAuthorize("hasAuthority('ADMIN')")
     @GetMapping("/flights")
     public String getAllFlights(HttpServletRequest req, Model model) {
@@ -185,7 +184,6 @@ public class FlightController {
         response.sendRedirect("/");
     }
 
-    //    Get a single flight
     @GetMapping("/flights/{id}")
     @ResponseBody
     public Flight getFlightById(@PathVariable(value = "id") Long flightID) throws FlightNotFoundException {
@@ -214,11 +212,8 @@ public class FlightController {
         model.addAttribute("FLIGHTID", flightID);
 
         return "/updateFlight.html";
-
     }
 
-
-    //    Update flight details
     @PreAuthorize("hasAuthority('ADMIN')")
     @PostMapping("/updateFlightInfo")
     public void updateFlightInfo(@RequestParam Long FLIGHTID, String source, String destination, String departureDate, String departureTime,
@@ -261,8 +256,6 @@ public class FlightController {
         response.sendRedirect("/flights");
     }
 
-
-    //    Delete a flight record
     @PreAuthorize("hasAuthority('ADMIN')")
     @PostMapping(value = "/deleteFlight")
     public void deleteFlight(@RequestParam Long flightID, Model model, HttpServletRequest req, HttpServletResponse response) throws FlightNotFoundException, IOException {
@@ -387,7 +380,7 @@ public class FlightController {
 
         model.addAttribute("displayedFlights", flightList);
 
-        //Determine if booking as a Member/Guest, or as an admin.
+        // Determine if booking as a Member/Guest, or as an admin.
         User user = null;
         if (isAdmin(sessionUser)) {
             user = userSession.getUser();
@@ -625,7 +618,7 @@ public class FlightController {
             model.addAttribute("sessionUser", sessionUser);
         }
 
-        //Determine if booking as admin
+        // Determine if booking as admin
         User user = null;
         if (isAdmin(sessionUser)) {
             user = userSession.getUser();
@@ -700,7 +693,7 @@ public class FlightController {
         card.getReservations().add(reservation);
 
         reservation.setEmail(guest.getEmail());
-        reservation.setFlight_reference(temporaryFlightReference);//Should be made redundant with Flight object now used
+        reservation.setFlight_reference(temporaryFlightReference); // Should be made redundant with Flight object now used
         reservation.setFlight(flightRepository.findFlightByFlightID(temporaryFlightReference));
 
         reservationRepository.saveAndFlush(reservation);

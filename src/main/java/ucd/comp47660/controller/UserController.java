@@ -79,7 +79,6 @@ public class UserController {
     BCryptPasswordEncoder bCryptPasswordEncoder;
 
 
-
     @GetMapping("/")
     public String index(Model model, HttpServletRequest req, HttpServletResponse response) throws IOException {
         Principal userDetails = req.getUserPrincipal();
@@ -97,8 +96,6 @@ public class UserController {
         return "index.html";
     }
 
-
-    //    Get all registrations
     @PreAuthorize("hasAuthority('ADMIN')")
     @GetMapping("/users")
     public String getAllUsers(Model model, HttpServletRequest req) {
@@ -122,8 +119,6 @@ public class UserController {
         return "adminViewUsers.html";
      }
 
-    //    Get a single registration by id
-    //    the id can be changed to any other attribute
     @PreAuthorize("#username == authentication.name or hasAuthority('ADMIN')")
     @GetMapping("/users/{username}")
     @ResponseBody
@@ -138,7 +133,6 @@ public class UserController {
         return userRepository.findByUsername(username);
     }
 
-    //    update registration details
     @PreAuthorize("#username == authentication.name or hasAuthority('ADMIN')")
     @PutMapping("/users/{id}")
     public User updateRegistration(@PathVariable(value = "id") Long registrationId, @Valid @RequestBody User userDetails) throws UserNotFoundException {
@@ -146,7 +140,7 @@ public class UserController {
         User user = userRepository.findById(registrationId)
                 .orElseThrow(() -> new UserNotFoundException(registrationId));
 
-//        update the details of a registration record
+        // Update the details of a registration record
         user.setAddress(userDetails.getAddress());
         user.setName(userDetails.getName());
         user.setEmail(userDetails.getEmail());
@@ -163,8 +157,6 @@ public class UserController {
         return userRepository.save(user);
     }
 
-
-    //    Delete a registration record
     @PreAuthorize("#username == authentication.name or hasAuthority('ADMIN')")
     @PostMapping("/user/delete")
     public void deleteRegistration(@RequestParam String username, HttpServletRequest req, HttpServletResponse response) throws UserNotFoundException, IOException {
@@ -209,7 +201,6 @@ public class UserController {
         }
         LOGGER.info("New user registered with username <" + userForm.getUsername() + "> with authority <" + userRoles + ">");
 
-//        Principal userDetails = req.getUserPrincipal();
         securityService.guestLogin();
         User sessionUser = userRepository.findByUsername("testguest");
         model.addAttribute("sessionUser", sessionUser);
@@ -330,7 +321,7 @@ public class UserController {
             model.addAttribute("sessionUser", sessionUser);
         }
 
-        //Determine if booking as admin
+        // Determine if booking as admin
         User user = null;
         if(isAdmin(sessionUser)){
             user = userRepository.findByUsername(username);
@@ -340,7 +331,6 @@ public class UserController {
         }
         model.addAttribute("user", user);
 
-//        model.addAttribute("user", userSession.getUser());
         return "editProfile.html";
     }
 
@@ -359,7 +349,7 @@ public class UserController {
             model.addAttribute("sessionUser", sessionUser);
         }
 
-        //Determine if booking as admin
+        // Determine if booking as admin
         User user;
 
         if(isAdmin(sessionUser)){
@@ -463,7 +453,7 @@ public class UserController {
             model.addAttribute("sessionUser", sessionUser);
         }
 
-        //Determine if booking as admin
+        // Determine if booking as admin
         User user = null;
         if(isAdmin(sessionUser)){
             user = userRepository.findByUsername(username);
@@ -493,7 +483,7 @@ public class UserController {
             model.addAttribute("sessionUser", sessionUser);
         }
 
-        //Determine if booking as admin
+        // Determine if booking as admin
         User user = null;
         if (isAdmin(sessionUser)) {
             user = userRepository.findByUsername(username);
@@ -517,8 +507,6 @@ public class UserController {
 
         if (bCryptPasswordEncoder.matches(passwordUpdateForm.getCurrentPassword(), user.getPassword()) &&
                 (passwordUpdateForm.getNewPassword().equals(passwordUpdateForm.getPasswordConfirm()))) {
-
-            //TODO create new hashed password here
 
             user.setPassword(bCryptPasswordEncoder.encode(passwordUpdateForm.getNewPassword()));
 
