@@ -3,7 +3,7 @@
 <html lang="en" xmlns:th="http://www.thymeleaf.org">
 
 <head>
-    <title>Administrator View User Profiles</title>
+    <title>View User Profiles</title>
 
     <div th:replace="fragments/header :: header-data"></div>
 </head>
@@ -12,7 +12,7 @@
 
     <nav th:replace="fragments/header :: navigation-bar"></nav>
 
-        <div class="col-lg-12 align-self-center">
+        <div class="align-self-center container">
             <h2>Users</h2>
             <table class="table table-hover table-fixed">
                 <thead>
@@ -20,8 +20,8 @@
                     <th>#</th>
                     <th>Username</th>
                     <th>E-mail</th>
-                    <th>Reservations</th>
                     <th>Profile</th>
+                    <th>Reservations</th>
                 </tr>
                 </thead>
                 <tbody>
@@ -29,8 +29,8 @@
                     <td class="counterCell"></td>
                     <td th:text="${user.getUsername()} "></td>
                     <td th:text="${user.getEmail()} "></td>
-                    <td> <a th:href="@{/getUserReservations/{username}(username = ${user.getUsername()})}" class="btn btn-danger">View Reservations</a></td>
-                    <td> <a th:href="@{/viewProfile/{username}(username = ${user.getUsername()})}" class="btn btn-danger">View Profile</a></td>
+                    <td> <a th:href="@{/viewProfile/{username}(username = ${user.getUsername()})}" class="btn btn-primary">View Profile</a></td>
+                    <td> <a th:href="@{/getUserReservations/{username}(username = ${user.getUsername()})}" class="btn btn-secondary">View Reservations</a></td>
                 </tr>
                 </tbody>
             </table>
