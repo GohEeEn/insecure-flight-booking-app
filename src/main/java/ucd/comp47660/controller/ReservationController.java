@@ -170,7 +170,7 @@ public class ReservationController {
             List<Reservation> cancelled_reservations = reservationRepository.findAllByUserAndCancelledIsTrue(user);
 
             // Loop through each reservation and find the flights associated
-            if (reservations.size() > 0 || cancelled_reservations.size() > 0) {
+            if (!reservations.isEmpty() || !cancelled_reservations.isEmpty()) {
 
                 List<Flight> flights = new ArrayList<>();
                 List<Flight> upcoming = new ArrayList<>();
@@ -220,20 +220,21 @@ public class ReservationController {
             model.addAttribute("error", "No Member logged in");
             return "index.html";
         }
-
-
     }
 
     @PreAuthorize("#username == authentication.name or hasAuthority('ADMIN')")
     @GetMapping("/reservations/cancel/{username}/{id}")
     public void cancelReservation(@PathVariable(value = "username") String username, @PathVariable(value = "id") Long flightID,
-                                  Model model, HttpServletResponse response, HttpServletRequest req) throws ReservationNotFoundException, IOException {
-        User user = null;
+                                  Model model, HttpServletResponse response, HttpServletRequest req) throws IOException {
 
         Principal userDetails = req.getUserPrincipal();
 
-        user = userRepository.findByUsername(username);
+        if(!userValidator.isUserValid(username)) {
+            LOGGER.warn("Suspicious reservation cancellation attempt by user <" + username + "> with invalid GET request URL");
+            return;
+        }
 
+        User user = userRepository.findByUsername(username);
         Flight flight = flightRepository.findFlightByFlightID(flightID);
 
         Reservation reservation = reservationRepository.findByUserAndFlight(user, flight);
@@ -241,6 +242,7 @@ public class ReservationController {
         reservationRepository.saveAndFlush(reservation);
         userRepository.saveAndFlush(user);
         flightRepository.saveAndFlush(flight);
+
         model.addAttribute("user", userRepository.findByUsername(userDetails.getName()));
 
         StringBuilder userRoles = new StringBuilder();
@@ -248,8 +250,7 @@ public class ReservationController {
             userRoles.append(role.getName());
         }
 
-        LOGGER.info("Reservation cancelled with flight id = <" + flightID + "> by user <" + username + "> with the role of <" + userRoles + ">");
-
+        LOGGER.info(String.format("Reservation cancelled with flight id = <%d> by user <%s> with the role of <%s>", flightID, username, userRoles));
         response.sendRedirect("/getUserReservations/" + username);
     }
 
@@ -260,10 +261,8 @@ public class ReservationController {
         LOGGER.info("Beginning Guest cancellation process.");
 
         Principal userDetails = req.getUserPrincipal();
-        userRepository.findByUsername(userDetails.getName());
         User user;
         User sessionUser = null;
-
 
         if (userDetails != null) {
             sessionUser = userRepository.findByUsername(userDetails.getName());
@@ -287,7 +286,6 @@ public class ReservationController {
 
         Guest guest = guestRepository.findByEmail(email);
         LOGGER.info(String.format("Flight ID: '%d', Guest: '%s %s %s'", flight.getFlightID(), guest.getName(), guest.getSurname(), guest.getEmail()));
-
 
         Reservation reservation = reservationRepository.findByGuestAndFlight(guest, flight);
         reservation.setCancelled(true);
@@ -342,10 +340,9 @@ public class ReservationController {
             model.addAttribute("guest", guest);
             model.addAttribute("reservation", reservation);
 
-
             return "viewFlightsGuest.html";
-        } else {
 
+        } else {
             // Keep user on the same page if no reservation found with the provided details
             model.addAttribute("error", "No such reservation found.");
 
@@ -381,14 +378,13 @@ public class ReservationController {
             Reservation reservation = optionalReservation.get();
 
                 if(userDetails.contains("@")){
-                Guest guest = guestRepository.findByEmail(userDetails);
-                reservation.setEmail(guest.getEmail());
-                reservation.setGuest(guest);
-                reservation.setFlight(flight);
-                reservation.setFlight_reference(flight.getFlightID());
+                    Guest guest = guestRepository.findByEmail(userDetails);
+                    reservation.setEmail(guest.getEmail());
+                    reservation.setGuest(guest);
+                    reservation.setFlight(flight);
+                    reservation.setFlight_reference(flight.getFlightID());
 
-                reservationRepository.saveAndFlush(reservation);
-
+                    reservationRepository.saveAndFlush(reservation);
                 }
                 else {
                     User user = userRepository.findByUsername(userDetails);
@@ -398,7 +394,6 @@ public class ReservationController {
                     reservation.setFlight_reference(flight.getFlightID());
 
                     reservationRepository.saveAndFlush(reservation);
-
                 }
             }
         else{
@@ -412,9 +407,7 @@ public class ReservationController {
     @PostMapping("/deleteReservation")
     public void updateReservationInfo(@RequestParam Long reservationID, HttpServletResponse response)
                                                                             throws IOException{
-
         reservationRepository.deleteById(reservationID);
-
         response.sendRedirect("/reservations");
     }
 }
