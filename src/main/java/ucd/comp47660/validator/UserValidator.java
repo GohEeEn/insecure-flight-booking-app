@@ -62,12 +62,12 @@ public class UserValidator implements Validator {
         return isValid(password, PASSWORD_REGEX);
     }
 
-    private boolean isEmailValid(String email){
+    public boolean isEmailValid(String email){
         return EmailValidator.getInstance().isValid(email);
     }
 
-    private boolean isUserValid(String username){
-        return username.matches("^[a-z0-9_-]{6,32}$");
+    public boolean isUserValid(String username){
+        return username.matches(USERNAME_REGEX);
     }
 
     private boolean isValid(String toValidate, String regex){

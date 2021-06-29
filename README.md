@@ -14,6 +14,11 @@ This is the Flight Reservation Web Application repository for UCD BSc Computer S
 - Java 8 or higher version (version 1.8+)
 - Maven
 
+## Project Status
+
+![GitHub](https://img.shields.io/github/license/GohEeEn/insecure-flight-booking-app)
+![CodeQL Analysis](https://github.com/GohEeEn/insecure-flight-booking-app/actions/workflows/codeql-analysis.yml/badge.svg?branch=main)
+
 ## How to run this program
 
 1. Decrypt encrypted sensitive properties
