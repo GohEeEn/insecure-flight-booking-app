@@ -72,6 +72,7 @@ public class JWTAuthorisationFilter extends BasicAuthenticationFilter {
             jwtCookie.setPath("/");
             jwtCookie.setHttpOnly(true);
             jwtCookie.setMaxAge(0);
+            jwtCookie.setSecure(true);
             response.addCookie(jwtCookie);
         }
 
